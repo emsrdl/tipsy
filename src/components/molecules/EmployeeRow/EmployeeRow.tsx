@@ -22,6 +22,7 @@
 import { useTranslation } from 'react-i18next'
 import { Input } from '@/components/atoms/Input/Input'
 import { Icon } from '@/components/atoms/Icon/Icon'
+import { Badge } from '@/components/atoms/Badge/Badge'
 import { Stepper } from '../Stepper/Stepper'
 import { cn } from '@/lib/utils'
 import type { EmployeeRowProps } from './EmployeeRow.types'
@@ -43,16 +44,24 @@ export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, o
     <div className="rounded-xl bg-surface-raised shadow-elevation-1 overflow-hidden">
       {/* Header row: name input + remove button */}
       <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-        <Input
-          value={employee.name}
-          onChange={(e) => onNameChange(employee.id, e.target.value)}
-          placeholder={t('screens:setup.employeeNamePlaceholder')}
-          className="flex-1 min-w-0 text-base h-12 rounded-lg border-border focus-visible:ring-accent"
-          aria-label={t('screens:setup.employeeNameLabel')}
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-        />
+        <div className="flex-1 min-w-0 space-y-1">
+          {employee.isProfileOwner && (
+            <Badge variant="default" className="text-xs bg-accent/10 text-accent border-0 gap-1 w-fit">
+              <Icon name="user" size={10} />
+              {t('common:profile.thisIsYou')}
+            </Badge>
+          )}
+          <Input
+            value={employee.name}
+            onChange={(e) => onNameChange(employee.id, e.target.value)}
+            placeholder={t('screens:setup.employeeNamePlaceholder')}
+            className="w-full text-base h-12 rounded-lg border-border focus-visible:ring-accent"
+            aria-label={t('screens:setup.employeeNameLabel')}
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        </div>
         {/* Remove button */}
         <button
           type="button"

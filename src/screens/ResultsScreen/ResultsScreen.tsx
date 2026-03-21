@@ -8,6 +8,7 @@
  * // Rendered via React Router at route "/calculate/results"
  */
 
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer'
@@ -23,6 +24,7 @@ import { useProfiles } from '@/hooks/useProfiles'
 import { useSmartSplitter } from '@/hooks/useSmartSplitter'
 import { useToast } from '@/context/ToastContext'
 import { useLocale } from '@/hooks/useLocale'
+import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { formatEurFromCents } from '@/config/currency'
 import { SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit'
@@ -47,7 +49,7 @@ export function ResultsScreen() {
   const { locale } = useLocale()
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
 
-  const [isSmartMode] = useLocalStorage('tipsy_smart_mode', true)
+  const [exportOpen, setExportOpen] = useState(false)
   const [threshold] = useLocalStorage<number>(SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD)
 
   const smartOutput = useSmartSplitter(
@@ -57,8 +59,26 @@ export function ResultsScreen() {
     session.denominations
   )
 
+  const { isSmartMode, toggleSmartMode } = smartOutput
+
   const results = session.results ?? []
   const hasResults = results.length > 0
+
+  // When smart mode is on, show actual (smart-adjusted) amounts; otherwise show proportional results
+  const displayResults = isSmartMode && smartOutput.output
+    ? smartOutput.output.distribution.personShares.map((s) => ({
+        employeeId: s.id,
+        name: s.name,
+        group: s.role,
+        hours: s.hoursWorked,
+        amountInCents: s.actualShareInCents,
+      }))
+    : results
+
+  function handleToggleSmartMode() {
+    toggleSmartMode()
+    showToast(t('common:toast.calculationUpdated'), 'info')
+  }
 
   function handleSaveAndFinish() {
     if (!hasResults) return
@@ -93,7 +113,7 @@ export function ResultsScreen() {
     }
 
     addShift(shift)
-    showToast('Schicht gespeichert', 'success')
+    showToast(t('common:toast.shiftSaved'), 'success')
     reset()
     void navigate('/history')
   }
@@ -118,7 +138,43 @@ export function ResultsScreen() {
       ) : (
         <div className="space-y-4">
           {/* Distribution table */}
-          <DistributionTable results={results} totalInCents={totalInCents} />
+          <DistributionTable
+            results={displayResults}
+            totalInCents={totalInCents}
+            {...(isSmartMode && smartOutput.output
+              ? { personShares: smartOutput.output.distribution.personShares }
+              : {})}
+          />
+
+          {/* Smart mode toggle */}
+          <button
+            type="button"
+            onClick={handleToggleSmartMode}
+            className="w-full flex items-center justify-between gap-3 min-h-12 rounded-xl bg-surface-raised shadow-elevation-1 px-4 py-3"
+            aria-pressed={isSmartMode}
+          >
+            <div className="flex items-center gap-3">
+              <div className={cn(
+                'h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0',
+                isSmartMode ? 'bg-accent/10' : 'bg-surface-overlay'
+              )}>
+                <Icon name="zap" size={16} className={isSmartMode ? 'text-accent' : 'text-text-secondary'} />
+              </div>
+              <div className="text-left">
+                <p className={cn('text-sm font-semibold', isSmartMode ? 'text-accent' : 'text-text-primary')}>
+                  {t('common:smartSplit.modeLabel')} — {isSmartMode ? t('common:smartSplit.smart') : t('common:smartSplit.normal')}
+                </p>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  {isSmartMode ? t('common:smartSplit.descSmart') : t('common:smartSplit.descNormal')}
+                </p>
+              </div>
+            </div>
+            <Icon
+              name={isSmartMode ? 'toggle-right' : 'toggle-left'}
+              size={28}
+              className={isSmartMode ? 'text-accent' : 'text-text-secondary'}
+            />
+          </button>
 
           {/* Fairness score (smart mode) */}
           {isSmartMode && fairnessScore !== undefined && (
@@ -162,7 +218,7 @@ export function ResultsScreen() {
                   {t('common:smartSplit.transfers')}
                 </span>
                 <Badge variant="default" className="ml-auto text-xs bg-status-warning/20 text-status-warning border-0">
-                  über {formatEurFromCents(threshold, fmtLocale)} Schwellwert
+                  {t('common:smartSplit.aboveThreshold', { amount: formatEurFromCents(threshold, fmtLocale) })}
                 </Badge>
               </div>
               <div className="divide-y divide-status-warning/10">
@@ -202,33 +258,21 @@ export function ResultsScreen() {
             >
               <Icon name="save" size={18} />
               {isGuestMode
-                ? 'Beenden (nicht gespeichert)'
-                : 'Beenden & Speichern'}
+                ? t('screens:results.finishNoSave')
+                : t('screens:results.saveAndFinish')}
             </Button>
 
-            {/* Export row */}
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 min-h-12"
-                isLoading={isExporting}
-                onClick={() => { exportPdf(results); showToast('PDF heruntergeladen', 'success') }}
-              >
-                <Icon name="file-text" size={16} />
-                {t('common:actions.exportPdf')}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 min-h-12"
-                isLoading={isExporting}
-                onClick={() => { exportCsv(results); showToast('CSV heruntergeladen', 'success') }}
-              >
-                <Icon name="download" size={16} />
-                {t('common:actions.exportCsv')}
-              </Button>
-            </div>
+            {/* Export button */}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full min-h-12"
+              isLoading={isExporting}
+              onClick={() => setExportOpen(true)}
+            >
+              <Icon name="download" size={16} />
+              {t('common:actions.export')}
+            </Button>
           </>
         )}
 
@@ -254,6 +298,16 @@ export function ResultsScreen() {
           </Button>
         </div>
       </div>
+
+      {/* Export dialog */}
+      <ExportDialog
+        isOpen={exportOpen}
+        onClose={() => setExportOpen(false)}
+        context="single"
+        onExportCsv={() => { exportCsv(results); showToast(t('common:toast.csvDownloaded'), 'success') }}
+        onExportPdf={() => { exportPdf(results); showToast(t('common:toast.pdfOpened'), 'success') }}
+        isProcessing={isExporting}
+      />
     </ScreenContainer>
   )
 }

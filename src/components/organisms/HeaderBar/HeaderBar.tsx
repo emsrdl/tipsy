@@ -15,7 +15,7 @@ import { Logo } from '@/components/atoms/Logo/Logo'
 import { Button } from '@/components/atoms/Button/Button'
 import { Icon } from '@/components/atoms/Icon/Icon'
 import { LanguageToggle } from '@/components/molecules/LanguageToggle/LanguageToggle'
-import { ThemeSwitcher } from '../ThemeSwitcher/ThemeSwitcher'
+import { ProfileAvatar } from '@/components/molecules/ProfileAvatar/ProfileAvatar'
 import { useTheme } from '@/hooks/useTheme'
 
 /**
@@ -55,8 +55,8 @@ export function HeaderBar() {
             <Icon name={colorMode === 'light' ? 'moon' : 'sun'} size={18} />
           </Button>
 
-          {/* Theme switcher */}
-          <ThemeSwitcher />
+          {/* Profile avatar with dropdown */}
+          <ProfileAvatar />
         </div>
       </div>
     </header>

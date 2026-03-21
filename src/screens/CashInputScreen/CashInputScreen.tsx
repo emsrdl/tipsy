@@ -37,7 +37,7 @@ export function CashInputScreen() {
 
   function handleReset() {
     DENOMINATIONS.forEach((d) => setDenominationQuantity(d.id, 0))
-    showToast('Bargeld zurückgesetzt', 'info')
+    showToast(t('common:toast.cashReset'), 'info')
   }
 
   return (

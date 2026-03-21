@@ -3,7 +3,8 @@
  * @description React context for the active tip distribution session.
  *
  * Manages the full session state: employees, split config, denomination
- * quantities, and calculated results.
+ * quantities, and calculated results. Persists to sessionStorage so page
+ * reloads during calculation don't lose data.
  *
  * State flows through three steps:
  *   1. Setup → update employees and split
@@ -25,6 +26,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
   type ReactNode,
 } from 'react'
 import type { TipSession, TipSplit, DistributionResult } from '@/types/session'
@@ -33,11 +35,28 @@ import { calculateDistribution } from '@/lib/tipCalculator'
 import { sumDenominations } from '@/lib/denominationParser'
 import { DENOMINATIONS } from '@/config/currency'
 
+const SESSION_STORAGE_KEY = 'tipsy_session'
+
 const DEFAULT_SESSION: TipSession = {
   employees: [],
-  split: { kitchenPercent: 30, servicePercent: 70 },
+  split: { kitchenPercent: 40, servicePercent: 60 },
   denominations: DENOMINATIONS.map((d) => ({ denominationId: d.id, quantity: 0 })),
   results: null,
+}
+
+function loadPersistedSession(): TipSession | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Partial<TipSession>
+    // Validate minimal shape
+    if (!Array.isArray(parsed.employees) || !parsed.split || !Array.isArray(parsed.denominations)) {
+      return null
+    }
+    return parsed as TipSession
+  } catch {
+    return null
+  }
 }
 
 export interface TipSessionContextValue {
@@ -51,6 +70,8 @@ export interface TipSessionContextValue {
   setDenominationQuantity: (denominationId: string, quantity: number) => void
   calculate: () => DistributionResult[]
   reset: () => void
+  /** Whether session was restored from sessionStorage on mount. */
+  wasRestored: boolean
 }
 
 const TipSessionContext = createContext<TipSessionContextValue | null>(null)
@@ -63,11 +84,24 @@ interface TipSessionProviderProps {
 
 /**
  * Provides tip session state and mutation actions to the component tree.
+ * Persists session to sessionStorage on every change for reload recovery.
  */
 export function TipSessionProvider({ children, initialSession }: TipSessionProviderProps) {
-  const [session, setSession] = useState<TipSession>(initialSession ?? DEFAULT_SESSION)
+  const persisted = !initialSession ? loadPersistedSession() : null
+  const [session, setSession] = useState<TipSession>(initialSession ?? persisted ?? DEFAULT_SESSION)
+  const [wasRestored] = useState(() => persisted !== null && !initialSession)
 
   const totalInCents = sumDenominations(session.denominations, DENOMINATIONS)
+
+  // Persist to sessionStorage on every change (skip in test environments)
+  useEffect(() => {
+    if (initialSession !== undefined) return // don't persist test sessions
+    try {
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session))
+    } catch {
+      // sessionStorage unavailable (private browsing restriction)
+    }
+  }, [session, initialSession])
 
   const addEmployee = useCallback((employee: Employee) => {
     setSession((s) => ({ ...s, results: null, employees: [...s.employees, employee] }))
@@ -114,6 +148,11 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
   }, [totalInCents, session.employees, session.split])
 
   const reset = useCallback(() => {
+    try {
+      sessionStorage.removeItem(SESSION_STORAGE_KEY)
+    } catch {
+      // ignore
+    }
     setSession(DEFAULT_SESSION)
   }, [])
 
@@ -129,6 +168,7 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
         setDenominationQuantity,
         calculate,
         reset,
+        wasRestored,
       }}
     >
       {children}

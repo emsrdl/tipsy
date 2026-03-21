@@ -33,11 +33,15 @@
     "deleteProfile": "Profil löschen",
     "resetStats": "Statistiken zurücksetzen",
     "guestMode": "Gastmodus",
-    "exitGuestMode": "Gastmodus beenden"
+    "exitGuestMode": "Gastmodus beenden",
+    "signOut": "Abmelden",
+    "export": "Exportieren",
+    "import": "Importieren"
   },
   "profile": {
     "guest": "Gast",
     "guestBadge": "Gast Modus",
+    "thisIsYou": "Das bist du",
     "role": {
       "kitchen": "Küche",
       "service": "Service"
@@ -46,19 +50,80 @@
       "totalShifts": "Schichten gesamt",
       "totalTips": "Trinkgeld gesamt",
       "hourlyAvg": "⌀ Stundensatz"
-    }
+    },
+    "headerMenu": {
+      "editProfile": "Profil bearbeiten",
+      "switchProfile": "Profil wechseln",
+      "signOut": "Abmelden",
+      "settings": "Einstellungen"
+    },
+    "noShiftsGuest": "Keine Schichten (Gast Modus)",
+    "noShiftsGuestSub": "Wechsle zu einem Profil, um Schichten zu speichern.",
+    "deleteWithShifts_one": "Profil und {{count}} Schicht löschen?",
+    "deleteWithShifts_other": "Profil und {{count}} Schichten löschen?",
+    "deleteWithShiftsInfo_one": "Dies kann nicht rückgängig gemacht werden. {{count}} Schicht wird gelöscht.",
+    "deleteWithShiftsInfo_other": "Dies kann nicht rückgängig gemacht werden. {{count}} Schichten werden gelöscht."
   },
   "smartSplit": {
     "normal": "Normal",
     "smart": "Smart",
     "modeLabel": "Verteilungsmodus",
-    "threshold": "Schwellenwert",
+    "threshold": "Schwellwert",
+    "thresholdDefault": "Standard Ausgleichsschwellwert",
     "fairnessScore": "Fairness-Score",
     "deviation": "Abweichung",
     "transfers": "Ausgleichszahlungen",
     "noTransfers": "Keine Ausgleichszahlungen nötig",
     "transferFrom": "{{from}} zahlt {{amount}} an {{to}}",
-    "remaining": "Restbetrag"
+    "remaining": "Restbetrag",
+    "descSmart": "Optimiert Münzen & Scheine Nutzung",
+    "descNormal": "Proportionale Verteilung",
+    "helpClose": "Schließen",
+    "helpWhat": "Was ist das?",
+    "helpText": "Ausgleichszahlungen werden vorgeschlagen, wenn die Abweichung diesen Betrag überschreitet.",
+    "aboveThreshold": "über {{amount}} Schwellwert"
+  },
+  "toast": {
+    "shiftSaved": "Schicht gespeichert",
+    "shiftDeleted": "Schicht gelöscht",
+    "profileSaved": "Profil gespeichert",
+    "profileCreated": "Profil erstellt",
+    "profileDeleted": "Profil gelöscht",
+    "profileDeletedWithShifts_one": "Profil gelöscht, {{count}} Schicht entfernt",
+    "profileDeletedWithShifts_other": "Profil gelöscht, {{count}} Schichten entfernt",
+    "statsReset": "Statistiken zurückgesetzt",
+    "historyCleared": "Verlauf gelöscht",
+    "backupExported": "Backup exportiert",
+    "csvExported": "CSV exportiert",
+    "pdfExported": "PDF exportiert",
+    "importSuccess": "{{added}} Schichten importiert",
+    "importPartial": "{{added}} Schichten importiert, {{skipped}} übersprungen",
+    "importFailed": "Import fehlgeschlagen",
+    "sessionRestored": "Schicht wiederhergestellt",
+    "cashReset": "Bargeld zurückgesetzt",
+    "calculationUpdated": "Berechnung aktualisiert",
+    "backupDownloaded": "Backup heruntergeladen",
+    "csvDownloaded": "CSV heruntergeladen",
+    "pdfOpened": "PDF wird geöffnet"
+  },
+  "history": {
+    "totalAllTime": "Gesamt aller Schichten",
+    "shiftsCount_one": "{{count}} Schicht",
+    "shiftsCount_other": "{{count}} Schichten",
+    "avgPerShift": "⌀ pro Schicht",
+    "perWeek": "Pro Woche",
+    "perDay": "Pro Tag",
+    "hourlyRate": "Stundensatz",
+    "chartTips": "Trinkgeld (€)",
+    "chartHourly": "Stundensatz (€/h)",
+    "shifts": "Schichten",
+    "clearAll": "Verlauf löschen",
+    "clearConfirm": "Alle Schichten wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
+    "importBackup": "Backup importieren",
+    "deleteShift": "Schicht löschen",
+    "smartSplitTag": "Smart Split",
+    "employees_one": "{{count}} Mitarbeiter",
+    "employees_other": "{{count}} Mitarbeiter"
   },
   "theme": {
     "tipsy": "Tipsy",

@@ -42,7 +42,15 @@
     "idealColumn": "Ideal",
     "actualColumn": "Actual",
     "transfersTitle": "Balance transfers",
-    "noTransfersNeeded": "No balance transfers needed."
+    "noTransfersNeeded": "No balance transfers needed.",
+    "saveAndFinish": "Finish & Save",
+    "finishNoSave": "Finish (not saved)"
+  },
+  "settings": {
+    "sectionProfiles": "Profiles",
+    "sectionAppearance": "Appearance",
+    "accentColor": "Accent colour",
+    "smartSplitDesc": "Balance transfers are suggested when the deviation exceeds this amount."
   },
   "profile": {
     "title": "Profile",
@@ -59,6 +67,7 @@
     "title": "Shifts",
     "subtitle": "Your tip distribution history.",
     "noShifts": "No shifts saved yet.",
+    "noShiftsSub": "Calculate a shift and save it to see it here.",
     "shiftDate": "Date",
     "shiftTotal": "Total",
     "shiftEmployees": "Employees",

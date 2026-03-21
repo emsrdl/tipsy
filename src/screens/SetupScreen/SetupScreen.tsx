@@ -4,12 +4,13 @@
  *
  * Step 1 of 3 in the calculation flow.
  * Includes: profile selector, employee list, split slider, smart split toggle.
+ * Auto-adds the active profile as the first employee.
  *
  * @example
  * // Rendered via React Router at route "/calculate"
  */
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer'
@@ -18,11 +19,14 @@ import { ProfileSelector } from '@/components/organisms/ProfileSelector/ProfileS
 import { Button } from '@/components/atoms/Button/Button'
 import { Icon } from '@/components/atoms/Icon/Icon'
 import { useTipCalculator } from '@/hooks/useTipCalculator'
+import { useProfiles } from '@/hooks/useProfiles'
 import { useToast } from '@/context/ToastContext'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { SMART_SPLIT_ENABLED, SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit'
-import { formatEurFromCents } from '@/config/currency'
 import { cn } from '@/lib/utils'
+
+/** Prefix used to identify profile-owned employees. */
+const PROFILE_EMP_PREFIX = 'profile-emp-'
 
 /**
  * Setup screen — step 1 of 3.
@@ -30,7 +34,8 @@ import { cn } from '@/lib/utils'
 export function SetupScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors'])
   const navigate = useNavigate()
-  const { session } = useTipCalculator()
+  const { session, addEmployee, removeEmployee, updateEmployee, wasRestored } = useTipCalculator()
+  const { activeProfile, isGuestMode } = useProfiles()
   const { showToast } = useToast()
   const [showSmartHelp, setShowSmartHelp] = useState(false)
 
@@ -40,9 +45,85 @@ export function SetupScreen() {
     DEFAULT_FAIRNESS_THRESHOLD
   )
 
+  // Custom threshold input state (in euros for display, stored as cents)
+  const [thresholdInputValue, setThresholdInputValue] = useState(
+    (threshold / 100).toFixed(2)
+  )
+  const thresholdInputRef = useRef<HTMLInputElement>(null)
+
   const hasEmployees = session.employees.length > 0
   const splitValid = session.split.kitchenPercent + session.split.servicePercent === 100
   const canContinue = hasEmployees && splitValid
+
+  // Show session restore toast once on mount
+  const hasShownRestoreToast = useRef(false)
+  useEffect(() => {
+    if (wasRestored && !hasShownRestoreToast.current) {
+      hasShownRestoreToast.current = true
+      showToast(t('common:toast.sessionRestored'), 'info')
+    }
+  }, [wasRestored, showToast, t])
+
+  // Auto-add/update/remove the profile employee when active profile changes
+  useEffect(() => {
+    if (isGuestMode || !activeProfile) {
+      // Remove any profile-owned employee when entering guest mode
+      const profileEmp = session.employees.find((e) => e.id.startsWith(PROFILE_EMP_PREFIX))
+      if (profileEmp) removeEmployee(profileEmp.id)
+      return
+    }
+
+    const profileEmpId = `${PROFILE_EMP_PREFIX}${activeProfile.id}`
+
+    // Remove stale profile employee (from a previously active profile)
+    const staleProfileEmp = session.employees.find(
+      (e) => e.id.startsWith(PROFILE_EMP_PREFIX) && e.id !== profileEmpId
+    )
+    if (staleProfileEmp) removeEmployee(staleProfileEmp.id)
+
+    // Add or sync the current profile employee
+    const existing = session.employees.find((e) => e.id === profileEmpId)
+    if (!existing) {
+      addEmployee({
+        id: profileEmpId,
+        name: activeProfile.name,
+        hours: 8,
+        group: activeProfile.role,
+        isProfileOwner: true,
+      })
+    } else if (
+      existing.name !== activeProfile.name ||
+      existing.group !== activeProfile.role ||
+      !existing.isProfileOwner
+    ) {
+      updateEmployee(profileEmpId, {
+        name: activeProfile.name,
+        group: activeProfile.role,
+        isProfileOwner: true,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProfile?.id, activeProfile?.name, activeProfile?.role, isGuestMode])
+
+  function handleThresholdInputChange(value: string) {
+    setThresholdInputValue(value)
+    const parsed = parseFloat(value.replace(',', '.'))
+    if (!isNaN(parsed) && parsed >= 0.5 && parsed <= 50) {
+      setThreshold(Math.round(parsed * 100))
+    }
+  }
+
+  function handleThresholdInputBlur() {
+    const parsed = parseFloat(thresholdInputValue.replace(',', '.'))
+    if (isNaN(parsed) || parsed < 0.5) {
+      setThresholdInputValue((DEFAULT_FAIRNESS_THRESHOLD / 100).toFixed(2))
+      setThreshold(DEFAULT_FAIRNESS_THRESHOLD)
+    } else {
+      const clamped = Math.min(Math.max(parsed, 0.5), 50)
+      setThresholdInputValue(clamped.toFixed(2))
+      setThreshold(Math.round(clamped * 100))
+    }
+  }
 
   function handleNext() {
     if (!canContinue) {
@@ -88,8 +169,8 @@ export function SetupScreen() {
               </p>
               <p className="text-xs text-text-secondary mt-0.5">
                 {isSmartMode
-                  ? 'Optimiert Münzen & Scheine Nutzung'
-                  : 'Proportionale Verteilung'}
+                  ? t('common:smartSplit.descSmart')
+                  : t('common:smartSplit.descNormal')}
               </p>
             </div>
           </div>
@@ -100,44 +181,43 @@ export function SetupScreen() {
           />
         </button>
 
-        {/* Threshold (shown when smart mode is on) */}
+        {/* Threshold — shown when smart mode is on */}
         {isSmartMode && (
           <div className="pt-2 border-t border-border space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-text-secondary">
-                {t('common:smartSplit.threshold')}: {formatEurFromCents(threshold, 'de-DE')}
-              </span>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-1">
+                <span className="text-xs font-medium text-text-secondary whitespace-nowrap">
+                  {t('common:smartSplit.threshold')}:
+                </span>
+                <div className="flex items-center gap-1">
+                  <input
+                    ref={thresholdInputRef}
+                    type="number"
+                    inputMode="decimal"
+                    min="0.50"
+                    max="50"
+                    step="0.50"
+                    value={thresholdInputValue}
+                    onChange={(e) => handleThresholdInputChange(e.target.value)}
+                    onBlur={handleThresholdInputBlur}
+                    className="w-20 h-9 px-2 rounded-lg bg-surface-overlay text-sm font-mono text-text-primary border border-border focus:outline-none focus:border-accent text-center"
+                  />
+                  <span className="text-sm text-text-secondary">€</span>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowSmartHelp(!showSmartHelp)}
-                className="text-xs text-accent underline"
+                className="text-xs text-accent underline whitespace-nowrap"
               >
-                {showSmartHelp ? 'Schließen' : 'Was ist das?'}
+                {showSmartHelp ? t('common:smartSplit.helpClose') : t('common:smartSplit.helpWhat')}
               </button>
             </div>
             {showSmartHelp && (
               <p className="text-xs text-text-secondary bg-surface-overlay rounded-lg p-3">
-                Ausgleichszahlungen werden vorgeschlagen, wenn die Abweichung diesen Betrag überschreitet.
+                {t('common:smartSplit.helpText')}
               </p>
             )}
-            {/* Threshold quick-select */}
-            <div className="flex gap-2 flex-wrap">
-              {[200, 500, 1000, 2000].map((val) => (
-                <button
-                  key={val}
-                  type="button"
-                  onClick={() => setThreshold(val)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
-                    threshold === val
-                      ? 'bg-accent text-accent-foreground'
-                      : 'bg-surface-overlay text-text-secondary hover:bg-accent-subtle'
-                  )}
-                >
-                  {formatEurFromCents(val, 'de-DE')}
-                </button>
-              ))}
-            </div>
           </div>
         )}
       </div>

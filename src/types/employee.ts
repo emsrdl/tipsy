@@ -27,4 +27,6 @@ export interface Employee {
   hours: number
   /** Which tip pool this employee draws from. */
   group: EmployeeGroup
+  /** Whether this employee was auto-added from the active profile. */
+  isProfileOwner?: boolean
 }

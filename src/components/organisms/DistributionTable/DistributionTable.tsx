@@ -12,6 +12,7 @@
  * <DistributionTable results={session.results} totalInCents={totalInCents} />
  */
 
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { Icon } from '@/components/atoms/Icon/Icon'
@@ -19,10 +20,13 @@ import { formatEurFromCents } from '@/config/currency'
 import { useLocale } from '@/hooks/useLocale'
 import { cn } from '@/lib/utils'
 import type { DistributionResult } from '@/types/session'
+import type { PersonShare } from '@/types/shift'
 
 export interface DistributionTableProps {
   results: DistributionResult[]
   totalInCents: number
+  /** Optional smart-split person shares — enables expandable cards with ideal/actual/deviation. */
+  personShares?: PersonShare[]
 }
 
 /**
@@ -34,10 +38,11 @@ export interface DistributionTableProps {
  * @example
  * <DistributionTable results={results} totalInCents={10000} />
  */
-export function DistributionTable({ results, totalInCents }: DistributionTableProps) {
+export function DistributionTable({ results, totalInCents, personShares }: DistributionTableProps) {
   const { t } = useTranslation(['common', 'screens'])
   const { locale } = useLocale()
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const kitchenResults = results.filter((r) => r.group === 'kitchen')
   const serviceResults = results.filter((r) => r.group === 'service')
@@ -79,30 +84,92 @@ export function DistributionTable({ results, totalInCents }: DistributionTablePr
           const perHour = r.hours > 0
             ? formatEurFromCents(Math.round(r.amountInCents / r.hours), fmtLocale)
             : null
+          const share = personShares?.find((s) => s.id === r.employeeId)
+          const isExpandable = share !== undefined
+          const isExpanded = expandedId === r.employeeId
 
           return (
             <div
               key={r.employeeId}
-              className={cn(
-                'rounded-xl bg-surface-raised shadow-elevation-1 px-4 py-3',
-                'flex items-center justify-between gap-4'
-              )}
+              className="rounded-xl bg-surface-raised shadow-elevation-1 overflow-hidden"
             >
-              <div className="min-w-0">
-                <p className="font-semibold text-text-primary text-base truncate">{r.name}</p>
-                <p className="text-sm text-text-secondary mt-0.5 flex items-center gap-1">
-                  <Icon name="clock" size={12} />
-                  {r.hours}h
-                  {perHour && (
-                    <span className="ml-1">· {perHour}/h</span>
+              {/* Card header row */}
+              {isExpandable ? (
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(isExpanded ? null : r.employeeId)}
+                  className="w-full flex items-center justify-between gap-4 px-4 py-3 hover:bg-surface-overlay transition-colors"
+                >
+                  <div className="min-w-0 text-left">
+                    <p className="font-semibold text-text-primary text-base truncate">{r.name}</p>
+                    <p className="text-sm text-text-secondary mt-0.5 flex items-center gap-1">
+                      <Icon name="clock" size={12} />
+                      {r.hours}h
+                      {perHour && (
+                        <span className="ml-1">· {perHour}/h</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <p className="text-xl font-bold font-mono text-text-primary">
+                      {formatEurFromCents(r.amountInCents, fmtLocale)}
+                    </p>
+                    <Icon
+                      name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                      size={16}
+                      className="text-text-secondary"
+                    />
+                  </div>
+                </button>
+              ) : (
+                <div className="flex items-center justify-between gap-4 px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-text-primary text-base truncate">{r.name}</p>
+                    <p className="text-sm text-text-secondary mt-0.5 flex items-center gap-1">
+                      <Icon name="clock" size={12} />
+                      {r.hours}h
+                      {perHour && (
+                        <span className="ml-1">· {perHour}/h</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 text-right">
+                    <p className="text-xl font-bold font-mono text-text-primary">
+                      {formatEurFromCents(r.amountInCents, fmtLocale)}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Expanded detail */}
+              {isExpandable && isExpanded && share && (
+                <div className="border-t border-border px-4 py-3 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-text-secondary">{t('screens:results.idealColumn')}</span>
+                    <span className="font-mono text-text-primary">
+                      {formatEurFromCents(share.idealShareInCents, fmtLocale)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-text-secondary">{t('screens:results.actualColumn')}</span>
+                    <span className="font-mono font-semibold text-text-primary">
+                      {formatEurFromCents(share.actualShareInCents, fmtLocale)}
+                    </span>
+                  </div>
+                  {share.deviationInCents !== 0 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-text-secondary">{t('screens:results.deviationColumn')}</span>
+                      <span className={cn(
+                        'font-mono font-semibold',
+                        share.deviationInCents > 0 ? 'text-status-success' : 'text-status-error'
+                      )}>
+                        {share.deviationInCents > 0 ? '+' : ''}
+                        {formatEurFromCents(share.deviationInCents, fmtLocale)}
+                      </span>
+                    </div>
                   )}
-                </p>
-              </div>
-              <div className="flex-shrink-0 text-right">
-                <p className="text-xl font-bold font-mono text-text-primary">
-                  {formatEurFromCents(r.amountInCents, fmtLocale)}
-                </p>
-              </div>
+                </div>
+              )}
             </div>
           )
         })}

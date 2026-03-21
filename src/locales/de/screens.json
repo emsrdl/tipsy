@@ -42,7 +42,15 @@
     "idealColumn": "Ideal",
     "actualColumn": "Tatsächlich",
     "transfersTitle": "Ausgleichszahlungen",
-    "noTransfersNeeded": "Keine Ausgleichszahlungen nötig."
+    "noTransfersNeeded": "Keine Ausgleichszahlungen nötig.",
+    "saveAndFinish": "Beenden & Speichern",
+    "finishNoSave": "Beenden (nicht gespeichert)"
+  },
+  "settings": {
+    "sectionProfiles": "Profile",
+    "sectionAppearance": "Darstellung",
+    "accentColor": "Akzentfarbe",
+    "smartSplitDesc": "Ausgleichszahlungen werden ab diesem Betrag vorgeschlagen."
   },
   "profile": {
     "title": "Profil",
@@ -59,6 +67,7 @@
     "title": "Schichten",
     "subtitle": "Verlauf deiner Trinkgeldverteilungen.",
     "noShifts": "Noch keine Schichten gespeichert.",
+    "noShiftsSub": "Berechne eine Schicht und speichere sie, um sie hier zu sehen.",
     "shiftDate": "Datum",
     "shiftTotal": "Gesamt",
     "shiftEmployees": "Mitarbeiter",

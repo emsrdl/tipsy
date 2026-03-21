@@ -2,11 +2,7 @@
  * @file src/screens/HistoryScreen/HistoryScreen.tsx
  * @description History screen — shift history with recharts graphs and import/export.
  *
- * Shows:
- * - Bar/line chart of tips per week or per day
- * - Scrollable list of past shifts
- * - Import/export backup buttons
- * - Clear history button with confirmation
+ * Shows only shifts for the active profile (or guest message if in guest mode).
  *
  * @example
  * // Rendered via React Router at route "/history"
@@ -14,6 +10,8 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog'
+import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog'
 import {
   BarChart,
   Bar,
@@ -31,6 +29,7 @@ import { Icon } from '@/components/atoms/Icon/Icon'
 import { useShifts } from '@/hooks/useShifts'
 import { useImportExport } from '@/hooks/useImportExport'
 import { useLocale } from '@/hooks/useLocale'
+import { useProfiles } from '@/hooks/useProfiles'
 import { useToast } from '@/context/ToastContext'
 import { formatEurFromCents } from '@/config/currency'
 import { cn } from '@/lib/utils'
@@ -38,7 +37,7 @@ import type { Shift } from '@/types/shift'
 
 type GraphMode = 'week' | 'day' | 'hourly'
 
-/** Groups shifts by ISO week key (YYYY-Www). */
+/** Groups shifts by ISO week key (KWxx). */
 function groupByWeek(shifts: Shift[]): { label: string; totalCents: number }[] {
   const map = new Map<string, number>()
   for (const shift of shifts) {
@@ -54,7 +53,7 @@ function groupByWeek(shifts: Shift[]): { label: string; totalCents: number }[] {
     .map(([label, totalCents]) => ({ label, totalCents }))
 }
 
-/** Groups shifts by date (YYYY-MM-DD). */
+/** Groups shifts by date (MM-DD). */
 function groupByDay(shifts: Shift[]): { label: string; totalCents: number }[] {
   const map = new Map<string, number>()
   for (const shift of shifts) {
@@ -63,22 +62,20 @@ function groupByDay(shifts: Shift[]): { label: string; totalCents: number }[] {
   }
   return Array.from(map.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .slice(-14) // last 14 days
-    .map(([label, totalCents]) => ({ label: label.slice(5), totalCents })) // MM-DD
+    .slice(-14)
+    .map(([label, totalCents]) => ({ label: label.slice(5), totalCents }))
 }
 
-/** Average hourly rate per shift. */
+/** Average hourly rate per shift (last 10). */
 function groupByHourly(shifts: Shift[]): { label: string; totalCents: number }[] {
-  return shifts
-    .slice(-10)
-    .map((shift) => {
-      const totalHours = shift.employees.reduce((s, e) => s + e.hours, 0)
-      const ratePerHour = totalHours > 0 ? Math.round(shift.totalTipsInCents / totalHours) : 0
-      return {
-        label: (shift.date.split('T')[0] ?? '').slice(5),
-        totalCents: ratePerHour,
-      }
-    })
+  return shifts.slice(-10).map((shift) => {
+    const totalHours = shift.employees.reduce((s, e) => s + e.hours, 0)
+    const ratePerHour = totalHours > 0 ? Math.round(shift.totalTipsInCents / totalHours) : 0
+    return {
+      label: (shift.date.split('T')[0] ?? '').slice(5),
+      totalCents: ratePerHour,
+    }
+  })
 }
 
 function centsToEur(cents: number): number {
@@ -86,13 +83,14 @@ function centsToEur(cents: number): number {
 }
 
 /**
- * History screen with charts and shift list.
+ * History screen with charts, profile-filtered shift list, and import/export.
  */
 export function HistoryScreen() {
   const { t } = useTranslation(['common', 'screens'])
-  const { shifts, deleteShift, clearHistory } = useShifts()
+  const { shifts: allShifts, deleteShift, clearHistory } = useShifts()
   const { exportCsv, exportPdf, exportJson, importJson, isProcessing } = useImportExport()
   const { locale } = useLocale()
+  const { activeProfile, isGuestMode } = useProfiles()
   const { showToast } = useToast()
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -101,6 +99,14 @@ export function HistoryScreen() {
   const [expandedShiftId, setExpandedShiftId] = useState<string | null>(null)
   const [confirmClear, setConfirmClear] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
+
+  // Filter shifts by active profile
+  const shifts = isGuestMode
+    ? []
+    : activeProfile
+    ? allShifts.filter((s) => s.profileId === activeProfile.id)
+    : allShifts
 
   const graphData = graphMode === 'week'
     ? groupByWeek(shifts)
@@ -118,25 +124,46 @@ export function HistoryScreen() {
       const json = ev.target?.result as string
       const result = importJson(json)
       if (result.errors.length > 0) {
-        showToast('Import fehlgeschlagen: ' + result.errors[0], 'error')
+        showToast(t('common:toast.importFailed') + ': ' + result.errors[0], 'error')
+      } else if (result.skipped > 0) {
+        showToast(t('common:toast.importPartial', { added: result.added, skipped: result.skipped }), 'success')
       } else {
-        showToast(`${result.added} Schichten importiert, ${result.skipped} übersprungen`, 'success')
+        showToast(t('common:toast.importSuccess', { added: result.added }), 'success')
       }
     }
     reader.readAsText(file)
     e.target.value = ''
-  }, [importJson, showToast])
+  }, [importJson, showToast, t])
 
   function handleClearHistory() {
     clearHistory()
     setConfirmClear(false)
-    showToast('Verlauf gelöscht', 'info')
+    showToast(t('common:toast.historyCleared'), 'info')
   }
 
   function handleDeleteShift(id: string) {
     deleteShift(id)
     setConfirmDeleteId(null)
-    showToast('Schicht gelöscht', 'info')
+    showToast(t('common:toast.shiftDeleted'), 'info')
+  }
+
+  // Guest mode empty state
+  if (isGuestMode) {
+    return (
+      <ScreenContainer title={t('screens:shifts.title')} subtitle={t('screens:shifts.subtitle')}>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="h-20 w-20 rounded-full bg-surface-overlay flex items-center justify-center mb-4">
+            <Icon name="user" size={32} className="text-text-secondary" />
+          </div>
+          <p className="text-base font-semibold text-text-primary mb-1">
+            {t('common:profile.noShiftsGuest')}
+          </p>
+          <p className="text-sm text-text-secondary mb-6">
+            {t('common:profile.noShiftsGuestSub')}
+          </p>
+        </div>
+      </ScreenContainer>
+    )
   }
 
   return (
@@ -151,9 +178,8 @@ export function HistoryScreen() {
             {t('screens:shifts.noShifts')}
           </p>
           <p className="text-sm text-text-secondary mb-6">
-            Berechne eine Schicht und speichere sie, um sie hier zu sehen.
+            {t('screens:shifts.noShiftsSub')}
           </p>
-          {/* Import option even when empty */}
           <Button
             type="button"
             variant="outline"
@@ -161,7 +187,7 @@ export function HistoryScreen() {
             className="gap-2"
           >
             <Icon name="upload" size={16} />
-            Backup importieren
+            {t('common:history.importBackup')}
           </Button>
         </div>
       ) : (
@@ -170,15 +196,19 @@ export function HistoryScreen() {
           <div className="rounded-xl bg-accent shadow-elevation-2 p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-accent-foreground/80">Gesamt aller Schichten</p>
+                <p className="text-sm font-medium text-accent-foreground/80">
+                  {t('common:history.totalAllTime')}
+                </p>
                 <p className="text-2xl font-bold font-mono text-accent-foreground">
                   {formatEurFromCents(totalAllTime, fmtLocale)}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium text-accent-foreground/80">{shifts.length} Schichten</p>
+                <p className="text-sm font-medium text-accent-foreground/80">
+                  {t('common:history.shiftsCount_other', { count: shifts.length })}
+                </p>
                 <p className="text-xs text-accent-foreground/60 mt-0.5">
-                  ⌀ {formatEurFromCents(shifts.length > 0 ? Math.round(totalAllTime / shifts.length) : 0, fmtLocale)}/Schicht
+                  ⌀ {formatEurFromCents(shifts.length > 0 ? Math.round(totalAllTime / shifts.length) : 0, fmtLocale)}/{t('common:history.avgPerShift')}
                 </p>
               </div>
             </div>
@@ -187,9 +217,9 @@ export function HistoryScreen() {
           {/* Graph mode selector */}
           <div className="flex gap-2">
             {([
-              { key: 'week', label: 'Pro Woche' },
-              { key: 'day',  label: 'Pro Tag' },
-              { key: 'hourly', label: 'Stundensatz' },
+              { key: 'week',   label: t('common:history.perWeek') },
+              { key: 'day',    label: t('common:history.perDay') },
+              { key: 'hourly', label: t('common:history.hourlyRate') },
             ] as { key: GraphMode; label: string }[]).map(({ key, label }) => (
               <button
                 key={key}
@@ -211,7 +241,7 @@ export function HistoryScreen() {
           {graphData.length > 0 && (
             <div className="rounded-xl bg-surface-raised shadow-elevation-1 p-4">
               <p className="text-xs font-medium text-text-secondary mb-3">
-                {graphMode === 'hourly' ? 'Stundensatz (€/h)' : 'Trinkgeld (€)'}
+                {graphMode === 'hourly' ? t('common:history.chartHourly') : t('common:history.chartTips')}
               </p>
               <div className="h-40">
                 <ResponsiveContainer width="100%" height="100%">
@@ -245,7 +275,7 @@ export function HistoryScreen() {
 
           {/* Shift list */}
           <div className="space-y-2">
-            <p className="text-xs font-medium text-text-secondary px-1">Schichten</p>
+            <p className="text-xs font-medium text-text-secondary px-1">{t('common:history.shifts')}</p>
             {shifts.map((shift) => {
               const isExpanded = expandedShiftId === shift.id
               const date = new Date(shift.date).toLocaleDateString(fmtLocale, {
@@ -265,8 +295,8 @@ export function HistoryScreen() {
                       <div className="text-left">
                         <p className="text-sm font-semibold text-text-primary">{date}</p>
                         <p className="text-xs text-text-secondary">
-                          {shift.employees.length} Mitarbeiter
-                          {shift.smartSplitting && ' · Smart Split'}
+                          {t('common:history.employees_other', { count: shift.employees.length })}
+                          {shift.smartSplitting && ` · ${t('common:history.smartSplitTag')}`}
                         </p>
                       </div>
                     </div>
@@ -307,35 +337,18 @@ export function HistoryScreen() {
                           </div>
                         ))}
                       </div>
+
                       {/* Delete shift */}
                       <div className="px-4 py-3 border-t border-border">
-                        {confirmDeleteId === shift.id ? (
-                          <div className="flex gap-2">
-                            <p className="text-xs text-text-secondary flex-1 flex items-center">
-                              {t('screens:shifts.deleteConfirm')}
-                            </p>
-                            <Button type="button" variant="ghost" onClick={() => setConfirmDeleteId(null)} className="min-h-9 px-3 text-xs">
-                              {t('common:actions.cancel')}
-                            </Button>
-                            <Button
-                              type="button"
-                              onClick={() => handleDeleteShift(shift.id)}
-                              className="min-h-9 px-3 text-xs bg-status-error hover:bg-status-error/90"
-                            >
-                              {t('common:actions.delete')}
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => setConfirmDeleteId(shift.id)}
-                            className="min-h-9 text-xs gap-1.5 text-status-error hover:text-status-error"
-                          >
-                            <Icon name="trash" size={12} />
-                            {t('screens:shifts.deleteConfirm').split('?')[0]}
-                          </Button>
-                        )}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => setConfirmDeleteId(shift.id)}
+                          className="min-h-9 text-xs gap-1.5 text-status-error hover:text-status-error"
+                        >
+                          <Icon name="trash" size={12} />
+                          {t('common:history.deleteShift')}
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -346,84 +359,39 @@ export function HistoryScreen() {
 
           {/* Clear history */}
           <div className="pt-2">
-            {confirmClear ? (
-              <div className="rounded-xl bg-status-error/10 p-4 space-y-3">
-                <p className="text-sm text-text-primary font-medium">
-                  Alle Schichten wirklich löschen? Dies kann nicht rückgängig gemacht werden.
-                </p>
-                <div className="flex gap-2">
-                  <Button type="button" variant="ghost" onClick={() => setConfirmClear(false)} className="flex-1 min-h-10">
-                    {t('common:actions.cancel')}
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={handleClearHistory}
-                    className="flex-1 min-h-10 bg-status-error hover:bg-status-error/90"
-                  >
-                    <Icon name="trash" size={14} />
-                    {t('common:actions.delete')}
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setConfirmClear(true)}
-                className="w-full min-h-12 text-status-error hover:text-status-error gap-2"
-              >
-                <Icon name="trash" size={16} />
-                Verlauf löschen
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setConfirmClear(true)}
+              className="w-full min-h-12 text-status-error hover:text-status-error gap-2"
+            >
+              <Icon name="trash" size={16} />
+              {t('common:history.clearAll')}
+            </Button>
           </div>
         </div>
       )}
 
       {/* Import / Export actions — always shown */}
-      <div className="mt-4 space-y-3 pt-4 border-t border-border">
-        <p className="text-xs font-medium text-text-secondary">{t('screens:importExport.title')}</p>
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            isLoading={isProcessing}
-            onClick={() => { exportJson(); showToast('Backup heruntergeladen', 'success') }}
-            className="min-h-12 text-sm gap-2"
-          >
-            <Icon name="download" size={14} />
-            {t('common:actions.exportJson')}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            className="min-h-12 text-sm gap-2"
-          >
-            <Icon name="upload" size={14} />
-            {t('common:actions.importJson')}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            isLoading={isProcessing}
-            onClick={() => { exportCsv(); showToast('CSV heruntergeladen', 'success') }}
-            className="min-h-12 text-sm gap-2"
-          >
-            <Icon name="file-text" size={14} />
-            {t('common:actions.exportCsv')}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            isLoading={isProcessing}
-            onClick={() => { exportPdf(); showToast('PDF wird geöffnet', 'success') }}
-            className="min-h-12 text-sm gap-2"
-          >
-            <Icon name="share-2" size={14} />
-            {t('common:actions.exportPdf')}
-          </Button>
-        </div>
+      <div className="mt-4 flex gap-3 pt-4 border-t border-border">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setExportOpen(true)}
+          className="flex-1 min-h-12 text-sm gap-2"
+        >
+          <Icon name="download" size={14} />
+          {t('common:actions.export')}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          className="flex-1 min-h-12 text-sm gap-2"
+        >
+          <Icon name="upload" size={14} />
+          {t('common:actions.import')}
+        </Button>
       </div>
 
       {/* Hidden file input for import */}
@@ -434,6 +402,39 @@ export function HistoryScreen() {
         onChange={handleFileImport}
         className="hidden"
         aria-hidden="true"
+      />
+
+      {/* Confirm: delete single shift */}
+      <ConfirmDialog
+        isOpen={confirmDeleteId !== null}
+        title={t('screens:shifts.deleteConfirm')}
+        confirmLabel={t('common:actions.delete')}
+        onConfirm={() => { if (confirmDeleteId) handleDeleteShift(confirmDeleteId) }}
+        onCancel={() => setConfirmDeleteId(null)}
+        variant="danger"
+      />
+
+      {/* Confirm: clear all history */}
+      <ConfirmDialog
+        isOpen={confirmClear}
+        title={t('common:history.clearAll')}
+        message={t('common:history.clearConfirm')}
+        confirmLabel={t('common:actions.delete')}
+        onConfirm={handleClearHistory}
+        onCancel={() => setConfirmClear(false)}
+        variant="danger"
+      />
+
+      {/* Export dialog */}
+      <ExportDialog
+        isOpen={exportOpen}
+        onClose={() => setExportOpen(false)}
+        context="all"
+        onExportCsv={() => { exportCsv(); showToast(t('common:toast.csvDownloaded'), 'success') }}
+        onExportPdf={() => { exportPdf(); showToast(t('common:toast.pdfOpened'), 'success') }}
+        onExportJson={() => { exportJson(); showToast(t('common:toast.backupDownloaded'), 'success') }}
+        onImport={() => fileInputRef.current?.click()}
+        isProcessing={isProcessing}
       />
     </ScreenContainer>
   )
