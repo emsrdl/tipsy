@@ -20,6 +20,7 @@ import { ThemeProvider } from '@/context/ThemeContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { ProfileProvider } from '@/context/ProfileContext'
 import { TipSessionProvider } from '@/context/TipSessionContext'
+import { ToastProvider } from '@/context/ToastContext'
 import { App } from './App'
 import '@/lib/i18n'
 import '@/styles/globals.css'
@@ -34,7 +35,9 @@ createRoot(root).render(
         <AuthProvider>
           <ProfileProvider>
             <TipSessionProvider>
-              <App />
+              <ToastProvider>
+                <App />
+              </ToastProvider>
             </TipSessionProvider>
           </ProfileProvider>
         </AuthProvider>

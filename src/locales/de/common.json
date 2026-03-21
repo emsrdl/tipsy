@@ -6,7 +6,11 @@
   "nav": {
     "setup": "Mitarbeiter",
     "cashInput": "Bargeld",
-    "results": "Ergebnis"
+    "results": "Ergebnis",
+    "calculate": "Berechnen",
+    "history": "Verlauf",
+    "settings": "Einstellungen",
+    "main": "Hauptnavigation"
   },
   "actions": {
     "next": "Weiter",

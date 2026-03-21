@@ -31,6 +31,19 @@ export type IconName =
   | 'users'
   | 'clock'
   | 'utensils-crossed'
+  | 'calculator'
+  | 'settings'
+  | 'history'
+  | 'toggle-left'
+  | 'toggle-right'
+  | 'bar-chart-2'
+  | 'save'
+  | 'upload'
+  | 'arrow-right'
+  | 'user'
+  | 'star'
+  | 'zap'
+  | 'edit-2'
 
 export interface IconProps {
   /** Which icon to render. */

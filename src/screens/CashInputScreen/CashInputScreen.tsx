@@ -1,11 +1,11 @@
 /**
  * @file src/screens/CashInputScreen/CashInputScreen.tsx
- * @description Cash input screen — enter denomination quantities.
+ * @description Cash input screen — touch-first denomination entry.
  *
- * Step 2 of 3 in the tip distribution flow.
+ * Step 2 of 3. DenominationGrid with running total and reset button.
  *
  * @example
- * // Rendered via React Router in App.tsx at route "/cash"
+ * // Rendered via React Router at route "/calculate/cash"
  */
 
 import { useNavigate } from 'react-router-dom'
@@ -16,25 +16,28 @@ import { Button } from '@/components/atoms/Button/Button'
 import { Alert } from '@/components/molecules/Alert/Alert'
 import { Icon } from '@/components/atoms/Icon/Icon'
 import { useTipCalculator } from '@/hooks/useTipCalculator'
+import { useToast } from '@/context/ToastContext'
+import { DENOMINATIONS } from '@/config/currency'
 
 /**
- * Cash input screen with denomination grid and navigation.
- *
- * @returns ScreenContainer with DenominationGrid and navigation
- *
- * @example
- * // Via router: <Route path="/cash" element={<CashInputScreen />} />
+ * Cash input screen — step 2 of 3.
  */
 export function CashInputScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors'])
   const navigate = useNavigate()
-  const { totalInCents, calculate } = useTipCalculator()
+  const { totalInCents, calculate, setDenominationQuantity } = useTipCalculator()
+  const { showToast } = useToast()
 
   const hasTotal = totalInCents > 0
 
   function handleCalculate() {
     calculate()
-    void navigate('/results')
+    void navigate('/calculate/results')
+  }
+
+  function handleReset() {
+    DENOMINATIONS.forEach((d) => setDenominationQuantity(d.id, 0))
+    showToast('Bargeld zurückgesetzt', 'info')
   }
 
   return (
@@ -44,6 +47,19 @@ export function CashInputScreen() {
       step={2}
       totalSteps={3}
     >
+      {/* Reset button — top right */}
+      <div className="flex justify-end mb-2">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={handleReset}
+          className="min-h-10 text-sm gap-1.5 text-text-secondary"
+        >
+          <Icon name="refresh-cw" size={14} />
+          Reset
+        </Button>
+      </div>
+
       <DenominationGrid />
 
       {!hasTotal && (
@@ -68,7 +84,7 @@ export function CashInputScreen() {
         <Button
           type="button"
           variant="ghost"
-          onClick={() => void navigate('/')}
+          onClick={() => void navigate('/calculate')}
           className="w-full min-h-12"
         >
           <Icon name="chevron-left" size={16} />

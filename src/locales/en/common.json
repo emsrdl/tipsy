@@ -6,7 +6,11 @@
   "nav": {
     "setup": "Staff",
     "cashInput": "Cash",
-    "results": "Results"
+    "results": "Results",
+    "calculate": "Calculate",
+    "history": "History",
+    "settings": "Settings",
+    "main": "Main navigation"
   },
   "actions": {
     "next": "Next",
