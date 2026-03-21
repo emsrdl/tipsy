@@ -18,6 +18,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from '@/context/ThemeContext'
 import { AuthProvider } from '@/context/AuthContext'
+import { ProfileProvider } from '@/context/ProfileContext'
 import { TipSessionProvider } from '@/context/TipSessionContext'
 import { App } from './App'
 import '@/lib/i18n'
@@ -31,9 +32,11 @@ createRoot(root).render(
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <TipSessionProvider>
-            <App />
-          </TipSessionProvider>
+          <ProfileProvider>
+            <TipSessionProvider>
+              <App />
+            </TipSessionProvider>
+          </ProfileProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>

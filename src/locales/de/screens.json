@@ -36,6 +36,38 @@
     "totalLabel": "Gesamt",
     "kitchenPoolLabel": "Küchenpool",
     "servicePoolLabel": "Servicepool",
-    "exportSection": "Exportieren"
+    "exportSection": "Exportieren",
+    "smartSplitLabel": "Smart Split",
+    "deviationColumn": "Abweichung",
+    "idealColumn": "Ideal",
+    "actualColumn": "Tatsächlich",
+    "transfersTitle": "Ausgleichszahlungen",
+    "noTransfersNeeded": "Keine Ausgleichszahlungen nötig."
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Verwalte dein Profil und Statistiken.",
+    "createTitle": "Neues Profil",
+    "editTitle": "Profil bearbeiten",
+    "nameLabel": "Name",
+    "namePlaceholder": "z. B. Anna",
+    "roleLabel": "Rolle",
+    "deleteConfirm": "Möchtest du dieses Profil wirklich löschen?",
+    "resetConfirm": "Statistiken wirklich zurücksetzen?"
+  },
+  "shifts": {
+    "title": "Schichten",
+    "subtitle": "Verlauf deiner Trinkgeldverteilungen.",
+    "noShifts": "Noch keine Schichten gespeichert.",
+    "shiftDate": "Datum",
+    "shiftTotal": "Gesamt",
+    "shiftEmployees": "Mitarbeiter",
+    "deleteConfirm": "Diese Schicht wirklich löschen?"
+  },
+  "importExport": {
+    "title": "Import / Export",
+    "subtitle": "Sichere deine Daten oder importiere ein Backup.",
+    "importSuccess": "{{added}} Schichten importiert, {{skipped}} übersprungen.",
+    "importErrors": "{{count}} Fehler beim Import."
   }
 }

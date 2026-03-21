@@ -31,3 +31,16 @@ export type {
   HistoryEntry,
   ValidationResult,
 } from './calculation'
+
+export type { Profile, ProfileRole, ProfileStats } from './profile'
+
+export type {
+  PersonShare,
+  SmartDistributionResult,
+  TransferMethod,
+  DifferenceLine,
+  Shift,
+  ImportResult,
+  SmartSplitInput,
+  SmartSplitOutput,
+} from './shift'

@@ -16,7 +16,45 @@
     "exportCsv": "Export CSV",
     "addEmployee": "Add employee",
     "removeEmployee": "Remove",
-    "calculate": "Calculate"
+    "calculate": "Calculate",
+    "exportJson": "Export backup",
+    "importJson": "Import backup",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "createProfile": "Create profile",
+    "switchProfile": "Switch profile",
+    "editProfile": "Edit profile",
+    "deleteProfile": "Delete profile",
+    "resetStats": "Reset stats",
+    "guestMode": "Guest mode",
+    "exitGuestMode": "Exit guest mode"
+  },
+  "profile": {
+    "guest": "Guest",
+    "guestBadge": "Guest Mode",
+    "role": {
+      "kitchen": "Kitchen",
+      "service": "Service"
+    },
+    "stats": {
+      "totalShifts": "Total shifts",
+      "totalTips": "Total tips",
+      "hourlyAvg": "Avg. hourly rate"
+    }
+  },
+  "smartSplit": {
+    "normal": "Normal",
+    "smart": "Smart",
+    "modeLabel": "Distribution mode",
+    "threshold": "Threshold",
+    "fairnessScore": "Fairness score",
+    "deviation": "Deviation",
+    "transfers": "Balance transfers",
+    "noTransfers": "No balance transfers needed",
+    "transferFrom": "{{from}} pays {{amount}} to {{to}}",
+    "remaining": "Remaining"
   },
   "theme": {
     "tipsy": "Tipsy",

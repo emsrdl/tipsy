@@ -13,6 +13,8 @@
 
 import type { Employee, EmployeeGroup } from '@/types/employee'
 import type { TipSession, TipSplit, DenominationQuantity, DistributionResult } from '@/types/session'
+import type { Profile, ProfileStats } from '@/types/profile'
+import type { Shift, PersonShare, SmartDistributionResult, DifferenceLine } from '@/types/shift'
 
 let _idCounter = 0
 function nextId(): string {
@@ -104,6 +106,96 @@ export function makeResult(opts: Partial<DistributionResult> = {}): Distribution
     group: 'service',
     hours: 8,
     amountInCents: 1000,
+    ...opts,
+  }
+}
+
+/**
+ * Creates a ProfileStats with zeroed defaults.
+ */
+export function makeProfileStats(opts: Partial<ProfileStats> = {}): ProfileStats {
+  return {
+    totalShifts: 0,
+    totalTipsInCents: 0,
+    hourlyRateAvgInCents: 0,
+    ...opts,
+  }
+}
+
+/**
+ * Creates a Profile with sensible defaults.
+ */
+export function makeProfile(opts: Partial<Profile> = {}): Profile {
+  return {
+    id: nextId(),
+    name: 'Test Profile',
+    role: 'service',
+    createdAt: '2026-03-21T10:00:00.000Z',
+    isActive: false,
+    stats: makeProfileStats(),
+    ...opts,
+  }
+}
+
+/**
+ * Creates a PersonShare with sensible defaults.
+ */
+export function makePersonShare(opts: Partial<PersonShare> = {}): PersonShare {
+  return {
+    id: nextId(),
+    name: 'Test Employee',
+    role: 'service',
+    hoursWorked: 8,
+    idealShareInCents: 5000,
+    actualShareInCents: 5000,
+    deviationInCents: 0,
+    ...opts,
+  }
+}
+
+/**
+ * Creates a SmartDistributionResult with sensible defaults.
+ */
+export function makeSmartDistribution(opts: Partial<SmartDistributionResult> = {}): SmartDistributionResult {
+  return {
+    personShares: [makePersonShare()],
+    remainingCents: 0,
+    fairnessScore: 100,
+    denominationsUsed: [],
+    ...opts,
+  }
+}
+
+/**
+ * Creates a DifferenceLine with sensible defaults.
+ */
+export function makeDifferenceLine(opts: Partial<DifferenceLine> = {}): DifferenceLine {
+  return {
+    fromPerson: { id: 'from-1', name: 'Person A' },
+    toPerson: { id: 'to-1', name: 'Person B' },
+    amountInCents: 500,
+    method: 'paypal',
+    reason: 'Denomination constraint optimization',
+    ...opts,
+  }
+}
+
+/**
+ * Creates a Shift with sensible defaults.
+ */
+export function makeShift(opts: Partial<Shift> = {}): Shift {
+  return {
+    id: nextId(),
+    profileId: null,
+    date: '2026-03-21T18:00:00.000Z',
+    kitchenPercent: 30,
+    employees: [makeEmployee()],
+    totalTipsInCents: 10000,
+    denominationInput: [makeDenomQty('eur_10', 10)],
+    distribution: makeSmartDistribution(),
+    smartSplitting: false,
+    differences: [],
+    savedAt: '2026-03-21T18:05:00.000Z',
     ...opts,
   }
 }

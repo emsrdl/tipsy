@@ -16,7 +16,45 @@
     "exportCsv": "CSV exportieren",
     "addEmployee": "Mitarbeiter hinzufügen",
     "removeEmployee": "Entfernen",
-    "calculate": "Berechnen"
+    "calculate": "Berechnen",
+    "exportJson": "Backup exportieren",
+    "importJson": "Backup importieren",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "confirm": "Bestätigen",
+    "createProfile": "Profil erstellen",
+    "switchProfile": "Profil wechseln",
+    "editProfile": "Profil bearbeiten",
+    "deleteProfile": "Profil löschen",
+    "resetStats": "Statistiken zurücksetzen",
+    "guestMode": "Gastmodus",
+    "exitGuestMode": "Gastmodus beenden"
+  },
+  "profile": {
+    "guest": "Gast",
+    "guestBadge": "Gast Modus",
+    "role": {
+      "kitchen": "Küche",
+      "service": "Service"
+    },
+    "stats": {
+      "totalShifts": "Schichten gesamt",
+      "totalTips": "Trinkgeld gesamt",
+      "hourlyAvg": "⌀ Stundensatz"
+    }
+  },
+  "smartSplit": {
+    "normal": "Normal",
+    "smart": "Smart",
+    "modeLabel": "Verteilungsmodus",
+    "threshold": "Schwellenwert",
+    "fairnessScore": "Fairness-Score",
+    "deviation": "Abweichung",
+    "transfers": "Ausgleichszahlungen",
+    "noTransfers": "Keine Ausgleichszahlungen nötig",
+    "transferFrom": "{{from}} zahlt {{amount}} an {{to}}",
+    "remaining": "Restbetrag"
   },
   "theme": {
     "tipsy": "Tipsy",

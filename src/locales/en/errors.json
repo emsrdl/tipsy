@@ -11,7 +11,16 @@
   },
   "export": {
     "pdfFailed": "PDF export failed. Please try again.",
-    "csvFailed": "CSV export failed. Please try again."
+    "csvFailed": "CSV export failed. Please try again.",
+    "jsonFailed": "JSON export failed. Please try again.",
+    "importFailed": "Import failed. Please check the file.",
+    "importInvalidFormat": "Invalid file format.",
+    "importDuplicates": "{{count}} entries skipped (already exist)."
+  },
+  "profile": {
+    "nameRequired": "Please enter a name.",
+    "profileNotFound": "Profile not found.",
+    "cannotDeleteActive": "Cannot delete active profile during calculation."
   },
   "env": {
     "missingDomain": "VITE_APP_DOMAIN is not configured."

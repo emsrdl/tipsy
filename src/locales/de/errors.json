@@ -11,7 +11,16 @@
   },
   "export": {
     "pdfFailed": "PDF-Export fehlgeschlagen. Bitte versuche es erneut.",
-    "csvFailed": "CSV-Export fehlgeschlagen. Bitte versuche es erneut."
+    "csvFailed": "CSV-Export fehlgeschlagen. Bitte versuche es erneut.",
+    "jsonFailed": "JSON-Export fehlgeschlagen. Bitte versuche es erneut.",
+    "importFailed": "Import fehlgeschlagen. Bitte überprüfe die Datei.",
+    "importInvalidFormat": "Ungültiges Dateiformat.",
+    "importDuplicates": "{{count}} Einträge übersprungen (bereits vorhanden)."
+  },
+  "profile": {
+    "nameRequired": "Bitte einen Namen eingeben.",
+    "profileNotFound": "Profil nicht gefunden.",
+    "cannotDeleteActive": "Aktives Profil kann während einer Berechnung nicht gelöscht werden."
   },
   "env": {
     "missingDomain": "VITE_APP_DOMAIN ist nicht konfiguriert."

@@ -36,6 +36,38 @@
     "totalLabel": "Total",
     "kitchenPoolLabel": "Kitchen pool",
     "servicePoolLabel": "Service pool",
-    "exportSection": "Export"
+    "exportSection": "Export",
+    "smartSplitLabel": "Smart Split",
+    "deviationColumn": "Deviation",
+    "idealColumn": "Ideal",
+    "actualColumn": "Actual",
+    "transfersTitle": "Balance transfers",
+    "noTransfersNeeded": "No balance transfers needed."
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your profile and statistics.",
+    "createTitle": "New profile",
+    "editTitle": "Edit profile",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Anna",
+    "roleLabel": "Role",
+    "deleteConfirm": "Are you sure you want to delete this profile?",
+    "resetConfirm": "Really reset statistics?"
+  },
+  "shifts": {
+    "title": "Shifts",
+    "subtitle": "Your tip distribution history.",
+    "noShifts": "No shifts saved yet.",
+    "shiftDate": "Date",
+    "shiftTotal": "Total",
+    "shiftEmployees": "Employees",
+    "deleteConfirm": "Really delete this shift?"
+  },
+  "importExport": {
+    "title": "Import / Export",
+    "subtitle": "Back up your data or import a backup.",
+    "importSuccess": "{{added}} shifts imported, {{skipped}} skipped.",
+    "importErrors": "{{count}} errors during import."
   }
 }
