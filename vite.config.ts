@@ -32,6 +32,7 @@ export default defineConfig({
       '@/locales':    r('src/locales'),
       '@/styles':     r('src/styles'),
       '@/types':      r('src/types'),
+      '@/utils':      r('src/utils'),
       '@/test':       r('src/test'),
     },
   },

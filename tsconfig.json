@@ -35,6 +35,7 @@
       "@/locales/*": ["src/locales/*"],
       "@/styles/*": ["src/styles/*"],
       "@/types/*": ["src/types/*"],
+      "@/utils/*": ["src/utils/*"],
       "@/test/*": ["src/test/*"]
     }
   },
