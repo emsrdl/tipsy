@@ -8,9 +8,9 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# vite
+/dist
+/dist-ssr
 
 # production
 /build

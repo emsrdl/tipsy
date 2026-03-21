@@ -1,0 +1,62 @@
+{
+  "app": {
+    "name": "Tipsy",
+    "tagline": "Fair tip distribution"
+  },
+  "nav": {
+    "setup": "Staff",
+    "cashInput": "Cash",
+    "results": "Results"
+  },
+  "actions": {
+    "next": "Next",
+    "back": "Back",
+    "reset": "Reset",
+    "exportPdf": "Export PDF",
+    "exportCsv": "Export CSV",
+    "addEmployee": "Add employee",
+    "removeEmployee": "Remove",
+    "calculate": "Calculate"
+  },
+  "theme": {
+    "tipsy": "Tipsy",
+    "katzentempel": "Katzentempel",
+    "dark": "Dark",
+    "light": "Light",
+    "switchMode": "Switch mode",
+    "switchTheme": "Switch theme",
+    "accent": {
+      "blue": "Blue",
+      "purple": "Purple",
+      "pink": "Pink",
+      "orange": "Orange",
+      "green": "Green"
+    }
+  },
+  "language": {
+    "de": "Deutsch",
+    "en": "English",
+    "switch": "Switch language"
+  },
+  "currency": {
+    "denomination": {
+      "500": "€500",
+      "200": "€200",
+      "100": "€100",
+      "50": "€50",
+      "20": "€20",
+      "10": "€10",
+      "5": "€5",
+      "2": "€2",
+      "1": "€1",
+      "50ct": "50 ct",
+      "20ct": "20 ct",
+      "10ct": "10 ct",
+      "5ct": "5 ct",
+      "2ct": "2 ct",
+      "1ct": "1 ct"
+    },
+    "total": "Total",
+    "perHour": "per hour"
+  }
+}

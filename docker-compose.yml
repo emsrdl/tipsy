@@ -1,0 +1,34 @@
+services:
+  # Production: nginx serving the pre-built Vite bundle
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_APP_DOMAIN: ${VITE_APP_DOMAIN}
+        VITE_APP_NAME: ${VITE_APP_NAME:-Tipsy}
+        VITE_DEFAULT_THEME: ${VITE_DEFAULT_THEME:-tipsy}
+        VITE_DEFAULT_LANG: ${VITE_DEFAULT_LANG:-de}
+        VITE_OIDC_AUTHORITY: ${VITE_OIDC_AUTHORITY:-}
+        VITE_OIDC_CLIENT_ID: ${VITE_OIDC_CLIENT_ID:-}
+        VITE_OIDC_REDIRECT_URI: ${VITE_OIDC_REDIRECT_URI:-}
+        VITE_OIDC_SCOPE: ${VITE_OIDC_SCOPE:-}
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+  # Dev server: Vite with HMR (use: docker compose --profile dev up)
+  app-dev:
+    profiles: [dev]
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development

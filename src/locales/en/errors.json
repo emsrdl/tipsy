@@ -1,0 +1,19 @@
+{
+  "validation": {
+    "required": "This field is required.",
+    "invalidNumber": "Please enter a valid number.",
+    "negativeNotAllowed": "Negative values are not allowed.",
+    "splitMustEqual100": "Kitchen + Service must add up to 100%.",
+    "noEmployees": "Please add at least one employee.",
+    "zeroTotal": "The total amount is €0.00.",
+    "hoursZero": "Hours must be greater than 0.",
+    "nameTooLong": "Name must be 50 characters or fewer."
+  },
+  "export": {
+    "pdfFailed": "PDF export failed. Please try again.",
+    "csvFailed": "CSV export failed. Please try again."
+  },
+  "env": {
+    "missingDomain": "VITE_APP_DOMAIN is not configured."
+  }
+}

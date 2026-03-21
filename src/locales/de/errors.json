@@ -1,0 +1,19 @@
+{
+  "validation": {
+    "required": "Dieses Feld ist erforderlich.",
+    "invalidNumber": "Bitte eine gültige Zahl eingeben.",
+    "negativeNotAllowed": "Negative Werte sind nicht erlaubt.",
+    "splitMustEqual100": "Küche + Service muss 100 % ergeben.",
+    "noEmployees": "Bitte mindestens einen Mitarbeiter hinzufügen.",
+    "zeroTotal": "Der Gesamtbetrag beträgt €0,00.",
+    "hoursZero": "Die Stundenzahl muss größer als 0 sein.",
+    "nameTooLong": "Der Name darf maximal 50 Zeichen lang sein."
+  },
+  "export": {
+    "pdfFailed": "PDF-Export fehlgeschlagen. Bitte versuche es erneut.",
+    "csvFailed": "CSV-Export fehlgeschlagen. Bitte versuche es erneut."
+  },
+  "env": {
+    "missingDomain": "VITE_APP_DOMAIN ist nicht konfiguriert."
+  }
+}

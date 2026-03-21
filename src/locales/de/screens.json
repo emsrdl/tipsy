@@ -1,0 +1,41 @@
+{
+  "setup": {
+    "title": "Mitarbeiter einrichten",
+    "subtitle": "Füge alle Mitarbeiter hinzu und konfiguriere die Trinkgeldverteilung.",
+    "employeeNameLabel": "Name",
+    "employeeNamePlaceholder": "z. B. Anna",
+    "hoursLabel": "Stunden",
+    "hoursPlaceholder": "8",
+    "groupLabel": "Gruppe",
+    "groupKitchen": "Küche",
+    "groupService": "Service",
+    "splitTitle": "Küche / Service Aufteilung",
+    "kitchenPercent": "Küche (%)",
+    "servicePercent": "Service (%)",
+    "noEmployees": "Noch keine Mitarbeiter hinzugefügt.",
+    "employeeCount_one": "{{count}} Mitarbeiter",
+    "employeeCount_other": "{{count}} Mitarbeiter"
+  },
+  "cashInput": {
+    "title": "Bargeld eingeben",
+    "subtitle": "Gib die Anzahl jeder Stückelung ein.",
+    "quantityLabel": "Anzahl",
+    "totalLabel": "Gesamtbetrag",
+    "denominationSection": "Scheine",
+    "coinSection": "Münzen"
+  },
+  "results": {
+    "title": "Verteilung",
+    "subtitle": "Trinkgeld für diese Schicht.",
+    "employeeColumn": "Mitarbeiter",
+    "amountColumn": "Betrag",
+    "hoursColumn": "Stunden",
+    "groupKitchen": "Küche",
+    "groupService": "Service",
+    "perHourLabel": "pro Stunde",
+    "totalLabel": "Gesamt",
+    "kitchenPoolLabel": "Küchenpool",
+    "servicePoolLabel": "Servicepool",
+    "exportSection": "Exportieren"
+  }
+}

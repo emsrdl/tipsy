@@ -1,0 +1,41 @@
+{
+  "setup": {
+    "title": "Set up staff",
+    "subtitle": "Add all employees and configure tip distribution.",
+    "employeeNameLabel": "Name",
+    "employeeNamePlaceholder": "e.g. Anna",
+    "hoursLabel": "Hours",
+    "hoursPlaceholder": "8",
+    "groupLabel": "Group",
+    "groupKitchen": "Kitchen",
+    "groupService": "Service",
+    "splitTitle": "Kitchen / Service split",
+    "kitchenPercent": "Kitchen (%)",
+    "servicePercent": "Service (%)",
+    "noEmployees": "No employees added yet.",
+    "employeeCount_one": "{{count}} employee",
+    "employeeCount_other": "{{count}} employees"
+  },
+  "cashInput": {
+    "title": "Enter cash",
+    "subtitle": "Enter the quantity of each denomination.",
+    "quantityLabel": "Quantity",
+    "totalLabel": "Total amount",
+    "denominationSection": "Banknotes",
+    "coinSection": "Coins"
+  },
+  "results": {
+    "title": "Distribution",
+    "subtitle": "Tips for this shift.",
+    "employeeColumn": "Employee",
+    "amountColumn": "Amount",
+    "hoursColumn": "Hours",
+    "groupKitchen": "Kitchen",
+    "groupService": "Service",
+    "perHourLabel": "per hour",
+    "totalLabel": "Total",
+    "kitchenPoolLabel": "Kitchen pool",
+    "servicePoolLabel": "Service pool",
+    "exportSection": "Export"
+  }
+}

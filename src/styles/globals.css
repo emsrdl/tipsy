@@ -1,0 +1,120 @@
+/**
+ * @file src/styles/globals.css
+ * @description Global styles and CSS custom property definitions.
+ *
+ * Theme palettes are applied via data attributes on <html>:
+ *   data-theme="tipsy|katzentempel"
+ *   data-mode="light|dark"
+ *
+ * Accent color variables (--color-accent, --color-accent-hover,
+ * --color-accent-subtle) are injected at runtime by ThemeContext
+ * via document.documentElement.style.setProperty() for the Tipsy theme.
+ * For Katzentempel they are set statically here.
+ *
+ * @see src/context/ThemeContext.tsx for runtime accent injection
+ * @see src/config/themes.ts for precomputed accent hex values
+ * @see tailwind.config.ts for color references to these variables
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Base layer: shadcn compatibility
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-surface text-text-primary;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ============================================================
+   Tipsy theme — Light mode (default)
+   ============================================================ */
+[data-theme="tipsy"] {
+  --color-surface: #ffffff;
+  --color-surface-raised: #f8fafc;
+  --color-surface-overlay: #f1f5f9;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-inverse: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-status-error: #ef4444;
+  --color-status-success: #22c55e;
+  --color-status-warning: #f59e0b;
+  /* Accent is injected by ThemeContext. Default blue shown below as fallback. */
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-accent-subtle: #dbeafe;
+  --color-accent-foreground: #ffffff;
+}
+
+/* ============================================================
+   Tipsy theme — Dark mode
+   ============================================================ */
+[data-theme="tipsy"][data-mode="dark"] {
+  --color-surface: #0f172a;
+  --color-surface-raised: #1e293b;
+  --color-surface-overlay: #334155;
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-inverse: #0f172a;
+  --color-border: #334155;
+  --color-border-strong: #475569;
+  --color-status-error: #f87171;
+  --color-status-success: #4ade80;
+  --color-status-warning: #fbbf24;
+  /* Accent subtle overridden for dark — ThemeContext injects the dark variant */
+  --color-accent-subtle: #1d3a6e;
+  --color-accent-foreground: #ffffff;
+}
+
+/* ============================================================
+   Katzentempel theme — Light mode
+   ============================================================ */
+[data-theme="katzentempel"] {
+  --color-surface: #f5f9f1;
+  --color-surface-raised: #edf4e7;
+  --color-surface-overlay: #dcebd3;
+  --color-text-primary: #1b2415;
+  --color-text-secondary: #4a6340;
+  --color-text-inverse: #ffffff;
+  --color-border: #c3d9b8;
+  --color-border-strong: #a0c490;
+  --color-status-error: #dc2626;
+  --color-status-success: #16a34a;
+  --color-status-warning: #d97706;
+  --color-accent: #6ba644;
+  --color-accent-hover: #5a9038;
+  --color-accent-subtle: #d4eaca;
+  --color-accent-foreground: #ffffff;
+}
+
+/* ============================================================
+   Katzentempel theme — Dark mode
+   ============================================================ */
+[data-theme="katzentempel"][data-mode="dark"] {
+  --color-surface: #1b2415;
+  --color-surface-raised: #243018;
+  --color-surface-overlay: #2e3d1e;
+  --color-text-primary: #edf4e7;
+  --color-text-secondary: #9abf8a;
+  --color-text-inverse: #1b2415;
+  --color-border: #3a4f2e;
+  --color-border-strong: #4e6b3e;
+  --color-status-error: #f87171;
+  --color-status-success: #4ade80;
+  --color-status-warning: #fbbf24;
+  --color-accent: #6ba644;
+  --color-accent-hover: #7cc04f;
+  --color-accent-subtle: #2a4a1a;
+  --color-accent-foreground: #ffffff;
+}

@@ -1,0 +1,62 @@
+{
+  "app": {
+    "name": "Tipsy",
+    "tagline": "Trinkgeld fair verteilen"
+  },
+  "nav": {
+    "setup": "Mitarbeiter",
+    "cashInput": "Bargeld",
+    "results": "Ergebnis"
+  },
+  "actions": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "reset": "Zurücksetzen",
+    "exportPdf": "PDF exportieren",
+    "exportCsv": "CSV exportieren",
+    "addEmployee": "Mitarbeiter hinzufügen",
+    "removeEmployee": "Entfernen",
+    "calculate": "Berechnen"
+  },
+  "theme": {
+    "tipsy": "Tipsy",
+    "katzentempel": "Katzentempel",
+    "dark": "Dunkel",
+    "light": "Hell",
+    "switchMode": "Modus wechseln",
+    "switchTheme": "Theme wechseln",
+    "accent": {
+      "blue": "Blau",
+      "purple": "Lila",
+      "pink": "Pink",
+      "orange": "Orange",
+      "green": "Grün"
+    }
+  },
+  "language": {
+    "de": "Deutsch",
+    "en": "English",
+    "switch": "Sprache wechseln"
+  },
+  "currency": {
+    "denomination": {
+      "500": "€500",
+      "200": "€200",
+      "100": "€100",
+      "50": "€50",
+      "20": "€20",
+      "10": "€10",
+      "5": "€5",
+      "2": "€2",
+      "1": "€1",
+      "50ct": "50 Ct",
+      "20ct": "20 Ct",
+      "10ct": "10 Ct",
+      "5ct": "5 Ct",
+      "2ct": "2 Ct",
+      "1ct": "1 Ct"
+    },
+    "total": "Gesamt",
+    "perHour": "pro Stunde"
+  }
+}
