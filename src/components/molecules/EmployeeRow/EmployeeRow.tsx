@@ -1,9 +1,13 @@
 /**
  * @file src/components/molecules/EmployeeRow/EmployeeRow.tsx
- * @description EmployeeRow molecule — a single editable employee entry.
+ * @description EmployeeRow molecule — Material card for a single employee entry.
  *
- * Displays name input, hours input, group toggle (Küche/Service), and remove button.
- * Used inside EmployeeForm.
+ * Touch-first redesign:
+ * - Full Material card with elevation shadow
+ * - Large name input (full width)
+ * - Group selection via tappable chips (48px touch targets)
+ * - Hours via Stepper (touch +/- buttons, no keyboard needed)
+ * - Remove button in card header
  *
  * @example
  * <EmployeeRow
@@ -17,74 +21,103 @@
 
 import { useTranslation } from 'react-i18next'
 import { Input } from '@/components/atoms/Input/Input'
-import { Button } from '@/components/atoms/Button/Button'
-import { Badge } from '@/components/atoms/Badge/Badge'
 import { Icon } from '@/components/atoms/Icon/Icon'
+import { Stepper } from '../Stepper/Stepper'
+import { cn } from '@/lib/utils'
 import type { EmployeeRowProps } from './EmployeeRow.types'
 
 /**
- * Inline editor for a single employee.
+ * Material card for editing a single employee's details.
+ * Touch targets are all 48px+ for mobile use.
  *
  * @param props - EmployeeRowProps
- * @returns div containing all employee fields
+ * @returns Material card with name input, group chips, and hours stepper
  *
  * @example
  * <EmployeeRow employee={e} onRemove={remove} onNameChange={update} ... />
  */
 export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, onGroupChange }: EmployeeRowProps) {
-  const { t } = useTranslation('screens')
-
-  function handleHoursChange(value: string) {
-    const parsed = parseFloat(value)
-    if (!isNaN(parsed) && parsed >= 0) onHoursChange(employee.id, parsed)
-  }
+  const { t } = useTranslation(['screens', 'common'])
 
   return (
-    <div className="flex items-center gap-2 rounded-md border border-border bg-surface-raised p-2">
-      {/* Name */}
-      <Input
-        value={employee.name}
-        onChange={(e) => onNameChange(employee.id, e.target.value)}
-        placeholder={t('setup.employeeNamePlaceholder')}
-        className="flex-1 min-w-0"
-        aria-label={t('setup.employeeNameLabel')}
-      />
+    <div className="rounded-xl bg-surface-raised shadow-elevation-1 overflow-hidden">
+      {/* Header row: name input + remove button */}
+      <div className="flex items-center gap-2 px-4 pt-4 pb-2">
+        <Input
+          value={employee.name}
+          onChange={(e) => onNameChange(employee.id, e.target.value)}
+          placeholder={t('screens:setup.employeeNamePlaceholder')}
+          className="flex-1 min-w-0 text-base h-12 rounded-lg border-border focus-visible:ring-accent"
+          aria-label={t('screens:setup.employeeNameLabel')}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+        />
+        {/* Remove button */}
+        <button
+          type="button"
+          onClick={() => onRemove(employee.id)}
+          aria-label={t('common:actions.removeEmployee')}
+          className={cn(
+            'ripple flex-shrink-0 h-12 w-12 flex items-center justify-center',
+            'rounded-full text-text-secondary transition-colors',
+            'hover:text-status-error hover:bg-red-50',
+            'active:bg-red-100',
+          )}
+        >
+          <Icon name="trash" size={18} />
+        </button>
+      </div>
 
-      {/* Hours */}
-      <Input
-        type="number"
-        min={0}
-        step={0.5}
-        value={employee.hours || ''}
-        onChange={(e) => handleHoursChange(e.target.value)}
-        placeholder={t('setup.hoursPlaceholder')}
-        className="w-16 text-center"
-        aria-label={t('setup.hoursLabel')}
-      />
+      {/* Group chips */}
+      <div className="flex gap-2 px-4 pb-3">
+        <button
+          type="button"
+          onClick={() => onGroupChange(employee.id, 'kitchen')}
+          aria-pressed={employee.group === 'kitchen'}
+          className={cn(
+            'ripple flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all',
+            employee.group === 'kitchen'
+              ? 'bg-orange-100 text-orange-800 shadow-elevation-1 dark:bg-orange-900/40 dark:text-orange-300'
+              : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80'
+          )}
+        >
+          <Icon name="utensils-crossed" size={16} />
+          {t('screens:setup.groupKitchen')}
+        </button>
+        <button
+          type="button"
+          onClick={() => onGroupChange(employee.id, 'service')}
+          aria-pressed={employee.group === 'service'}
+          className={cn(
+            'ripple flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all',
+            employee.group === 'service'
+              ? 'bg-accent-subtle text-accent shadow-elevation-1'
+              : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80'
+          )}
+        >
+          <Icon name="users" size={16} />
+          {t('screens:setup.groupService')}
+        </button>
+      </div>
 
-      {/* Group toggle */}
-      <button
-        type="button"
-        onClick={() => onGroupChange(employee.id, employee.group === 'kitchen' ? 'service' : 'kitchen')}
-        title={t('setup.groupLabel')}
-        className="shrink-0"
-      >
-        <Badge variant={employee.group === 'kitchen' ? 'kitchen' : 'service'}>
-          {employee.group === 'kitchen' ? t('setup.groupKitchen') : t('setup.groupService')}
-        </Badge>
-      </button>
-
-      {/* Remove */}
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 shrink-0 text-text-secondary hover:text-status-error"
-        onClick={() => onRemove(employee.id)}
-        aria-label={t('actions.removeEmployee', { ns: 'common' })}
-      >
-        <Icon name="trash" size={14} />
-      </Button>
+      {/* Hours stepper */}
+      <div className="flex items-center justify-between px-4 pb-4 pt-1 border-t border-border">
+        <div className="flex items-center gap-2">
+          <Icon name="clock" size={15} className="text-text-secondary" />
+          <span className="text-sm text-text-secondary">{t('screens:setup.hoursLabel')}</span>
+        </div>
+        <Stepper
+          value={employee.hours}
+          onChange={(hours) => onHoursChange(employee.id, hours)}
+          min={0}
+          max={24}
+          step={0.5}
+          unit="h"
+          size="md"
+          aria-label={t('screens:setup.hoursLabel')}
+        />
+      </div>
     </div>
   )
 }

@@ -41,6 +41,8 @@ export function CashInputScreen() {
     <ScreenContainer
       title={t('screens:cashInput.title')}
       subtitle={t('screens:cashInput.subtitle')}
+      step={2}
+      totalSteps={3}
     >
       <DenominationGrid />
 
@@ -53,22 +55,24 @@ export function CashInputScreen() {
       )}
 
       {/* Navigation */}
-      <div className="mt-6 flex justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => void navigate('/')}
-        >
-          <Icon name="chevron-left" size={16} />
-          {t('common:actions.back')}
-        </Button>
+      <div className="mt-8 space-y-3">
         <Button
           type="button"
           disabled={!hasTotal}
           onClick={handleCalculate}
+          className="w-full min-h-14 text-base font-semibold"
         >
           {t('common:actions.calculate')}
-          <Icon name="chevron-right" size={16} />
+          <Icon name="chevron-right" size={18} />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => void navigate('/')}
+          className="w-full min-h-12"
+        >
+          <Icon name="chevron-left" size={16} />
+          {t('common:actions.back')}
         </Button>
       </div>
     </ScreenContainer>

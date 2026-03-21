@@ -1,22 +1,25 @@
 /**
  * @file src/components/molecules/DenominationItem/DenominationItem.tsx
- * @description DenominationItem molecule — one denomination row in the cash grid.
+ * @description DenominationItem molecule — touch-optimized denomination row.
  *
- * Shows the denomination symbol, a CurrencyInput for the quantity,
- * and the subtotal (symbol × quantity).
+ * Touch-first redesign:
+ * - Large denomination symbol (pill badge)
+ * - Full Stepper with 48px +/- buttons
+ * - Subtotal displayed prominently
+ * - Active state highlight when quantity > 0
  *
  * @example
  * <DenominationItem
- *   denomination={{ id: 'eur_10', valueInCents: 1000, symbol: '€10', labelKey: 'currency.denomination.10' }}
+ *   denomination={{ id: 'eur_10', valueInCents: 1000, symbol: '€10', labelKey: '...' }}
  *   quantity={5}
  *   onQuantityChange={(id, qty) => setQty(id, qty)}
  * />
  */
 
-import { useTranslation } from 'react-i18next'
-import { CurrencyInput } from '../CurrencyInput/CurrencyInput'
+import { Stepper } from '../Stepper/Stepper'
 import { formatEurFromCents } from '@/config/currency'
 import { useLocale } from '@/hooks/useLocale'
+import { cn } from '@/lib/utils'
 import type { Denomination } from '@/config/currency'
 
 export interface DenominationItemProps {
@@ -29,39 +32,59 @@ export interface DenominationItemProps {
 }
 
 /**
- * One row in the denomination grid.
+ * One row in the denomination grid — touch optimized.
  *
  * @param props - DenominationItemProps
- * @returns div with symbol, quantity input, and subtotal
+ * @returns div with symbol badge, stepper, and subtotal
  *
  * @example
  * <DenominationItem denomination={d} quantity={qty} onQuantityChange={update} />
  */
 export function DenominationItem({ denomination, quantity, onQuantityChange }: DenominationItemProps) {
-  const { t } = useTranslation('common')
   const { locale } = useLocale()
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
-
   const subtotalCents = denomination.valueInCents * quantity
+  const isActive = quantity > 0
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-md px-3 py-2 even:bg-surface-raised">
-      {/* Symbol */}
-      <span className="w-12 font-mono font-medium text-text-primary">
+    <div
+      className={cn(
+        'flex items-center gap-3 px-4 py-3 transition-colors',
+        isActive && 'bg-accent-subtle/30'
+      )}
+    >
+      {/* Denomination symbol — pill */}
+      <div
+        className={cn(
+          'w-16 flex-shrink-0 flex items-center justify-center h-10 rounded-lg text-sm font-bold font-mono',
+          isActive
+            ? 'bg-accent text-accent-foreground shadow-elevation-1'
+            : 'bg-surface-overlay text-text-primary'
+        )}
+      >
         {denomination.symbol}
-      </span>
+      </div>
 
-      {/* Quantity input */}
-      <CurrencyInput
-        value={quantity}
-        onChange={(qty) => onQuantityChange(denomination.id, qty)}
-        aria-label={`${t(denomination.labelKey)} ${t('currency.denomination.50ct' /* dummy to satisfy i18n, just needs namespace */) ? t(denomination.labelKey) : denomination.symbol} ${t('cashInput.quantityLabel', { ns: 'screens' })}`}
-      />
+      {/* Stepper */}
+      <div className="flex-1 flex justify-center">
+        <Stepper
+          value={quantity}
+          onChange={(qty) => onQuantityChange(denomination.id, qty)}
+          min={0}
+          max={999}
+          step={1}
+          size="md"
+          aria-label={`${denomination.symbol} Anzahl`}
+        />
+      </div>
 
       {/* Subtotal */}
-      <span className="w-20 text-right font-mono text-sm text-text-secondary">
+      <div className={cn(
+        'w-20 text-right font-mono text-sm flex-shrink-0',
+        isActive ? 'font-semibold text-text-primary' : 'text-text-secondary'
+      )}>
         {subtotalCents > 0 ? formatEurFromCents(subtotalCents, fmtLocale) : '—'}
-      </span>
+      </div>
     </div>
   )
 }

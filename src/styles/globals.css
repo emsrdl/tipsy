@@ -1,19 +1,21 @@
 /**
  * @file src/styles/globals.css
- * @description Global styles and CSS custom property definitions.
+ * @description Global styles — Material Design tokens, themes, and touch utilities.
  *
  * Theme palettes are applied via data attributes on <html>:
  *   data-theme="tipsy|katzentempel"
  *   data-mode="light|dark"
  *
- * Accent color variables (--color-accent, --color-accent-hover,
- * --color-accent-subtle) are injected at runtime by ThemeContext
- * via document.documentElement.style.setProperty() for the Tipsy theme.
- * For Katzentempel they are set statically here.
+ * Touch-first design:
+ * - Minimum touch targets: 48×48px
+ * - 8px grid spacing
+ * - Ripple state layer for interactive elements
+ * - Safe area padding utilities (notch-aware)
+ * - Prevents zoom on input focus (iOS)
  *
  * @see src/context/ThemeContext.tsx for runtime accent injection
  * @see src/config/themes.ts for precomputed accent hex values
- * @see tailwind.config.ts for color references to these variables
+ * @see tailwind.config.ts for color/shadow references
  */
 
 @tailwind base;
@@ -21,17 +23,138 @@
 @tailwind utilities;
 
 /* ============================================================
-   Base layer: shadcn compatibility
+   Base layer
    ============================================================ */
 @layer base {
   * {
     @apply border-border;
   }
+
+  html {
+    /* Material motion timing */
+    --motion-duration-short: 200ms;
+    --motion-duration-medium: 300ms;
+    --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --motion-easing-decelerate: cubic-bezier(0, 0, 0, 1);
+  }
+
   body {
     @apply bg-surface text-text-primary;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Touch optimization */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+
+  /* Prevent zoom on input focus (iOS Safari) */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* Material range slider */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--color-surface-overlay);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    border: 2px solid var(--color-surface);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:active {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px var(--color-accent-subtle);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    border: 2px solid var(--color-surface);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    border: none;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 2px;
+  }
+}
+
+/* ============================================================
+   Utility layer — safe area + ripple + state layer
+   ============================================================ */
+@layer utilities {
+  /* Safe area utilities for notch-aware layouts */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right);
+  }
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Touch ripple feedback */
+  .ripple {
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+    border-radius: inherit;
+    transition: opacity var(--motion-duration-short) var(--motion-easing-standard);
+    pointer-events: none;
+  }
+
+  .ripple:active::after {
+    opacity: 0.12;
+  }
+
+  /* Hide scrollbar but remain scrollable */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
@@ -50,7 +173,7 @@
   --color-status-error: #ef4444;
   --color-status-success: #22c55e;
   --color-status-warning: #f59e0b;
-  /* Accent is injected by ThemeContext. Default blue shown below as fallback. */
+  /* Accent injected by ThemeContext. Default blue as fallback. */
   --color-accent: #3b82f6;
   --color-accent-hover: #2563eb;
   --color-accent-subtle: #dbeafe;
@@ -72,7 +195,6 @@
   --color-status-error: #f87171;
   --color-status-success: #4ade80;
   --color-status-warning: #fbbf24;
-  /* Accent subtle overridden for dark — ThemeContext injects the dark variant */
   --color-accent-subtle: #1d3a6e;
   --color-accent-foreground: #ffffff;
 }

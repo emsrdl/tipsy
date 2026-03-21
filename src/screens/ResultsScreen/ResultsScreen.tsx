@@ -43,6 +43,8 @@ export function ResultsScreen() {
     <ScreenContainer
       title={t('screens:results.title')}
       subtitle={t('screens:results.subtitle')}
+      step={3}
+      totalSteps={3}
     >
       {results.length === 0 ? (
         <Alert status="info" message={t('errors:validation.noEmployees')} />
@@ -55,37 +57,38 @@ export function ResultsScreen() {
       )}
 
       {/* Export + navigation */}
-      <div className="mt-6 space-y-3">
+      <div className="mt-8 space-y-3">
         {results.length > 0 && (
-          <div className="flex gap-2">
+          <>
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
+              className="w-full min-h-14 text-base font-semibold"
               isLoading={isExporting}
               onClick={() => exportPdf(results)}
             >
-              <Icon name="file-text" size={16} />
+              <Icon name="file-text" size={18} />
               {t('common:actions.exportPdf')}
             </Button>
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
+              className="w-full min-h-14 text-base font-semibold"
               isLoading={isExporting}
               onClick={() => exportCsv(results)}
             >
-              <Icon name="download" size={16} />
+              <Icon name="download" size={18} />
               {t('common:actions.exportCsv')}
             </Button>
-          </div>
+          </>
         )}
 
-        <div className="flex justify-between">
+        <div className="flex gap-3">
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             onClick={() => void navigate('/cash')}
+            className="flex-1 min-h-12"
           >
             <Icon name="chevron-left" size={16} />
             {t('common:actions.back')}
@@ -94,6 +97,7 @@ export function ResultsScreen() {
             type="button"
             variant="ghost"
             onClick={handleReset}
+            className="flex-1 min-h-12"
           >
             <Icon name="refresh-cw" size={16} />
             {t('common:actions.reset')}

@@ -3,15 +3,18 @@
  * @description Icon name union type and Icon props.
  *
  * Thin wrapper around lucide-react icons to keep the icon set curated.
- * Add new icon names here as needed.
+ * Add new icon names here when a new icon is needed.
  */
 
 /** Curated set of icon names used in the app. Maps to lucide-react exports. */
 export type IconName =
   | 'plus'
+  | 'minus'
   | 'trash'
   | 'chevron-right'
   | 'chevron-left'
+  | 'chevron-up'
+  | 'chevron-down'
   | 'download'
   | 'file-text'
   | 'sun'
@@ -23,6 +26,11 @@ export type IconName =
   | 'refresh-cw'
   | 'banknote'
   | 'coins'
+  | 'share-2'
+  | 'copy'
+  | 'users'
+  | 'clock'
+  | 'utensils-crossed'
 
 export interface IconProps {
   /** Which icon to render. */

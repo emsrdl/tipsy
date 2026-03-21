@@ -1,14 +1,12 @@
 /**
  * @file tailwind.config.ts
- * @description Tailwind CSS configuration.
+ * @description Tailwind CSS — Material Design tokens.
  *
  * All colors reference CSS custom properties (no hardcoded hex values).
- * CSS variables are defined in src/styles/globals.css and toggled via
- * data-theme / data-mode attributes on <html> by ThemeContext.
+ * Material Design elevation shadows, 8px grid spacing, and touch-target
+ * sizing (48px minimum) are included.
  *
- * Border radius default is 12px (rounded-[12px]) per design spec.
- *
- * @see src/styles/globals.css for CSS variable definitions per theme
+ * @see src/styles/globals.css for CSS variable definitions
  * @see src/context/ThemeContext.tsx for runtime theme switching
  */
 import type { Config } from 'tailwindcss'
@@ -25,7 +23,21 @@ export default {
         md: '12px',
         lg: '16px',
         xl: '20px',
+        '2xl': '28px',
         full: '9999px',
+      },
+      boxShadow: {
+        // Material Design elevation system
+        'elevation-1': '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+        'elevation-2': '0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.10)',
+        'elevation-4': '0 6px 10px rgba(0,0,0,0.14), 0 1px 18px rgba(0,0,0,0.08)',
+        'elevation-8': '0 12px 17px rgba(0,0,0,0.14), 0 5px 22px rgba(0,0,0,0.08)',
+      },
+      spacing: {
+        '18': '4.5rem',   // 72px
+        '14': '3.5rem',   // 56px — AppBar / bottom nav
+        '13': '3.25rem',  // 52px
+        '12': '3rem',     // 48px — Material min touch target
       },
       colors: {
         accent: {

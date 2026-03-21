@@ -38,6 +38,8 @@ export function SetupScreen() {
     <ScreenContainer
       title={t('screens:setup.title')}
       subtitle={t('screens:setup.subtitle')}
+      step={1}
+      totalSteps={3}
     >
       <EmployeeForm />
 
@@ -46,14 +48,15 @@ export function SetupScreen() {
       )}
 
       {/* Navigation */}
-      <div className="mt-6 flex justify-end">
+      <div className="mt-8">
         <Button
           type="button"
           disabled={!canContinue}
           onClick={() => void navigate('/cash')}
+          className="w-full min-h-14 text-base font-semibold"
         >
           {t('common:actions.next')}
-          <Icon name="chevron-right" size={16} />
+          <Icon name="chevron-right" size={18} />
         </Button>
       </div>
     </ScreenContainer>

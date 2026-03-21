@@ -1,9 +1,12 @@
 /**
  * @file src/components/organisms/DenominationGrid/DenominationGrid.tsx
- * @description DenominationGrid organism — full denomination input grid.
+ * @description DenominationGrid organism — touch-optimized denomination input grid.
  *
- * Renders all 15 EUR denominations in two groups (banknotes / coins).
- * Shows a running total at the bottom.
+ * Touch-first redesign:
+ * - Material cards for banknotes and coins sections
+ * - Each DenominationItem has 48px+ Stepper touch targets
+ * - Sticky total display at bottom
+ * - Dividers between rows for visual separation
  *
  * @example
  * <DenominationGrid />
@@ -14,15 +17,16 @@ import { DenominationItem } from '@/components/molecules/DenominationItem/Denomi
 import { SummaryLine } from '@/components/molecules/SummaryLine/SummaryLine'
 import { useTipCalculator } from '@/hooks/useTipCalculator'
 import { DENOMINATIONS } from '@/config/currency'
+import { Icon } from '@/components/atoms/Icon/Icon'
 
-// Denominations split: banknotes (≥ €5) and coins (< €5)
 const BANKNOTES = DENOMINATIONS.filter((d) => d.valueInCents >= 500)
 const COINS = DENOMINATIONS.filter((d) => d.valueInCents < 500)
 
 /**
- * Grid of all 15 EUR denomination inputs with running total.
+ * Grid of all 15 EUR denominations with running total.
+ * Touch-optimized with 48px+ stepper buttons.
  *
- * @returns section element
+ * @returns section with banknotes, coins, and total summary
  *
  * @example
  * <DenominationGrid />
@@ -38,11 +42,14 @@ export function DenominationGrid() {
   return (
     <div className="space-y-4">
       {/* Banknotes */}
-      <div>
-        <h3 className="mb-2 text-sm font-medium text-text-secondary">
-          {t('screens:cashInput.denominationSection')}
-        </h3>
-        <div className="rounded-md border border-border overflow-hidden">
+      <div className="rounded-xl overflow-hidden shadow-elevation-1 bg-surface-raised">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+          <Icon name="banknote" size={16} className="text-text-secondary" />
+          <h3 className="text-sm font-semibold text-text-secondary">
+            {t('screens:cashInput.denominationSection')}
+          </h3>
+        </div>
+        <div className="divide-y divide-border">
           {BANKNOTES.map((denom) => (
             <DenominationItem
               key={denom.id}
@@ -55,11 +62,14 @@ export function DenominationGrid() {
       </div>
 
       {/* Coins */}
-      <div>
-        <h3 className="mb-2 text-sm font-medium text-text-secondary">
-          {t('screens:cashInput.coinSection')}
-        </h3>
-        <div className="rounded-md border border-border overflow-hidden">
+      <div className="rounded-xl overflow-hidden shadow-elevation-1 bg-surface-raised">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+          <Icon name="coins" size={16} className="text-text-secondary" />
+          <h3 className="text-sm font-semibold text-text-secondary">
+            {t('screens:cashInput.coinSection')}
+          </h3>
+        </div>
+        <div className="divide-y divide-border">
           {COINS.map((denom) => (
             <DenominationItem
               key={denom.id}
@@ -71,13 +81,21 @@ export function DenominationGrid() {
         </div>
       </div>
 
-      {/* Running total */}
-      <div className="rounded-md border border-border bg-surface-raised p-3">
-        <SummaryLine
-          label={t('common:currency.total')}
-          amountInCents={totalInCents}
-          prominent
-        />
+      {/* Running total — Material card, prominent */}
+      <div className="rounded-xl bg-accent shadow-elevation-2 p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-base font-semibold text-accent-foreground">
+            {t('common:currency.total')}
+          </span>
+          <span className="text-2xl font-bold text-accent-foreground font-mono">
+            <SummaryLine
+              label=""
+              amountInCents={totalInCents}
+              prominent
+              className="text-accent-foreground text-2xl"
+            />
+          </span>
+        </div>
       </div>
     </div>
   )

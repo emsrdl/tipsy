@@ -1,9 +1,12 @@
 /**
  * @file src/components/organisms/DistributionTable/DistributionTable.tsx
- * @description DistributionTable organism — shows calculated tip amounts per employee.
+ * @description DistributionTable organism — Material card results per employee.
  *
- * Renders results grouped by kitchen/service, showing each employee's
- * name, hours, and calculated amount.
+ * Touch-first redesign:
+ * - Each employee as a Material card with prominent amount display
+ * - Group header chips with pool total
+ * - Per-hour rate displayed on each card
+ * - Summary footer card with kitchen/service/total breakdown
  *
  * @example
  * <DistributionTable results={session.results} totalInCents={totalInCents} />
@@ -11,23 +14,22 @@
 
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/atoms/Badge/Badge'
-import { SummaryLine } from '@/components/molecules/SummaryLine/SummaryLine'
+import { Icon } from '@/components/atoms/Icon/Icon'
 import { formatEurFromCents } from '@/config/currency'
 import { useLocale } from '@/hooks/useLocale'
+import { cn } from '@/lib/utils'
 import type { DistributionResult } from '@/types/session'
 
 export interface DistributionTableProps {
-  /** Calculated distribution results. */
   results: DistributionResult[]
-  /** Total cash in cents (for the summary footer). */
   totalInCents: number
 }
 
 /**
- * Results table grouped by kitchen/service.
+ * Material card-based results display grouped by kitchen/service.
  *
  * @param props - DistributionTableProps
- * @returns div with grouped employee rows and total summary
+ * @returns div with employee cards and summary footer
  *
  * @example
  * <DistributionTable results={results} totalInCents={10000} />
@@ -39,56 +41,107 @@ export function DistributionTable({ results, totalInCents }: DistributionTablePr
 
   const kitchenResults = results.filter((r) => r.group === 'kitchen')
   const serviceResults = results.filter((r) => r.group === 'service')
-
   const kitchenTotal = kitchenResults.reduce((s, r) => s + r.amountInCents, 0)
   const serviceTotal = serviceResults.reduce((s, r) => s + r.amountInCents, 0)
 
-  function renderGroup(groupResults: DistributionResult[], groupLabel: string, badgeVariant: 'kitchen' | 'service') {
+  function renderGroup(
+    groupResults: DistributionResult[],
+    groupLabel: string,
+    badgeVariant: 'kitchen' | 'service',
+    icon: 'utensils-crossed' | 'users'
+  ) {
     if (groupResults.length === 0) return null
     const groupTotal = groupResults.reduce((s, r) => s + r.amountInCents, 0)
     const groupHours = groupResults.reduce((s, r) => s + r.hours, 0)
 
     return (
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 px-1 mb-2">
-          <Badge variant={badgeVariant}>{groupLabel}</Badge>
-          <span className="text-xs text-text-secondary">{formatEurFromCents(groupTotal, fmtLocale)}</span>
-        </div>
-        {groupResults.map((r) => (
-          <div key={r.employeeId} className="flex items-center justify-between rounded-md px-3 py-2 even:bg-surface-raised">
-            <div>
-              <span className="font-medium text-text-primary">{r.name}</span>
-              <span className="ml-2 text-xs text-text-secondary">
-                {r.hours} {t('common:currency.perHour')}
-              </span>
-            </div>
-            <span className="font-mono font-medium">
-              {formatEurFromCents(r.amountInCents, fmtLocale)}
-            </span>
+      <div className="space-y-2">
+        {/* Group header */}
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <Icon name={icon} size={14} className="text-text-secondary" />
+            <Badge variant={badgeVariant}>{groupLabel}</Badge>
           </div>
-        ))}
-        <div className="px-3 py-1 text-right text-xs text-text-secondary">
-          {t('screens:results.perHourLabel')}: {groupHours > 0 ? formatEurFromCents(Math.round(groupTotal / groupHours), fmtLocale) : '—'}
+          <div className="text-right">
+            <span className="text-sm font-semibold text-text-primary">
+              {formatEurFromCents(groupTotal, fmtLocale)}
+            </span>
+            {groupHours > 0 && (
+              <span className="ml-2 text-xs text-text-secondary">
+                ⌀ {formatEurFromCents(Math.round(groupTotal / groupHours), fmtLocale)}/h
+              </span>
+            )}
+          </div>
         </div>
+
+        {/* Employee cards */}
+        {groupResults.map((r) => {
+          const perHour = r.hours > 0
+            ? formatEurFromCents(Math.round(r.amountInCents / r.hours), fmtLocale)
+            : null
+
+          return (
+            <div
+              key={r.employeeId}
+              className={cn(
+                'rounded-xl bg-surface-raised shadow-elevation-1 px-4 py-3',
+                'flex items-center justify-between gap-4'
+              )}
+            >
+              <div className="min-w-0">
+                <p className="font-semibold text-text-primary text-base truncate">{r.name}</p>
+                <p className="text-sm text-text-secondary mt-0.5 flex items-center gap-1">
+                  <Icon name="clock" size={12} />
+                  {r.hours}h
+                  {perHour && (
+                    <span className="ml-1">· {perHour}/h</span>
+                  )}
+                </p>
+              </div>
+              <div className="flex-shrink-0 text-right">
+                <p className="text-xl font-bold font-mono text-text-primary">
+                  {formatEurFromCents(r.amountInCents, fmtLocale)}
+                </p>
+              </div>
+            </div>
+          )
+        })}
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      {renderGroup(kitchenResults, t('screens:results.groupKitchen'), 'kitchen')}
-      {renderGroup(serviceResults, t('screens:results.groupService'), 'service')}
+      {renderGroup(kitchenResults, t('screens:results.groupKitchen'), 'kitchen', 'utensils-crossed')}
+      {renderGroup(serviceResults, t('screens:results.groupService'), 'service', 'users')}
 
-      {/* Total summary */}
-      <div className="rounded-md border border-border bg-surface-raised p-3 space-y-1">
+      {/* Summary card */}
+      <div className="rounded-xl overflow-hidden shadow-elevation-2">
         {kitchenResults.length > 0 && (
-          <SummaryLine label={t('screens:results.kitchenPoolLabel')} amountInCents={kitchenTotal} muted />
+          <div className="flex items-center justify-between px-4 py-3 bg-surface-raised border-b border-border">
+            <div className="flex items-center gap-2">
+              <Icon name="utensils-crossed" size={14} className="text-orange-600" />
+              <span className="text-sm text-text-secondary">{t('screens:results.kitchenPoolLabel')}</span>
+            </div>
+            <span className="font-mono text-sm font-semibold">{formatEurFromCents(kitchenTotal, fmtLocale)}</span>
+          </div>
         )}
         {serviceResults.length > 0 && (
-          <SummaryLine label={t('screens:results.servicePoolLabel')} amountInCents={serviceTotal} muted />
+          <div className="flex items-center justify-between px-4 py-3 bg-surface-raised border-b border-border">
+            <div className="flex items-center gap-2">
+              <Icon name="users" size={14} className="text-accent" />
+              <span className="text-sm text-text-secondary">{t('screens:results.servicePoolLabel')}</span>
+            </div>
+            <span className="font-mono text-sm font-semibold">{formatEurFromCents(serviceTotal, fmtLocale)}</span>
+          </div>
         )}
-        <div className="border-t border-border pt-1 mt-1">
-          <SummaryLine label={t('screens:results.totalLabel')} amountInCents={totalInCents} prominent />
+        <div className="flex items-center justify-between px-4 py-4 bg-accent">
+          <span className="text-base font-semibold text-accent-foreground">
+            {t('screens:results.totalLabel')}
+          </span>
+          <span className="text-2xl font-bold font-mono text-accent-foreground">
+            {formatEurFromCents(totalInCents, fmtLocale)}
+          </span>
         </div>
       </div>
     </div>

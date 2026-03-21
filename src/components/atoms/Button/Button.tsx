@@ -1,12 +1,11 @@
 /**
  * @file src/components/atoms/Button/Button.tsx
- * @description Button atom — wraps shadcn Button with loading state.
+ * @description Button atom — wraps shadcn Button with loading state and Material touch feedback.
  *
- * Adds:
- * - `isLoading` prop: shows a Spinner, disables interaction
- * - `loadingLabel`: accessible screen-reader text during loading
- *
- * All other props pass through to the underlying shadcn Button.
+ * Touch-first design:
+ * - Default/outline/destructive variants: min-h-12 (48px) for Material touch targets
+ * - Icon variant: 48×48px touch target
+ * - Ripple state layer on press
  *
  * @see src/components/ui/button.tsx for the shadcn base
  * @see src/components/atoms/Spinner/Spinner.tsx
@@ -20,10 +19,11 @@
 import { forwardRef } from 'react'
 import { Button as ShadcnButton } from '@/components/ui/button'
 import { Spinner } from '../Spinner/Spinner'
+import { cn } from '@/lib/utils'
 import type { ButtonProps } from './Button.types'
 
 /**
- * App-level Button atom.
+ * App-level Button atom. 48px min-height for Material touch targets.
  * Use this everywhere instead of the shadcn Button directly.
  *
  * @param props - ButtonProps (extends shadcn ButtonProps)
@@ -31,18 +31,32 @@ import type { ButtonProps } from './Button.types'
  *
  * @example
  * <Button variant="default" isLoading={isSaving}>Speichern</Button>
+ * <Button variant="outline" size="lg" className="w-full">Weiter</Button>
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ isLoading = false, loadingLabel = 'Lädt...', disabled, children, ...props }, ref) => {
+  ({ isLoading = false, loadingLabel = 'Lädt...', disabled, className, size, ...props }, ref) => {
+    // Ensure 48px touch target for all interactive sizes
+    const touchClass = size === 'icon'
+      ? 'min-h-12 min-w-12'
+      : size === 'sm'
+        ? 'min-h-10'
+        : 'min-h-12'
+
     return (
-      <ShadcnButton ref={ref} disabled={disabled ?? isLoading} {...props}>
+      <ShadcnButton
+        ref={ref}
+        disabled={disabled ?? isLoading}
+        size={size}
+        className={cn('ripple transition-all', touchClass, className)}
+        {...props}
+      >
         {isLoading ? (
           <>
             <Spinner size="sm" aria-label={loadingLabel} />
-            <span aria-hidden>{children}</span>
+            <span aria-hidden>{props.children}</span>
           </>
         ) : (
-          children
+          props.children
         )}
       </ShadcnButton>
     )

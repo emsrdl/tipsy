@@ -1,21 +1,22 @@
 /**
  * @file src/components/organisms/EmployeeForm/EmployeeForm.tsx
- * @description EmployeeForm organism — full employee management UI.
+ * @description EmployeeForm organism — Material card-based employee management.
  *
- * Includes: employee list with EmployeeRow, add button, kitchen/service split config.
+ * Touch-first redesign:
+ * - Each employee as a Material card (EmployeeRow)
+ * - Large 56px FAB-style "Add Employee" button
+ * - Material Slider for kitchen/service split (no keyboard)
+ * - Live split display with percentage badges
  *
  * @example
  * <EmployeeForm />
  */
 
-import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EmployeeRow } from '@/components/molecules/EmployeeRow/EmployeeRow'
 import { Button } from '@/components/atoms/Button/Button'
 import { Icon } from '@/components/atoms/Icon/Icon'
-import { FormGroup } from '@/components/molecules/FormGroup/FormGroup'
-import { Input } from '@/components/atoms/Input/Input'
-import { Alert } from '@/components/molecules/Alert/Alert'
+import { Slider } from '@/components/molecules/Slider/Slider'
 import { useTipCalculator } from '@/hooks/useTipCalculator'
 import type { Employee } from '@/types/employee'
 
@@ -24,10 +25,10 @@ function generateId(): string {
 }
 
 /**
- * Complete employee setup form.
+ * Complete employee setup form with Material Design interactions.
  * Reads and writes session state via useTipCalculator hook.
  *
- * @returns section element with employee list and split config
+ * @returns section with employee cards, add button, and split slider
  *
  * @example
  * <EmployeeForm />
@@ -36,11 +37,7 @@ export function EmployeeForm() {
   const { t } = useTranslation(['common', 'screens', 'errors'])
   const { session, addEmployee, removeEmployee, updateEmployee, setSplit } = useTipCalculator()
 
-  const kitchenId = useId()
-  const serviceId = useId()
-
-  const splitError =
-    session.split.kitchenPercent + session.split.servicePercent !== 100
+  const splitError = session.split.kitchenPercent + session.split.servicePercent !== 100
 
   function handleAddEmployee() {
     const employee: Employee = {
@@ -52,91 +49,68 @@ export function EmployeeForm() {
     addEmployee(employee)
   }
 
-  function handleKitchenChange(value: string) {
-    const k = parseInt(value, 10)
-    if (!isNaN(k) && k >= 0 && k <= 100) {
-      setSplit({ kitchenPercent: k, servicePercent: 100 - k })
-    }
-  }
-
-  function handleServiceChange(value: string) {
-    const s = parseInt(value, 10)
-    if (!isNaN(s) && s >= 0 && s <= 100) {
-      setSplit({ kitchenPercent: 100 - s, servicePercent: s })
-    }
-  }
-
   return (
     <div className="space-y-4">
-      {/* Employee list */}
-      <div className="space-y-2">
-        {session.employees.length === 0 && (
-          <p className="text-sm text-text-secondary py-2">{t('screens:setup.noEmployees')}</p>
-        )}
-        {session.employees.map((emp) => (
-          <EmployeeRow
-            key={emp.id}
-            employee={emp}
-            onRemove={removeEmployee}
-            onNameChange={(id, name) => updateEmployee(id, { name })}
-            onHoursChange={(id, hours) => updateEmployee(id, { hours })}
-            onGroupChange={(id, group) => updateEmployee(id, { group })}
-          />
-        ))}
-      </div>
+      {/* Employee cards */}
+      {session.employees.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <div className="h-16 w-16 rounded-full bg-surface-overlay flex items-center justify-center mb-4">
+            <Icon name="users" size={28} className="text-text-secondary" />
+          </div>
+          <p className="text-base font-medium text-text-primary mb-1">
+            {t('screens:setup.noEmployees')}
+          </p>
+          <p className="text-sm text-text-secondary">
+            {t('screens:setup.subtitle')}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {session.employees.map((emp) => (
+            <EmployeeRow
+              key={emp.id}
+              employee={emp}
+              onRemove={removeEmployee}
+              onNameChange={(id, name) => updateEmployee(id, { name })}
+              onHoursChange={(id, hours) => updateEmployee(id, { hours })}
+              onGroupChange={(id, group) => updateEmployee(id, { group })}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* Add employee button */}
+      {/* Add employee — large touch button */}
       <Button
         type="button"
         variant="outline"
-        className="w-full"
+        className="w-full min-h-14 text-base gap-3 rounded-xl border-2 border-dashed border-accent/50 text-accent hover:bg-accent-subtle hover:border-accent"
         onClick={handleAddEmployee}
       >
-        <Icon name="plus" size={16} />
+        <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center">
+          <Icon name="plus" size={18} className="text-accent" />
+        </div>
         {t('common:actions.addEmployee')}
       </Button>
 
-      {/* Split configuration */}
-      <div className="rounded-md border border-border p-4 space-y-3">
-        <p className="text-sm font-medium">{t('screens:setup.splitTitle')}</p>
-        <div className="flex gap-3">
-          <FormGroup
-            id={kitchenId}
-            label={t('screens:setup.kitchenPercent')}
-            error={splitError}
-            className="flex-1"
-          >
-            <Input
-              id={kitchenId}
-              type="number"
-              min={0}
-              max={100}
-              value={session.split.kitchenPercent}
-              onChange={(e) => handleKitchenChange(e.target.value)}
-              error={splitError}
-            />
-          </FormGroup>
-
-          <FormGroup
-            id={serviceId}
-            label={t('screens:setup.servicePercent')}
-            error={splitError}
-            className="flex-1"
-          >
-            <Input
-              id={serviceId}
-              type="number"
-              min={0}
-              max={100}
-              value={session.split.servicePercent}
-              onChange={(e) => handleServiceChange(e.target.value)}
-              error={splitError}
-            />
-          </FormGroup>
+      {/* Kitchen / Service split — Material Slider */}
+      <div className="rounded-xl bg-surface-raised shadow-elevation-1 p-4 space-y-4">
+        <div className="flex items-center gap-2">
+          <Icon name="utensils-crossed" size={16} className="text-text-secondary" />
+          <p className="text-sm font-semibold text-text-primary">{t('screens:setup.splitTitle')}</p>
         </div>
 
+        <Slider
+          value={session.split.kitchenPercent}
+          onChange={(k) => setSplit({ kitchenPercent: k, servicePercent: 100 - k })}
+          label={t('screens:setup.groupKitchen')}
+          counterLabel={t('screens:setup.groupService')}
+          aria-label={t('screens:setup.splitTitle')}
+        />
+
         {splitError && (
-          <Alert status="error" message={t('errors:validation.splitMustEqual100')} />
+          <p className="text-xs text-status-error">
+            {t('errors:validation.splitMustEqual100')}
+          </p>
         )}
       </div>
     </div>

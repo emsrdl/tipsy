@@ -1,9 +1,9 @@
 /**
  * @file src/components/organisms/HeaderBar/HeaderBar.tsx
- * @description HeaderBar organism — top navigation bar.
+ * @description HeaderBar organism — Material AppBar (56px, elevation, safe area).
  *
- * Contains: Logo, app name, LanguageToggle, dark mode toggle, ThemeSwitcher trigger.
- * Sticks to the top of the viewport.
+ * Touch-first: 48px icon buttons, safe area top padding for notched devices.
+ * Uses Material elevation shadow instead of border.
  *
  * @example
  * // Used inside AppLayout
@@ -19,7 +19,7 @@ import { ThemeSwitcher } from '../ThemeSwitcher/ThemeSwitcher'
 import { useTheme } from '@/hooks/useTheme'
 
 /**
- * Top navigation bar with logo, controls, and theme switcher.
+ * Material AppBar: sticky, 56px tall, elevation shadow, safe-area aware.
  *
  * @returns header element
  *
@@ -31,16 +31,16 @@ export function HeaderBar() {
   const { colorMode, toggleColorMode } = useTheme()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 bg-surface shadow-elevation-2 pt-safe">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
         {/* Left: Logo + App Name */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <Logo size={28} className="text-accent" />
-          <span className="font-semibold text-text-primary">{t('app.name')}</span>
+          <span className="text-title-md text-text-primary">{t('app.name')}</span>
         </div>
 
-        {/* Right: Controls */}
-        <div className="flex items-center gap-2">
+        {/* Right: Controls (48px touch targets) */}
+        <div className="flex items-center gap-1">
           <LanguageToggle />
 
           {/* Dark mode toggle */}
@@ -50,8 +50,9 @@ export function HeaderBar() {
             size="icon"
             onClick={toggleColorMode}
             aria-label={colorMode === 'light' ? t('theme.dark') : t('theme.light')}
+            className="h-12 w-12"
           >
-            <Icon name={colorMode === 'light' ? 'moon' : 'sun'} size={16} />
+            <Icon name={colorMode === 'light' ? 'moon' : 'sun'} size={18} />
           </Button>
 
           {/* Theme switcher */}
