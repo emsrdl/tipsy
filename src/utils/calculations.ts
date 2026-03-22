@@ -26,7 +26,7 @@
  * percentageOf(999, 50)   // 499   (floor of 499.5)
  */
 export function percentageOf(totalCents: number, percent: number): number {
-  return Math.floor((totalCents * percent) / 100)
+  return Math.floor((totalCents * percent) / 100);
 }
 
 /**
@@ -44,8 +44,8 @@ export function percentageOf(totalCents: number, percent: number): number {
  * roundToNearest(1234, 1)   // 1234 (already at 1ct precision)
  */
 export function roundToNearest(amountCents: number, unitCents: number): number {
-  if (unitCents <= 0) return amountCents
-  return Math.round(amountCents / unitCents) * unitCents
+  if (unitCents <= 0) return amountCents;
+  return Math.round(amountCents / unitCents) * unitCents;
 }
 
 /**
@@ -61,7 +61,7 @@ export function roundToNearest(amountCents: number, unitCents: number): number {
  * clampInt(100)  // 100
  */
 export function clampInt(value: number): number {
-  return Math.floor(Math.max(0, value))
+  return Math.floor(Math.max(0, value));
 }
 
 /**
@@ -90,33 +90,33 @@ export function clampInt(value: number): number {
  * // [0, 0]
  */
 export function proportionalSplit(totalCents: number, weights: number[]): number[] {
-  if (weights.length === 0) return []
+  if (weights.length === 0) return [];
 
-  const totalWeight = weights.reduce((sum, w) => sum + w, 0)
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
   if (totalWeight === 0 || totalCents <= 0) {
-    return weights.map(() => 0)
+    return weights.map(() => 0);
   }
 
   // Compute exact fractional shares
-  const exact = weights.map((w) => (totalCents * w) / totalWeight)
-  const floored = exact.map((v) => Math.floor(v))
+  const exact = weights.map((w) => (totalCents * w) / totalWeight);
+  const floored = exact.map((v) => Math.floor(v));
   const fractionals = exact.map((v, i) => ({
     index: i,
     frac: v - floored[i]!,
-  }))
+  }));
 
-  let remainder = totalCents - floored.reduce((s, v) => s + v, 0)
+  let remainder = totalCents - floored.reduce((s, v) => s + v, 0);
 
   // Sort by fractional part descending, break ties by index ascending (deterministic)
-  fractionals.sort((a, b) => b.frac - a.frac || a.index - b.index)
+  fractionals.sort((a, b) => b.frac - a.frac || a.index - b.index);
 
   for (const f of fractionals) {
-    if (remainder <= 0) break
-    floored[f.index]! += 1
-    remainder--
+    if (remainder <= 0) break;
+    floored[f.index]! += 1;
+    remainder--;
   }
 
-  return floored
+  return floored;
 }
 
 /**
@@ -132,8 +132,8 @@ export function proportionalSplit(totalCents: number, weights: number[]): number
  * mean([5])          // 5
  */
 export function mean(values: number[]): number {
-  if (values.length === 0) return 0
-  return values.reduce((sum, v) => sum + v, 0) / values.length
+  if (values.length === 0) return 0;
+  return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
 /**
@@ -149,8 +149,8 @@ export function mean(values: number[]): number {
  * tipPerHour(8000, 0) // 0
  */
 export function tipPerHour(amountCents: number, hours: number): number {
-  if (hours <= 0) return 0
-  return amountCents / hours
+  if (hours <= 0) return 0;
+  return amountCents / hours;
 }
 
 /**
@@ -167,7 +167,7 @@ export function tipPerHour(amountCents: number, hours: number): number {
  * rmsd([])             // 0
  */
 export function rmsd(deviations: number[]): number {
-  if (deviations.length === 0) return 0
-  const sumSquares = deviations.reduce((sum, d) => sum + d * d, 0)
-  return Math.sqrt(sumSquares / deviations.length)
+  if (deviations.length === 0) return 0;
+  const sumSquares = deviations.reduce((sum, d) => sum + d * d, 0);
+  return Math.sqrt(sumSquares / deviations.length);
 }

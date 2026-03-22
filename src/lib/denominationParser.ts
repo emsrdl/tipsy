@@ -14,8 +14,8 @@
  * // total === 5000 (5 × €10 = €50.00 = 5000 cents)
  */
 
-import type { DenominationQuantity } from '@/types/session'
-import type { Denomination } from '@/config/currency'
+import type { DenominationQuantity } from '@/types/session';
+import type { Denomination } from '@/config/currency';
 
 /**
  * Sums a list of denomination quantities into a total in euro cents.
@@ -36,16 +36,14 @@ import type { Denomination } from '@/config/currency'
  */
 export function sumDenominations(
   quantities: DenominationQuantity[],
-  denominations: Denomination[]
+  denominations: Denomination[],
 ): number {
-  const valueMap = new Map<string, number>(
-    denominations.map((d) => [d.id, d.valueInCents])
-  )
+  const valueMap = new Map<string, number>(denominations.map((d) => [d.id, d.valueInCents]));
 
   return quantities.reduce((total, { denominationId, quantity }) => {
-    const value = valueMap.get(denominationId)
-    if (value === undefined) return total
+    const value = valueMap.get(denominationId);
+    if (value === undefined) return total;
     // Floor quantity to prevent fractional cent issues
-    return total + value * Math.floor(quantity)
-  }, 0)
+    return total + value * Math.floor(quantity);
+  }, 0);
 }

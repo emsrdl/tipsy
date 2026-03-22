@@ -17,12 +17,12 @@
  * if (!result.valid) showErrors(result.errors)
  */
 
-import type { Employee } from '@/types/employee'
-import type { TipSplit, DenominationQuantity } from '@/types/session'
-import type { ValidationResult } from '@/types/calculation'
+import type { Employee } from '@/types/employee';
+import type { TipSplit, DenominationQuantity } from '@/types/session';
+import type { ValidationResult } from '@/types/calculation';
 
 /** Maximum allowed employee name length. */
-const MAX_NAME_LENGTH = 50
+const MAX_NAME_LENGTH = 50;
 
 /**
  * Validates a list of employees for the setup screen.
@@ -52,31 +52,31 @@ const MAX_NAME_LENGTH = 50
  * // { valid: false, errors: { 'employees[0].name': 'errors:validation.required' } }
  */
 export function validateEmployees(employees: Employee[]): ValidationResult {
-  const errors: Record<string, string> = {}
+  const errors: Record<string, string> = {};
 
   if (employees.length === 0) {
-    errors['employees'] = 'errors:validation.noEmployees'
-    return { valid: false, errors }
+    errors['employees'] = 'errors:validation.noEmployees';
+    return { valid: false, errors };
   }
 
   employees.forEach((emp, i) => {
     // Name validation
     if (!emp.name || emp.name.trim() === '') {
-      errors[`employees[${i}].name`] = 'errors:validation.required'
+      errors[`employees[${i}].name`] = 'errors:validation.required';
     } else if (emp.name.length > MAX_NAME_LENGTH) {
-      errors[`employees[${i}].name`] = 'errors:validation.nameTooLong'
+      errors[`employees[${i}].name`] = 'errors:validation.nameTooLong';
     }
 
     // Hours validation
     if (emp.hours <= 0) {
-      errors[`employees[${i}].hours`] = 'errors:validation.hoursZero'
+      errors[`employees[${i}].hours`] = 'errors:validation.hoursZero';
     }
     if (isNaN(emp.hours)) {
-      errors[`employees[${i}].hours`] = 'errors:validation.invalidNumber'
+      errors[`employees[${i}].hours`] = 'errors:validation.invalidNumber';
     }
-  })
+  });
 
-  return { valid: Object.keys(errors).length === 0, errors }
+  return { valid: Object.keys(errors).length === 0, errors };
 }
 
 /**
@@ -101,25 +101,25 @@ export function validateEmployees(employees: Employee[]): ValidationResult {
  * // { valid: false, errors: { split: 'errors:validation.splitMustEqual100' } }
  */
 export function validateSplit(split: TipSplit): ValidationResult {
-  const errors: Record<string, string> = {}
+  const errors: Record<string, string> = {};
 
   if (isNaN(split.kitchenPercent) || isNaN(split.servicePercent)) {
-    errors['split'] = 'errors:validation.invalidNumber'
-    return { valid: false, errors }
+    errors['split'] = 'errors:validation.invalidNumber';
+    return { valid: false, errors };
   }
 
   if (split.kitchenPercent < 0) {
-    errors['split.kitchenPercent'] = 'errors:validation.negativeNotAllowed'
+    errors['split.kitchenPercent'] = 'errors:validation.negativeNotAllowed';
   }
   if (split.servicePercent < 0) {
-    errors['split.servicePercent'] = 'errors:validation.negativeNotAllowed'
+    errors['split.servicePercent'] = 'errors:validation.negativeNotAllowed';
   }
 
   if (split.kitchenPercent + split.servicePercent !== 100) {
-    errors['split'] = 'errors:validation.splitMustEqual100'
+    errors['split'] = 'errors:validation.splitMustEqual100';
   }
 
-  return { valid: Object.keys(errors).length === 0, errors }
+  return { valid: Object.keys(errors).length === 0, errors };
 }
 
 /**
@@ -152,31 +152,31 @@ export function validateSplit(split: TipSplit): ValidationResult {
  */
 export function validateDenominations(
   denominations: DenominationQuantity[],
-  denominationValues: Map<string, number>
+  denominationValues: Map<string, number>,
 ): ValidationResult {
-  const errors: Record<string, string> = {}
+  const errors: Record<string, string> = {};
 
   denominations.forEach((d, i) => {
     if (isNaN(d.quantity)) {
-      errors[`denominations[${i}]`] = 'errors:validation.invalidNumber'
+      errors[`denominations[${i}]`] = 'errors:validation.invalidNumber';
     } else if (d.quantity < 0) {
-      errors[`denominations[${i}]`] = 'errors:validation.negativeNotAllowed'
+      errors[`denominations[${i}]`] = 'errors:validation.negativeNotAllowed';
     }
-  })
+  });
 
   // Only check total if no individual errors
   if (Object.keys(errors).length === 0) {
     const total = denominations.reduce((sum, d) => {
-      const value = denominationValues.get(d.denominationId) ?? 0
-      return sum + value * d.quantity
-    }, 0)
+      const value = denominationValues.get(d.denominationId) ?? 0;
+      return sum + value * d.quantity;
+    }, 0);
 
     if (total <= 0) {
-      errors['total'] = 'errors:validation.zeroTotal'
+      errors['total'] = 'errors:validation.zeroTotal';
     }
   }
 
-  return { valid: Object.keys(errors).length === 0, errors }
+  return { valid: Object.keys(errors).length === 0, errors };
 }
 
 /**
@@ -202,20 +202,20 @@ export function validateSession(
   employees: Employee[],
   split: TipSplit,
   denominations: DenominationQuantity[],
-  denominationValues: Map<string, number>
+  denominationValues: Map<string, number>,
 ): ValidationResult {
-  const empResult = validateEmployees(employees)
-  const splitResult = validateSplit(split)
-  const denomResult = validateDenominations(denominations, denominationValues)
+  const empResult = validateEmployees(employees);
+  const splitResult = validateSplit(split);
+  const denomResult = validateDenominations(denominations, denominationValues);
 
   const errors = {
     ...empResult.errors,
     ...splitResult.errors,
     ...denomResult.errors,
-  }
+  };
 
   return {
     valid: empResult.valid && splitResult.valid && denomResult.valid,
     errors,
-  }
+  };
 }

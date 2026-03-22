@@ -9,59 +9,52 @@
  * <ProfileSelector />
  */
 
-import { useState, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useProfiles } from '@/hooks/useProfiles'
-import { useShifts } from '@/hooks/useShifts'
-import { Icon } from '@/components/atoms/Icon/Icon'
-import { Badge } from '@/components/atoms/Badge/Badge'
-import { Button } from '@/components/atoms/Button/Button'
-import { cn } from '@/lib/utils'
+import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useProfiles } from '@/hooks/useProfiles';
+import { useShifts } from '@/hooks/useShifts';
+import { Icon } from '@/components/atoms/Icon/Icon';
+import { Badge } from '@/components/atoms/Badge/Badge';
+import { Button } from '@/components/atoms/Button/Button';
+import { cn } from '@/lib/utils';
 
 /**
  * Profile selector with inline dropdown panel.
  */
 export function ProfileSelector() {
-  const { t } = useTranslation(['common', 'screens'])
-  const {
-    profiles,
-    activeProfile,
-    isGuestMode,
-    switchProfile,
-    createProfile,
-    enterGuestMode,
-  } = useProfiles()
-  const { shifts } = useShifts()
+  const { t } = useTranslation(['common', 'screens']);
+  const { profiles, activeProfile, isGuestMode, switchProfile, createProfile, enterGuestMode } =
+    useProfiles();
+  const { shifts } = useShifts();
 
-  const [isOpen, setIsOpen] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
-  const [newName, setNewName] = useState('')
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newName, setNewName] = useState('');
 
-  const toggle = useCallback(() => setIsOpen((v) => !v), [])
+  const toggle = useCallback(() => setIsOpen((v) => !v), []);
 
   function handleSwitch(id: string) {
-    switchProfile(id)
-    setIsOpen(false)
+    switchProfile(id);
+    setIsOpen(false);
   }
 
   function handleGuestMode() {
-    enterGuestMode()
-    setIsOpen(false)
+    enterGuestMode();
+    setIsOpen(false);
   }
 
   function handleCreate() {
-    if (!newName.trim()) return
-    createProfile(newName.trim(), 'service', true)
-    setNewName('')
-    setIsCreating(false)
-    setIsOpen(false)
+    if (!newName.trim()) return;
+    createProfile(newName.trim(), 'service', true);
+    setNewName('');
+    setIsCreating(false);
+    setIsOpen(false);
   }
 
-  const displayName = isGuestMode || !activeProfile
-    ? t('common:profile.guestBadge')
-    : activeProfile.name
+  const displayName =
+    isGuestMode || !activeProfile ? t('common:profile.guestBadge') : activeProfile.name;
 
-  const displayRole = activeProfile?.role ?? null
+  const displayRole = activeProfile?.role ?? null;
 
   return (
     <div className="relative">
@@ -70,17 +63,19 @@ export function ProfileSelector() {
         type="button"
         onClick={toggle}
         className={cn(
-          'w-full flex items-center gap-3 px-4 py-3 rounded-xl',
+          'flex w-full items-center gap-3 rounded-xl px-4 py-3',
           'bg-surface-raised shadow-elevation-1 transition-all',
           'hover:shadow-elevation-2 active:shadow-elevation-1',
-          'min-h-14'
+          'min-h-14',
         )}
         aria-expanded={isOpen}
       >
-        <div className={cn(
-          'h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0',
-          isGuestMode || !activeProfile ? 'bg-surface-overlay' : 'bg-accent/10'
-        )}>
+        <div
+          className={cn(
+            'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full',
+            isGuestMode || !activeProfile ? 'bg-surface-overlay' : 'bg-accent/10',
+          )}
+        >
           <Icon
             name={isGuestMode || !activeProfile ? 'user' : 'user'}
             size={18}
@@ -92,7 +87,10 @@ export function ProfileSelector() {
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-text-primary">{displayName}</span>
             {isGuestMode && (
-              <Badge variant="default" className="text-xs bg-status-warning/20 text-status-warning border-0">
+              <Badge
+                variant="default"
+                className="bg-status-warning/20 border-0 text-xs text-status-warning"
+              >
                 {t('common:profile.guestBadge')}
               </Badge>
             )}
@@ -104,21 +102,19 @@ export function ProfileSelector() {
               </Badge>
             )}
           </div>
-          <p className="text-xs text-text-secondary mt-0.5">
-            {t('common:actions.switchProfile')}
-          </p>
+          <p className="mt-0.5 text-xs text-text-secondary">{t('common:actions.switchProfile')}</p>
         </div>
 
         <Icon
           name={isOpen ? 'chevron-up' : 'chevron-down'}
           size={16}
-          className="text-text-secondary flex-shrink-0"
+          className="flex-shrink-0 text-text-secondary"
         />
       </button>
 
       {/* Dropdown panel */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-2 z-30 bg-surface-raised rounded-xl shadow-elevation-4 overflow-hidden border border-border">
+        <div className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-border bg-surface-raised shadow-elevation-4">
           {/* Existing profiles */}
           {profiles.map((profile) => (
             <button
@@ -126,14 +122,18 @@ export function ProfileSelector() {
               type="button"
               onClick={() => handleSwitch(profile.id)}
               className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-overlay transition-colors',
-                activeProfile?.id === profile.id && 'bg-accent-subtle'
+                'flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-overlay',
+                activeProfile?.id === profile.id && 'bg-accent-subtle',
               )}
             >
-              <div className={cn(
-                'h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold',
-                activeProfile?.id === profile.id ? 'bg-accent text-accent-foreground' : 'bg-surface-overlay text-text-secondary'
-              )}>
+              <div
+                className={cn(
+                  'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                  activeProfile?.id === profile.id
+                    ? 'bg-accent text-accent-foreground'
+                    : 'bg-surface-overlay text-text-secondary',
+                )}
+              >
                 {profile.name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 text-left">
@@ -143,7 +143,8 @@ export function ProfileSelector() {
                     ? t('common:profile.role.kitchen')
                     : t('common:profile.role.service')}
                   {' · '}
-                  {shifts.filter((s) => s.profileId === profile.id).length} {t('screens:shifts.title').toLowerCase()}
+                  {shifts.filter((s) => s.profileId === profile.id).length}{' '}
+                  {t('screens:shifts.title').toLowerCase()}
                 </p>
               </div>
               {activeProfile?.id === profile.id && (
@@ -157,14 +158,14 @@ export function ProfileSelector() {
             type="button"
             onClick={handleGuestMode}
             className={cn(
-              'w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-overlay transition-colors border-t border-border',
-              isGuestMode && 'bg-accent-subtle'
+              'flex w-full items-center gap-3 border-t border-border px-4 py-3 transition-colors hover:bg-surface-overlay',
+              isGuestMode && 'bg-accent-subtle',
             )}
           >
-            <div className="h-8 w-8 rounded-full bg-surface-overlay flex items-center justify-center flex-shrink-0">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-surface-overlay">
               <Icon name="user" size={16} className="text-text-secondary" />
             </div>
-            <span className="text-sm font-medium text-text-primary flex-1 text-left">
+            <span className="flex-1 text-left text-sm font-medium text-text-primary">
               {t('common:actions.guestMode')}
             </span>
             {isGuestMode && <Icon name="check" size={16} className="text-accent" />}
@@ -176,7 +177,7 @@ export function ProfileSelector() {
               <Button
                 type="button"
                 variant="ghost"
-                className="w-full min-h-10 text-sm gap-2"
+                className="min-h-10 w-full gap-2 text-sm"
                 onClick={() => setIsCreating(true)}
               >
                 <Icon name="plus" size={14} />
@@ -190,13 +191,21 @@ export function ProfileSelector() {
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                   placeholder={t('screens:profile.namePlaceholder')}
-                  className="flex-1 h-10 px-3 rounded-lg bg-surface-overlay text-sm text-text-primary border border-border focus:outline-none focus:border-accent"
+                  className="h-10 flex-1 rounded-lg border border-border bg-surface-overlay px-3 text-sm text-text-primary focus:border-accent focus:outline-none"
                   autoFocus
                 />
                 <Button type="button" onClick={handleCreate} className="min-h-10 px-3 text-sm">
                   <Icon name="check" size={14} />
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => { setIsCreating(false); setNewName('') }} className="min-h-10 px-3 text-sm">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setIsCreating(false);
+                    setNewName('');
+                  }}
+                  className="min-h-10 px-3 text-sm"
+                >
                   <Icon name="x" size={14} />
                 </Button>
               </div>
@@ -205,5 +214,5 @@ export function ProfileSelector() {
         </div>
       )}
     </div>
-  )
+  );
 }

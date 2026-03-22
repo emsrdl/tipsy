@@ -6,8 +6,8 @@
  * cn('px-4 py-2', condition && 'bg-accent', className)
  */
 
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 /**
  * Merges Tailwind CSS class names, resolving conflicts intelligently.
@@ -19,5 +19,5 @@ import { twMerge } from 'tailwind-merge'
  * cn('px-2 py-1', 'px-4') // "py-1 px-4" (px-4 wins)
  */
 export function cn(...inputs: ClassValue[]): string {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }

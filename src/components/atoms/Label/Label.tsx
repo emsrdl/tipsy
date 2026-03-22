@@ -12,12 +12,12 @@
  * <Label htmlFor="hours">Stunden</Label>
  */
 
-import type { ComponentPropsWithoutRef } from 'react'
-import { Label as ShadcnLabel } from '@/components/ui/label'
+import type { ComponentPropsWithoutRef } from 'react';
+import { Label as ShadcnLabel } from '@/components/ui/label';
 
 export interface LabelProps extends ComponentPropsWithoutRef<typeof ShadcnLabel> {
   /** @property Appends a red asterisk to indicate a required field. */
-  required?: boolean
+  required?: boolean;
 }
 
 /**
@@ -39,5 +39,5 @@ export function Label({ required, children, ...props }: LabelProps) {
         </span>
       )}
     </ShadcnLabel>
-  )
+  );
 }

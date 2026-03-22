@@ -10,22 +10,17 @@
  * />
  */
 
-import { useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/atoms/Button/Button'
-import { Icon } from '@/components/atoms/Icon/Icon'
+import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/atoms/Button/Button';
+import { Icon } from '@/components/atoms/Icon/Icon';
 
 export interface ImportDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  onImport: (file: File) => void
-  isProcessing?: boolean
+  isOpen: boolean;
+  onClose: () => void;
+  onImport: (file: File) => void;
+  isProcessing?: boolean;
 }
 
 /**
@@ -37,29 +32,34 @@ export function ImportDialog({
   onImport,
   isProcessing = false,
 }: ImportDialogProps) {
-  const { t } = useTranslation(['common'])
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { t } = useTranslation(['common']);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null
-    setSelectedFile(file)
+    const file = e.target.files?.[0] ?? null;
+    setSelectedFile(file);
   }
 
   function handleImport() {
-    if (!selectedFile) return
-    onImport(selectedFile)
-    setSelectedFile(null)
-    onClose()
+    if (!selectedFile) return;
+    onImport(selectedFile);
+    setSelectedFile(null);
+    onClose();
   }
 
   function handleClose() {
-    setSelectedFile(null)
-    onClose()
+    setSelectedFile(null);
+    onClose();
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose() }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>{t('common:actions.import')}</DialogTitle>
@@ -69,7 +69,7 @@ export function ImportDialog({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-full flex flex-col items-center justify-center gap-2 px-4 py-6 rounded-xl border-2 border-dashed border-border hover:border-accent/50 hover:bg-surface-overlay transition-colors"
+            className="hover:border-accent/50 flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-4 py-6 transition-colors hover:bg-surface-overlay"
           >
             <Icon name="upload" size={24} className="text-text-secondary" />
             {selectedFile ? (
@@ -89,12 +89,7 @@ export function ImportDialog({
         </div>
 
         <div className="flex gap-2 pt-1">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleClose}
-            className="min-h-11 px-4"
-          >
+          <Button type="button" variant="ghost" onClick={handleClose} className="min-h-11 px-4">
             {t('common:actions.cancel')}
           </Button>
           <Button
@@ -102,12 +97,12 @@ export function ImportDialog({
             disabled={!selectedFile}
             isLoading={isProcessing}
             onClick={handleImport}
-            className="flex-1 min-h-11"
+            className="min-h-11 flex-1"
           >
             {t('common:actions.import')}
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

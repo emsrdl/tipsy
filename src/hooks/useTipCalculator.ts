@@ -8,4 +8,4 @@
  * const { session, totalInCents, calculate, reset } = useTipCalculator()
  */
 
-export { useTipSessionContext as useTipCalculator } from '@/context/TipSessionContext'
+export { useTipSessionContext as useTipCalculator } from '@/context/TipSessionContext';

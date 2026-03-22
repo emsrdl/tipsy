@@ -31,20 +31,17 @@
  * }
  */
 
-import { useMemo, useCallback } from 'react'
-import {
-  calculateDistribution,
-  type CalculateDistributionInput,
-} from '@/lib/tipCalculator'
-import type { DistributionResult } from '@/types/session'
-import type { HistoryEntry } from '@/types/calculation'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useMemo, useCallback } from 'react';
+import { calculateDistribution, type CalculateDistributionInput } from '@/lib/tipCalculator';
+import type { DistributionResult } from '@/types/session';
+import type { HistoryEntry } from '@/types/calculation';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 /** localStorage key for persisted history entries. */
-const HISTORY_STORAGE_KEY = 'tipsy-history'
+const HISTORY_STORAGE_KEY = 'tipsy-history';
 
 /** Maximum number of history entries retained. Oldest entries are pruned on save. */
-const MAX_HISTORY_ENTRIES = 50
+const MAX_HISTORY_ENTRIES = 50;
 
 /**
  * Return value of the {@link useCalculation} hook.
@@ -57,15 +54,15 @@ const MAX_HISTORY_ENTRIES = 50
  */
 export interface UseCalculationResult {
   /** Current distribution results. Empty array if input is null. */
-  results: DistributionResult[]
+  results: DistributionResult[];
   /** Persisted history of past calculations. */
-  history: HistoryEntry[]
+  history: HistoryEntry[];
   /** Saves current results as a new history entry. No-op if results are empty. */
-  saveToHistory: () => void
+  saveToHistory: () => void;
   /** Removes all history entries from localStorage. */
-  clearHistory: () => void
+  clearHistory: () => void;
   /** Removes a single history entry by its id. */
-  removeHistoryEntry: (id: string) => void
+  removeHistoryEntry: (id: string) => void;
 }
 
 /**
@@ -97,23 +94,21 @@ export interface UseCalculationResult {
  * const { history, clearHistory, removeHistoryEntry } = useCalculation(null)
  * history.forEach(entry => console.log(entry.timestamp, entry.totalInCents))
  */
-export function useCalculation(
-  input: CalculateDistributionInput | null
-): UseCalculationResult {
+export function useCalculation(input: CalculateDistributionInput | null): UseCalculationResult {
   // Memoized calculation — only recalculates when input reference changes
   const results = useMemo<DistributionResult[]>(() => {
-    if (!input) return []
-    return calculateDistribution(input)
-  }, [input])
+    if (!input) return [];
+    return calculateDistribution(input);
+  }, [input]);
 
   // History persistence
   const [history, setHistory, clearHistoryStorage] = useLocalStorage<HistoryEntry[]>(
     HISTORY_STORAGE_KEY,
-    []
-  )
+    [],
+  );
 
   const saveToHistory = useCallback(() => {
-    if (results.length === 0 || !input) return
+    if (results.length === 0 || !input) return;
 
     const entry: HistoryEntry = {
       id: generateId(),
@@ -121,25 +116,25 @@ export function useCalculation(
       totalInCents: input.totalInCents,
       employeeCount: input.employees.length,
       results: [...results],
-    }
+    };
 
     setHistory((prev) => {
-      const next = [entry, ...prev]
+      const next = [entry, ...prev];
       // Prune to max entries
-      return next.slice(0, MAX_HISTORY_ENTRIES)
-    })
-  }, [results, input, setHistory])
+      return next.slice(0, MAX_HISTORY_ENTRIES);
+    });
+  }, [results, input, setHistory]);
 
   const clearHistory = useCallback(() => {
-    clearHistoryStorage()
-  }, [clearHistoryStorage])
+    clearHistoryStorage();
+  }, [clearHistoryStorage]);
 
   const removeHistoryEntry = useCallback(
     (id: string) => {
-      setHistory((prev) => prev.filter((e) => e.id !== id))
+      setHistory((prev) => prev.filter((e) => e.id !== id));
     },
-    [setHistory]
-  )
+    [setHistory],
+  );
 
   return {
     results,
@@ -147,7 +142,7 @@ export function useCalculation(
     saveToHistory,
     clearHistory,
     removeHistoryEntry,
-  }
+  };
 }
 
 /**
@@ -158,7 +153,7 @@ export function useCalculation(
  * @returns A string id like "hist-1711036200000-a1b2c3"
  */
 function generateId(): string {
-  const timestamp = Date.now()
-  const random = Math.random().toString(36).substring(2, 8)
-  return `hist-${timestamp}-${random}`
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `hist-${timestamp}-${random}`;
 }

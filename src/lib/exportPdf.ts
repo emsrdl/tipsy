@@ -17,14 +17,14 @@
  * exportTipsPdf(results, { locale: 'de', title: 'Trinkgeld 2024-03-21' })
  */
 
-import type { DistributionResult } from '@/types/session'
-import { formatEurFromCents } from './formatCurrency'
+import type { DistributionResult } from '@/types/session';
+import { formatEurFromCents } from './formatCurrency';
 
 export interface ExportPdfOptions {
   /** BCP 47 locale for number formatting. Defaults to 'de-DE'. */
-  locale?: string
+  locale?: string;
   /** Document title shown in the print dialog. */
-  title?: string
+  title?: string;
 }
 
 /**
@@ -37,11 +37,11 @@ export interface ExportPdfOptions {
  * exportTipsPdf(results, { title: 'Schicht 21.03.2024' })
  */
 export function exportTipsPdf(results: DistributionResult[], options: ExportPdfOptions = {}): void {
-  const locale = options.locale === 'en' ? 'en-US' : 'de-DE'
-  const title = options.title ?? 'Tipsy — Trinkgeldverteilung'
-  const date = new Date().toLocaleDateString(locale)
+  const locale = options.locale === 'en' ? 'en-US' : 'de-DE';
+  const title = options.title ?? 'Tipsy — Trinkgeldverteilung';
+  const date = new Date().toLocaleDateString(locale);
 
-  const totalCents = results.reduce((sum, r) => sum + r.amountInCents, 0)
+  const totalCents = results.reduce((sum, r) => sum + r.amountInCents, 0);
 
   const rows = results
     .map(
@@ -51,9 +51,9 @@ export function exportTipsPdf(results: DistributionResult[], options: ExportPdfO
       <td>${r.group === 'kitchen' ? 'Küche' : 'Service'}</td>
       <td>${r.hours}</td>
       <td>${formatEurFromCents(r.amountInCents, locale)}</td>
-    </tr>`
+    </tr>`,
     )
-    .join('')
+    .join('');
 
   const html = `<!DOCTYPE html>
 <html lang="${locale.startsWith('de') ? 'de' : 'en'}">
@@ -90,12 +90,12 @@ export function exportTipsPdf(results: DistributionResult[], options: ExportPdfO
   </table>
   <script>window.onload = () => { window.print(); window.close(); }<\/script>
 </body>
-</html>`
+</html>`;
 
-  const printWindow = window.open('', '_blank')
-  if (!printWindow) return // Popup blocked — silently fail
-  printWindow.document.write(html)
-  printWindow.document.close()
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return; // Popup blocked — silently fail
+  printWindow.document.write(html);
+  printWindow.document.close();
 }
 
 function escapeHtml(str: string): string {
@@ -104,5 +104,5 @@ function escapeHtml(str: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+    .replace(/'/g, '&#39;');
 }

@@ -3,7 +3,7 @@
  * @description Type definitions for the Button atom.
  */
 
-import type { ButtonProps as ShadcnButtonProps } from '@/components/ui/button'
+import type { ButtonProps as ShadcnButtonProps } from '@/components/ui/button';
 
 /**
  * Props for the Tipsy Button atom.
@@ -13,7 +13,7 @@ import type { ButtonProps as ShadcnButtonProps } from '@/components/ui/button'
  */
 export interface ButtonProps extends ShadcnButtonProps {
   /** @property Shows spinner and disables button. */
-  isLoading?: boolean
+  isLoading?: boolean;
   /** @property Accessible label shown to screen readers during loading. @default "Lädt..." */
-  loadingLabel?: string
+  loadingLabel?: string;
 }

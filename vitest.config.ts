@@ -8,8 +8,8 @@
  * @see src/test/setup.ts for global test setup (jest-dom, mocks)
  * @see vite.config.ts which this config extends
  */
-import { defineConfig, mergeConfig } from 'vitest/config'
-import viteConfig from './vite.config'
+import { defineConfig, mergeConfig } from 'vitest/config';
+import viteConfig from './vite.config';
 
 export default mergeConfig(
   viteConfig,
@@ -23,12 +23,7 @@ export default mergeConfig(
       coverage: {
         provider: 'v8',
         include: ['src/**/*.{ts,tsx}'],
-        exclude: [
-          'src/**/*.types.ts',
-          'src/vite-env.d.ts',
-          'src/test/**',
-          'src/components/ui/**',
-        ],
+        exclude: ['src/**/*.types.ts', 'src/vite-env.d.ts', 'src/test/**', 'src/components/ui/**'],
         thresholds: {
           lines: 80,
           functions: 80,
@@ -36,5 +31,5 @@ export default mergeConfig(
         },
       },
     },
-  })
-)
+  }),
+);

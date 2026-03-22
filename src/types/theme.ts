@@ -10,10 +10,10 @@
  */
 
 /** Available theme identifiers. */
-export type ThemeId = 'tipsy' | 'katzentempel'
+export type ThemeId = 'tipsy' | 'katzentempel';
 
 /** Dark/light mode. */
-export type ColorMode = 'light' | 'dark'
+export type ColorMode = 'light' | 'dark';
 
 /**
  * A selectable accent color within the Tipsy theme.
@@ -31,17 +31,17 @@ export type ColorMode = 'light' | 'dark'
  */
 export interface AccentColor {
   /** Unique identifier, used as CSS variable key. */
-  id: string
+  id: string;
   /** i18n key for the label. @see src/locales/de/common.json */
-  labelKey: string
+  labelKey: string;
   /** Base hex value. */
-  hex: string
+  hex: string;
   /** Darkened hex for hover states (~10% darker). */
-  hoverHex: string
+  hoverHex: string;
   /** Light background tint for subtle use (light mode). */
-  subtleHex: string
+  subtleHex: string;
   /** Dark background tint for subtle use (dark mode). */
-  subtleDarkHex: string
+  subtleDarkHex: string;
 }
 
 /**
@@ -54,17 +54,17 @@ export interface AccentColor {
  */
 export interface Theme {
   /** @see ThemeId */
-  id: ThemeId
+  id: ThemeId;
   /** i18n key for the display name. */
-  labelKey: string
+  labelKey: string;
   /** Which Logo variant to render. */
-  logoVariant: 'tipsy' | 'katzentempel'
+  logoVariant: 'tipsy' | 'katzentempel';
   /** Whether this theme supports dark mode (both do). */
-  supportsDarkMode: boolean
+  supportsDarkMode: boolean;
   /** Whether this theme has a color picker (only Tipsy). */
-  hasAccentPicker: boolean
+  hasAccentPicker: boolean;
   /** Available accent colors. Katzentempel has exactly one. */
-  accentColors: AccentColor[]
+  accentColors: AccentColor[];
   /** The default accent color id. */
-  defaultAccentId: string
+  defaultAccentId: string;
 }

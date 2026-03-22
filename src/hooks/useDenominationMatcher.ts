@@ -63,8 +63,8 @@
  * console.log(result.fairness.score)                  // high score
  */
 
-import { useMemo } from 'react'
-import type { DistributionResult } from '@/types/session'
+import { useMemo } from 'react';
+import type { DistributionResult } from '@/types/session';
 import type {
   AvailableDenomination,
   DenominationAssignment,
@@ -72,7 +72,7 @@ import type {
   DenominationMatchResult,
   EmployeePayoutPlan,
   FairnessScore,
-} from '@/types/calculation'
+} from '@/types/calculation';
 
 /**
  * React hook that runs the denomination matching algorithm.
@@ -91,12 +91,12 @@ import type {
  * }
  */
 export function useDenominationMatcher(
-  input: DenominationMatchInput | null
+  input: DenominationMatchInput | null,
 ): DenominationMatchResult | null {
   return useMemo(() => {
-    if (!input) return null
-    return matchDenominations(input)
-  }, [input])
+    if (!input) return null;
+    return matchDenominations(input);
+  }, [input]);
 }
 
 /**
@@ -114,8 +114,8 @@ export function useDenominationMatcher(
  * })
  */
 export function matchDenominations(input: DenominationMatchInput): DenominationMatchResult {
-  const start = performance.now()
-  const { distributions, available } = input
+  const start = performance.now();
+  const { distributions, available } = input;
 
   // Edge case: no employees
   if (distributions.length === 0) {
@@ -124,11 +124,11 @@ export function matchDenominations(input: DenominationMatchInput): DenominationM
       fairness: perfectFairness(),
       unallocated: available.map((a) => ({ ...a })),
       durationMs: performance.now() - start,
-    }
+    };
   }
 
   // Edge case: all ideal amounts are zero
-  const totalIdeal = distributions.reduce((s, d) => s + d.amountInCents, 0)
+  const totalIdeal = distributions.reduce((s, d) => s + d.amountInCents, 0);
   if (totalIdeal === 0) {
     return {
       payouts: distributions.map((d) => ({
@@ -142,36 +142,36 @@ export function matchDenominations(input: DenominationMatchInput): DenominationM
       fairness: perfectFairness(),
       unallocated: available.map((a) => ({ ...a })),
       durationMs: performance.now() - start,
-    }
+    };
   }
 
   // Deep copy available denominations (we mutate counts during assignment)
   const pool = available
     .map((a) => ({ ...a }))
     .filter((a) => a.available > 0 && a.valueInCents > 0)
-    .sort((a, b) => b.valueInCents - a.valueInCents)
+    .sort((a, b) => b.valueInCents - a.valueInCents);
 
   // Sort employees by ideal amount descending — process largest shares first
-  const sorted = [...distributions].sort((a, b) => b.amountInCents - a.amountInCents)
+  const sorted = [...distributions].sort((a, b) => b.amountInCents - a.amountInCents);
 
   // Phase 1: Greedy assignment
-  const assignmentMap = new Map<string, DenominationAssignment[]>()
-  const actualMap = new Map<string, number>()
+  const assignmentMap = new Map<string, DenominationAssignment[]>();
+  const actualMap = new Map<string, number>();
 
   for (const dist of sorted) {
-    const assignments = greedyAssign(dist.amountInCents, pool)
-    assignmentMap.set(dist.employeeId, assignments)
-    const actual = assignments.reduce((s, a) => s + a.totalCents, 0)
-    actualMap.set(dist.employeeId, actual)
+    const assignments = greedyAssign(dist.amountInCents, pool);
+    assignmentMap.set(dist.employeeId, assignments);
+    const actual = assignments.reduce((s, a) => s + a.totalCents, 0);
+    actualMap.set(dist.employeeId, actual);
   }
 
   // Phase 2: Improvement swaps — try to reduce max deviation
-  improveSwaps(distributions, assignmentMap, actualMap)
+  improveSwaps(distributions, assignmentMap, actualMap);
 
   // Build payouts
   const payouts: EmployeePayoutPlan[] = distributions.map((d) => {
-    const assignments = assignmentMap.get(d.employeeId) ?? []
-    const actual = actualMap.get(d.employeeId) ?? 0
+    const assignments = assignmentMap.get(d.employeeId) ?? [];
+    const actual = actualMap.get(d.employeeId) ?? 0;
     return {
       employeeId: d.employeeId,
       name: d.name,
@@ -179,21 +179,21 @@ export function matchDenominations(input: DenominationMatchInput): DenominationM
       actualAmountInCents: actual,
       deviationInCents: actual - d.amountInCents,
       assignments: assignments.filter((a) => a.count > 0),
-    }
-  })
+    };
+  });
 
   // Compute fairness
-  const fairness = computeFairness(payouts, totalIdeal)
+  const fairness = computeFairness(payouts, totalIdeal);
 
   // Unallocated denominations
-  const unallocated = pool.filter((p) => p.available > 0)
+  const unallocated = pool.filter((p) => p.available > 0);
 
   return {
     payouts,
     fairness,
     unallocated,
     durationMs: performance.now() - start,
-  }
+  };
 }
 
 /**
@@ -211,33 +211,30 @@ export function matchDenominations(input: DenominationMatchInput): DenominationM
  */
 function greedyAssign(
   targetCents: number,
-  pool: AvailableDenomination[]
+  pool: AvailableDenomination[],
 ): DenominationAssignment[] {
-  const assignments: DenominationAssignment[] = []
-  let remaining = targetCents
+  const assignments: DenominationAssignment[] = [];
+  let remaining = targetCents;
 
   for (let i = 0; i < pool.length; i++) {
-    const denom = pool[i]!
-    if (denom.available <= 0 || denom.valueInCents <= 0) continue
+    const denom = pool[i]!;
+    if (denom.available <= 0 || denom.valueInCents <= 0) continue;
 
     // How many of this denomination can we use?
-    let count = Math.min(
-      denom.available,
-      Math.floor(remaining / denom.valueInCents)
-    )
+    let count = Math.min(denom.available, Math.floor(remaining / denom.valueInCents));
 
     // If we haven't reached the target and this denomination would get us closer,
     // consider using one more (overshoot by at most one unit of this denomination)
     if (count < denom.available && remaining > 0) {
-      const shortfall = remaining - count * denom.valueInCents
+      const shortfall = remaining - count * denom.valueInCents;
       // Only overshoot if the overshoot is smaller than the shortfall
       if (shortfall > 0 && denom.valueInCents - shortfall < shortfall) {
         // Check if there's a smaller denomination that could fill the gap better
-        const hasSmaller = pool.slice(i + 1).some(
-          (d) => d.available > 0 && d.valueInCents <= shortfall
-        )
+        const hasSmaller = pool
+          .slice(i + 1)
+          .some((d) => d.available > 0 && d.valueInCents <= shortfall);
         if (!hasSmaller) {
-          count++
+          count++;
         }
       }
     }
@@ -247,13 +244,13 @@ function greedyAssign(
         denominationId: denom.denominationId,
         count,
         totalCents: count * denom.valueInCents,
-      })
-      denom.available -= count
-      remaining -= count * denom.valueInCents
+      });
+      denom.available -= count;
+      remaining -= count * denom.valueInCents;
     }
   }
 
-  return assignments
+  return assignments;
 }
 
 /**
@@ -275,69 +272,61 @@ function improveSwaps(
   assignmentMap: Map<string, DenominationAssignment[]>,
   actualMap: Map<string, number>,
 ): void {
-  const MAX_ITERATIONS = 50
-  let improved = true
-  let iteration = 0
+  const MAX_ITERATIONS = 50;
+  let improved = true;
+  let iteration = 0;
 
   while (improved && iteration < MAX_ITERATIONS) {
-    improved = false
-    iteration++
+    improved = false;
+    iteration++;
 
     for (const distA of distributions) {
       for (const distB of distributions) {
-        if (distA.employeeId === distB.employeeId) continue
+        if (distA.employeeId === distB.employeeId) continue;
 
-        const deviationA = (actualMap.get(distA.employeeId) ?? 0) - distA.amountInCents
-        const deviationB = (actualMap.get(distB.employeeId) ?? 0) - distB.amountInCents
+        const deviationA = (actualMap.get(distA.employeeId) ?? 0) - distA.amountInCents;
+        const deviationB = (actualMap.get(distB.employeeId) ?? 0) - distB.amountInCents;
 
         // Only try swaps where A is overpaid and B is underpaid
-        if (deviationA <= 0 || deviationB >= 0) continue
+        if (deviationA <= 0 || deviationB >= 0) continue;
 
-        const assignmentsA = assignmentMap.get(distA.employeeId) ?? []
+        const assignmentsA = assignmentMap.get(distA.employeeId) ?? [];
 
         // Try moving one denomination from A to B
         for (const assignA of assignmentsA) {
-          if (assignA.count <= 0) continue
-          const denomValue = assignA.totalCents / assignA.count
+          if (assignA.count <= 0) continue;
+          const denomValue = assignA.totalCents / assignA.count;
 
           // Would this swap improve things?
-          const newDeviationA = deviationA - denomValue
-          const newDeviationB = deviationB + denomValue
+          const newDeviationA = deviationA - denomValue;
+          const newDeviationB = deviationB + denomValue;
 
-          const oldSumSq = deviationA * deviationA + deviationB * deviationB
-          const newSumSq = newDeviationA * newDeviationA + newDeviationB * newDeviationB
+          const oldSumSq = deviationA * deviationA + deviationB * deviationB;
+          const newSumSq = newDeviationA * newDeviationA + newDeviationB * newDeviationB;
 
           if (newSumSq < oldSumSq) {
             // Accept swap: move one unit from A to B
-            assignA.count--
-            assignA.totalCents -= denomValue
+            assignA.count--;
+            assignA.totalCents -= denomValue;
 
-            const assignmentsB = assignmentMap.get(distB.employeeId) ?? []
-            const existingB = assignmentsB.find(
-              (a) => a.denominationId === assignA.denominationId
-            )
+            const assignmentsB = assignmentMap.get(distB.employeeId) ?? [];
+            const existingB = assignmentsB.find((a) => a.denominationId === assignA.denominationId);
             if (existingB) {
-              existingB.count++
-              existingB.totalCents += denomValue
+              existingB.count++;
+              existingB.totalCents += denomValue;
             } else {
               assignmentsB.push({
                 denominationId: assignA.denominationId,
                 count: 1,
                 totalCents: denomValue,
-              })
+              });
             }
 
-            actualMap.set(
-              distA.employeeId,
-              (actualMap.get(distA.employeeId) ?? 0) - denomValue
-            )
-            actualMap.set(
-              distB.employeeId,
-              (actualMap.get(distB.employeeId) ?? 0) + denomValue
-            )
+            actualMap.set(distA.employeeId, (actualMap.get(distA.employeeId) ?? 0) - denomValue);
+            actualMap.set(distB.employeeId, (actualMap.get(distB.employeeId) ?? 0) + denomValue);
 
-            improved = true
-            break
+            improved = true;
+            break;
           }
         }
       }
@@ -362,21 +351,22 @@ function improveSwaps(
  * @returns Computed fairness score
  */
 function computeFairness(payouts: EmployeePayoutPlan[], totalIdeal: number): FairnessScore {
-  if (payouts.length === 0) return perfectFairness()
+  if (payouts.length === 0) return perfectFairness();
 
-  const absDeviations = payouts.map((p) => Math.abs(p.deviationInCents))
-  const maxDeviation = Math.max(...absDeviations)
-  const meanDeviation = absDeviations.reduce((s, d) => s + d, 0) / absDeviations.length
+  const absDeviations = payouts.map((p) => Math.abs(p.deviationInCents));
+  const maxDeviation = Math.max(...absDeviations);
+  const meanDeviation = absDeviations.reduce((s, d) => s + d, 0) / absDeviations.length;
 
-  const totalActual = payouts.reduce((s, p) => s + p.actualAmountInCents, 0)
-  const totalUnallocated = Math.max(0, totalIdeal - totalActual)
+  const totalActual = payouts.reduce((s, p) => s + p.actualAmountInCents, 0);
+  const totalUnallocated = Math.max(0, totalIdeal - totalActual);
 
-  const isPerfect = maxDeviation === 0 && totalUnallocated === 0
+  const isPerfect = maxDeviation === 0 && totalUnallocated === 0;
 
   // Score: 100 when perfect, decreases as mean deviation increases relative to total
-  const score = totalIdeal > 0
-    ? Math.max(0, Math.round(100 - Math.min(100, (meanDeviation / totalIdeal) * 10000)))
-    : 100
+  const score =
+    totalIdeal > 0
+      ? Math.max(0, Math.round(100 - Math.min(100, (meanDeviation / totalIdeal) * 10000)))
+      : 100;
 
   return {
     maxDeviationInCents: maxDeviation,
@@ -384,7 +374,7 @@ function computeFairness(payouts: EmployeePayoutPlan[], totalIdeal: number): Fai
     totalUnallocatedCents: totalUnallocated,
     isPerfect,
     score,
-  }
+  };
 }
 
 /**
@@ -400,5 +390,5 @@ function perfectFairness(): FairnessScore {
     totalUnallocatedCents: 0,
     isPerfect: true,
     score: 100,
-  }
+  };
 }

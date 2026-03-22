@@ -14,17 +14,17 @@
  * </ScreenContainer>
  */
 
-import type { ReactNode } from 'react'
-import { cn } from '@/lib/utils'
+import type { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 export interface ScreenContainerProps {
-  title: string
-  subtitle?: string
+  title: string;
+  subtitle?: string;
   /** Current step number (1-based) for progress indicator. */
-  step?: number
+  step?: number;
   /** Total number of steps. */
-  totalSteps?: number
-  children: ReactNode
+  totalSteps?: number;
+  children: ReactNode;
 }
 
 /**
@@ -38,20 +38,32 @@ export interface ScreenContainerProps {
  *   <DenominationGrid />
  * </ScreenContainer>
  */
-export function ScreenContainer({ title, subtitle, step, totalSteps, children }: ScreenContainerProps) {
-  const showSteps = step !== undefined && totalSteps !== undefined
+export function ScreenContainer({
+  title,
+  subtitle,
+  step,
+  totalSteps,
+  children,
+}: ScreenContainerProps) {
+  const showSteps = step !== undefined && totalSteps !== undefined;
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 pb-8">
       {/* Step indicator */}
       {showSteps && (
-        <div className="flex items-center gap-2 mb-5" role="progressbar" aria-valuenow={step} aria-valuemin={1} aria-valuemax={totalSteps}>
+        <div
+          className="mb-5 flex items-center gap-2"
+          role="progressbar"
+          aria-valuenow={step}
+          aria-valuemin={1}
+          aria-valuemax={totalSteps}
+        >
           {Array.from({ length: totalSteps }, (_, i) => (
             <div
               key={i}
               className={cn(
                 'h-1.5 flex-1 rounded-full transition-all duration-300',
-                i < step ? 'bg-accent' : 'bg-surface-overlay'
+                i < step ? 'bg-accent' : 'bg-surface-overlay',
               )}
             />
           ))}
@@ -61,19 +73,19 @@ export function ScreenContainer({ title, subtitle, step, totalSteps, children }:
       {/* Title area */}
       <div className="mb-6">
         <div className="flex items-baseline justify-between">
-          <h1 className="text-2xl font-bold text-text-primary leading-tight">{title}</h1>
+          <h1 className="text-2xl font-bold leading-tight text-text-primary">{title}</h1>
           {showSteps && (
-            <span className="text-sm text-text-secondary ml-4 flex-shrink-0">
+            <span className="ml-4 flex-shrink-0 text-sm text-text-secondary">
               {step}/{totalSteps}
             </span>
           )}
         </div>
         {subtitle && (
-          <p className="mt-1.5 text-sm text-text-secondary leading-relaxed">{subtitle}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">{subtitle}</p>
         )}
       </div>
 
       {children}
     </main>
-  )
+  );
 }

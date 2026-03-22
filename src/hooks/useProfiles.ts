@@ -9,12 +9,12 @@
  * const { profiles, activeProfile, createProfile } = useProfiles()
  */
 
-import { useProfileContext } from '@/context/ProfileContext'
+import { useProfileContext } from '@/context/ProfileContext';
 
 /**
  * Hook to access and manage user profiles.
  * Must be used within a ProfileProvider.
  */
 export function useProfiles() {
-  return useProfileContext()
+  return useProfileContext();
 }

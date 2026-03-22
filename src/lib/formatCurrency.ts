@@ -29,13 +29,13 @@
  * formatEurFromCents(4599, 'en-US') // "€45.99"
  */
 export function formatEurFromCents(cents: number, locale: string = 'de-DE'): string {
-  const euros = cents / 100
+  const euros = cents / 100;
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(euros)
+  }).format(euros);
 }
 
 /**
@@ -54,8 +54,8 @@ export function formatEurFromCents(cents: number, locale: string = 'de-DE'): str
  */
 export function parseCentsFromInput(value: string): number | null {
   // Normalize: replace comma decimal separator with dot
-  const normalized = value.trim().replace(',', '.')
-  const parsed = parseFloat(normalized)
-  if (isNaN(parsed) || parsed < 0) return null
-  return Math.round(parsed * 100)
+  const normalized = value.trim().replace(',', '.');
+  const parsed = parseFloat(normalized);
+  if (isNaN(parsed) || parsed < 0) return null;
+  return Math.round(parsed * 100);
 }

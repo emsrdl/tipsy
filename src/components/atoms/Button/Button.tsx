@@ -16,11 +16,11 @@
  * <Button variant="outline" size="sm">Zurück</Button>
  */
 
-import { forwardRef } from 'react'
-import { Button as ShadcnButton } from '@/components/ui/button'
-import { Spinner } from '../Spinner/Spinner'
-import { cn } from '@/lib/utils'
-import type { ButtonProps } from './Button.types'
+import { forwardRef } from 'react';
+import { Button as ShadcnButton } from '@/components/ui/button';
+import { Spinner } from '../Spinner/Spinner';
+import { cn } from '@/lib/utils';
+import type { ButtonProps } from './Button.types';
 
 /**
  * App-level Button atom. 48px min-height for Material touch targets.
@@ -36,11 +36,8 @@ import type { ButtonProps } from './Button.types'
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ isLoading = false, loadingLabel = 'Lädt...', disabled, className, size, ...props }, ref) => {
     // Ensure 48px touch target for all interactive sizes
-    const touchClass = size === 'icon'
-      ? 'min-h-12 min-w-12'
-      : size === 'sm'
-        ? 'min-h-10'
-        : 'min-h-12'
+    const touchClass =
+      size === 'icon' ? 'min-h-12 min-w-12' : size === 'sm' ? 'min-h-10' : 'min-h-12';
 
     return (
       <ShadcnButton
@@ -59,8 +56,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           props.children
         )}
       </ShadcnButton>
-    )
-  }
-)
+    );
+  },
+);
 
-Button.displayName = 'Button'
+Button.displayName = 'Button';

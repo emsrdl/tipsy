@@ -13,17 +13,17 @@
  * />
  */
 
-import { Stepper } from '../Stepper/Stepper'
+import { Stepper } from '../Stepper/Stepper';
 
 export interface CurrencyInputProps {
   /** Current quantity value (non-negative integer). */
-  value: number
+  value: number;
   /** Called with the new quantity when it changes. */
-  onChange: (value: number) => void
+  onChange: (value: number) => void;
   /** Accessible label for screen readers. */
-  'aria-label'?: string
+  'aria-label'?: string;
   /** Whether the input is disabled. */
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 /**
@@ -35,7 +35,12 @@ export interface CurrencyInputProps {
  * @example
  * <CurrencyInput value={3} onChange={setQty} aria-label="Anzahl €5" />
  */
-export function CurrencyInput({ value, onChange, 'aria-label': ariaLabel, disabled }: CurrencyInputProps) {
+export function CurrencyInput({
+  value,
+  onChange,
+  'aria-label': ariaLabel,
+  disabled,
+}: CurrencyInputProps) {
   return (
     <Stepper
       value={value}
@@ -47,5 +52,5 @@ export function CurrencyInput({ value, onChange, 'aria-label': ariaLabel, disabl
       {...(ariaLabel !== undefined ? { 'aria-label': ariaLabel } : {})}
       size="md"
     />
-  )
+  );
 }

@@ -16,19 +16,19 @@
  * />
  */
 
-import { Stepper } from '../Stepper/Stepper'
-import { formatEurFromCents } from '@/config/currency'
-import { useLocale } from '@/hooks/useLocale'
-import { cn } from '@/lib/utils'
-import type { Denomination } from '@/config/currency'
+import { Stepper } from '../Stepper/Stepper';
+import { formatEurFromCents } from '@/config/currency';
+import { useLocale } from '@/hooks/useLocale';
+import { cn } from '@/lib/utils';
+import type { Denomination } from '@/config/currency';
 
 export interface DenominationItemProps {
   /** The denomination definition. */
-  denomination: Denomination
+  denomination: Denomination;
   /** Current quantity. */
-  quantity: number
+  quantity: number;
   /** Called when quantity changes. */
-  onQuantityChange: (denominationId: string, quantity: number) => void
+  onQuantityChange: (denominationId: string, quantity: number) => void;
 }
 
 /**
@@ -40,33 +40,37 @@ export interface DenominationItemProps {
  * @example
  * <DenominationItem denomination={d} quantity={qty} onQuantityChange={update} />
  */
-export function DenominationItem({ denomination, quantity, onQuantityChange }: DenominationItemProps) {
-  const { locale } = useLocale()
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
-  const subtotalCents = denomination.valueInCents * quantity
-  const isActive = quantity > 0
+export function DenominationItem({
+  denomination,
+  quantity,
+  onQuantityChange,
+}: DenominationItemProps) {
+  const { locale } = useLocale();
+  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
+  const subtotalCents = denomination.valueInCents * quantity;
+  const isActive = quantity > 0;
 
   return (
     <div
       className={cn(
         'flex items-center gap-3 px-4 py-3 transition-colors',
-        isActive && 'bg-accent-subtle/30'
+        isActive && 'bg-accent-subtle/30',
       )}
     >
       {/* Denomination symbol — pill */}
       <div
         className={cn(
-          'w-16 flex-shrink-0 flex items-center justify-center h-10 rounded-lg text-sm font-bold font-mono',
+          'flex h-10 w-16 flex-shrink-0 items-center justify-center rounded-lg font-mono text-sm font-bold',
           isActive
             ? 'bg-accent text-accent-foreground shadow-elevation-1'
-            : 'bg-surface-overlay text-text-primary'
+            : 'bg-surface-overlay text-text-primary',
         )}
       >
         {denomination.symbol}
       </div>
 
       {/* Stepper */}
-      <div className="flex-1 flex justify-center">
+      <div className="flex flex-1 justify-center">
         <Stepper
           value={quantity}
           onChange={(qty) => onQuantityChange(denomination.id, qty)}
@@ -79,12 +83,14 @@ export function DenominationItem({ denomination, quantity, onQuantityChange }: D
       </div>
 
       {/* Subtotal */}
-      <div className={cn(
-        'w-20 text-right font-mono text-sm flex-shrink-0',
-        isActive ? 'font-semibold text-text-primary' : 'text-text-secondary'
-      )}>
+      <div
+        className={cn(
+          'w-20 flex-shrink-0 text-right font-mono text-sm',
+          isActive ? 'font-semibold text-text-primary' : 'text-text-secondary',
+        )}
+      >
         {subtotalCents > 0 ? formatEurFromCents(subtotalCents, fmtLocale) : '—'}
       </div>
     </div>
-  )
+  );
 }

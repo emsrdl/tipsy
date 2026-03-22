@@ -10,13 +10,13 @@
  * <HeaderBar />
  */
 
-import { useTranslation } from 'react-i18next'
-import { Logo } from '@/components/atoms/Logo/Logo'
-import { Button } from '@/components/atoms/Button/Button'
-import { Icon } from '@/components/atoms/Icon/Icon'
-import { LanguageToggle } from '@/components/molecules/LanguageToggle/LanguageToggle'
-import { ProfileAvatar } from '@/components/molecules/ProfileAvatar/ProfileAvatar'
-import { useTheme } from '@/hooks/useTheme'
+import { useTranslation } from 'react-i18next';
+import { Logo } from '@/components/atoms/Logo/Logo';
+import { Button } from '@/components/atoms/Button/Button';
+import { Icon } from '@/components/atoms/Icon/Icon';
+import { LanguageToggle } from '@/components/molecules/LanguageToggle/LanguageToggle';
+import { ProfileAvatar } from '@/components/molecules/ProfileAvatar/ProfileAvatar';
+import { useTheme } from '@/hooks/useTheme';
 
 /**
  * Material AppBar: sticky, 56px tall, elevation shadow, safe-area aware.
@@ -27,11 +27,11 @@ import { useTheme } from '@/hooks/useTheme'
  * <HeaderBar />
  */
 export function HeaderBar() {
-  const { t } = useTranslation('common')
-  const { colorMode, toggleColorMode } = useTheme()
+  const { t } = useTranslation('common');
+  const { colorMode, toggleColorMode } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 bg-surface shadow-elevation-2 pt-safe">
+    <header className="pt-safe sticky top-0 z-40 bg-surface shadow-elevation-2">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
         {/* Left: Logo + App Name */}
         <div className="flex items-center gap-2.5">
@@ -60,5 +60,5 @@ export function HeaderBar() {
         </div>
       </div>
     </header>
-  )
+  );
 }

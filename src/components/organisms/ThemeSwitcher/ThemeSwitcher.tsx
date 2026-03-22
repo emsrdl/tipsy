@@ -10,19 +10,19 @@
  * <ThemeSwitcher />
  */
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/atoms/Button/Button'
-import { ColorSwatch } from '@/components/molecules/ColorSwatch/ColorSwatch'
-import { useTheme } from '@/hooks/useTheme'
-import { THEME_IDS } from '@/config/themes'
-import type { ThemeId } from '@/types/theme'
+} from '@/components/ui/dialog';
+import { Button } from '@/components/atoms/Button/Button';
+import { ColorSwatch } from '@/components/molecules/ColorSwatch/ColorSwatch';
+import { useTheme } from '@/hooks/useTheme';
+import { THEME_IDS } from '@/config/themes';
+import type { ThemeId } from '@/types/theme';
 
 /**
  * Theme selection button that opens a dialog.
@@ -33,18 +33,13 @@ import type { ThemeId } from '@/types/theme'
  * <ThemeSwitcher />
  */
 export function ThemeSwitcher() {
-  const { t } = useTranslation('common')
-  const { theme, accentColor, setTheme, setAccentColor } = useTheme()
+  const { t } = useTranslation('common');
+  const { theme, accentColor, setTheme, setAccentColor } = useTheme();
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          aria-label={t('theme.switchTheme')}
-        >
+        <Button type="button" variant="ghost" size="sm" aria-label={t('theme.switchTheme')}>
           <span
             className="h-4 w-4 rounded-full border border-border"
             style={{ backgroundColor: accentColor.hex }}
@@ -77,7 +72,9 @@ export function ThemeSwitcher() {
         {/* Accent color picker — only for Tipsy */}
         {theme.hasAccentPicker && (
           <div>
-            <p className="mb-2 text-sm text-text-secondary">{t('theme.accent.blue').replace('Blau', '').trim() || 'Farbe'}</p>
+            <p className="mb-2 text-sm text-text-secondary">
+              {t('theme.accent.blue').replace('Blau', '').trim() || 'Farbe'}
+            </p>
             <div className="flex gap-3">
               {theme.accentColors.map((color) => (
                 <ColorSwatch
@@ -94,5 +91,5 @@ export function ThemeSwitcher() {
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }

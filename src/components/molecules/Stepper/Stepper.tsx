@@ -14,30 +14,30 @@
  * <Stepper value={3} onChange={setQty} min={0} aria-label="Anzahl €10" />
  */
 
-import { cn } from '@/lib/utils'
-import { Icon } from '@/components/atoms/Icon/Icon'
+import { cn } from '@/lib/utils';
+import { Icon } from '@/components/atoms/Icon/Icon';
 
 export interface StepperProps {
   /** Current value. */
-  value: number
+  value: number;
   /** Called with the new value on +/- press. */
-  onChange: (value: number) => void
+  onChange: (value: number) => void;
   /** Minimum allowed value. @default 0 */
-  min?: number
+  min?: number;
   /** Maximum allowed value. @default 999 */
-  max?: number
+  max?: number;
   /** Increment/decrement step. @default 1 */
-  step?: number
+  step?: number;
   /** Unit label shown after the value (e.g. "h"). */
-  unit?: string
+  unit?: string;
   /** Accessible label for the component. */
-  'aria-label'?: string
+  'aria-label'?: string;
   /** Whether to disable both buttons. */
-  disabled?: boolean
+  disabled?: boolean;
   /** Additional CSS classes for the wrapper. */
-  className?: string
+  className?: string;
   /** Display size variant. @default "md" */
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg';
 }
 
 const SIZE = {
@@ -56,7 +56,7 @@ const SIZE = {
     value: 'text-xl min-w-[3.5rem]',
     wrapper: 'gap-2',
   },
-}
+};
 
 /**
  * Touch-optimized integer stepper with +/- buttons.
@@ -79,19 +79,19 @@ export function Stepper({
   className,
   size = 'md',
 }: StepperProps) {
-  const sizes = SIZE[size]
+  const sizes = SIZE[size];
 
   function decrement() {
-    const next = Math.round((value - step) * 100) / 100
-    if (next >= min) onChange(next)
+    const next = Math.round((value - step) * 100) / 100;
+    if (next >= min) onChange(next);
   }
 
   function increment() {
-    const next = Math.round((value + step) * 100) / 100
-    if (next <= max) onChange(next)
+    const next = Math.round((value + step) * 100) / 100;
+    if (next <= max) onChange(next);
   }
 
-  const displayValue = Number.isInteger(value) ? value.toString() : value.toFixed(1)
+  const displayValue = Number.isInteger(value) ? value.toString() : value.toFixed(1);
 
   return (
     <div
@@ -110,7 +110,7 @@ export function Stepper({
           'ripple flex items-center justify-center rounded-full',
           'border-2 border-border bg-surface transition-all',
           'text-text-primary',
-          'disabled:opacity-40 disabled:cursor-not-allowed',
+          'disabled:cursor-not-allowed disabled:opacity-40',
           'active:bg-surface-overlay',
           '[&:not(:disabled)]:hover:border-accent [&:not(:disabled)]:hover:text-accent',
         )}
@@ -122,13 +122,13 @@ export function Stepper({
       <div
         className={cn(
           sizes.value,
-          'flex items-center justify-center gap-0.5 font-semibold text-text-primary select-none'
+          'flex select-none items-center justify-center gap-0.5 font-semibold text-text-primary',
         )}
         aria-live="polite"
         aria-atomic="true"
       >
         <span>{displayValue}</span>
-        {unit && <span className="text-text-secondary text-sm font-normal">{unit}</span>}
+        {unit && <span className="text-sm font-normal text-text-secondary">{unit}</span>}
       </div>
 
       {/* Increment */}
@@ -142,12 +142,12 @@ export function Stepper({
           'ripple flex items-center justify-center rounded-full',
           'bg-accent text-accent-foreground transition-all',
           'shadow-elevation-1',
-          'disabled:opacity-40 disabled:cursor-not-allowed',
+          'disabled:cursor-not-allowed disabled:opacity-40',
           'active:scale-95',
         )}
       >
         <Icon name="plus" size={size === 'sm' ? 14 : 18} />
       </button>
     </div>
-  )
+  );
 }

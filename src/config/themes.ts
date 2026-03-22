@@ -20,7 +20,7 @@
  * const defaultAccent = tipsy.accentColors.find(c => c.id === tipsy.defaultAccentId)
  */
 
-import type { Theme } from '@/types/theme'
+import type { Theme } from '@/types/theme';
 
 /**
  * All theme definitions keyed by ThemeId.
@@ -96,10 +96,10 @@ export const THEMES: Record<string, Theme> = {
       },
     ],
   },
-}
+};
 
 /**
  * Ordered list of theme ids for use in selectors and loops.
  * @example THEME_IDS.map(id => THEMES[id])
  */
-export const THEME_IDS = ['tipsy', 'katzentempel'] as const
+export const THEME_IDS = ['tipsy', 'katzentempel'] as const;

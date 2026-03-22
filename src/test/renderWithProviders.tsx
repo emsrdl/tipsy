@@ -13,17 +13,17 @@
  * const { getByText } = renderWithProviders(<MyOrganism />)
  */
 
-import { render, type RenderOptions } from '@testing-library/react'
-import { type ReactElement, type ReactNode } from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { ThemeProvider } from '@/context/ThemeContext'
-import { TipSessionProvider } from '@/context/TipSessionContext'
-import type { TipSession } from '@/types/session'
-import { makeSession } from './factories'
+import { render, type RenderOptions } from '@testing-library/react';
+import { type ReactElement, type ReactNode } from 'react';
+import { MemoryRouter } from 'react-router-dom';
+import { ThemeProvider } from '@/context/ThemeContext';
+import { TipSessionProvider } from '@/context/TipSessionContext';
+import type { TipSession } from '@/types/session';
+import { makeSession } from './factories';
 
 interface ProvidersProps {
-  children: ReactNode
-  initialSession: Partial<TipSession> | undefined
+  children: ReactNode;
+  initialSession: Partial<TipSession> | undefined;
 }
 
 function AllProviders({ children, initialSession }: ProvidersProps) {
@@ -35,11 +35,11 @@ function AllProviders({ children, initialSession }: ProvidersProps) {
         </TipSessionProvider>
       </ThemeProvider>
     </MemoryRouter>
-  )
+  );
 }
 
 interface RenderWithProvidersOptions extends Omit<RenderOptions, 'wrapper'> {
-  initialSession?: Partial<TipSession>
+  initialSession?: Partial<TipSession>;
 }
 
 /**
@@ -54,12 +54,12 @@ interface RenderWithProvidersOptions extends Omit<RenderOptions, 'wrapper'> {
  */
 export function renderWithProviders(
   ui: ReactElement,
-  { initialSession, ...options }: RenderWithProvidersOptions = {}
+  { initialSession, ...options }: RenderWithProvidersOptions = {},
 ) {
   return render(ui, {
     wrapper: ({ children }) => (
       <AllProviders initialSession={initialSession}>{children}</AllProviders>
     ),
     ...options,
-  })
+  });
 }

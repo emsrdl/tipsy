@@ -11,18 +11,18 @@
  * @see vitest.config.ts where this file is registered as setupFiles
  */
 
-import '@testing-library/jest-dom'
-import { vi } from 'vitest'
+import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 
 /* ----------------------------------------------------------
    import.meta.env mock
    Provides defaults for all VITE_* variables.
    Override per-test with vi.stubEnv() if needed.
 ---------------------------------------------------------- */
-vi.stubEnv('VITE_APP_DOMAIN', 'test.tipsy.local')
-vi.stubEnv('VITE_APP_NAME', 'Tipsy Test')
-vi.stubEnv('VITE_DEFAULT_THEME', 'tipsy')
-vi.stubEnv('VITE_DEFAULT_LANG', 'de')
+vi.stubEnv('VITE_APP_DOMAIN', 'test.tipsy.local');
+vi.stubEnv('VITE_APP_NAME', 'Tipsy Test');
+vi.stubEnv('VITE_DEFAULT_THEME', 'tipsy');
+vi.stubEnv('VITE_DEFAULT_LANG', 'de');
 
 /* ----------------------------------------------------------
    window.matchMedia mock
@@ -41,7 +41,7 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
 /* ----------------------------------------------------------
    i18next mock
@@ -52,7 +52,7 @@ Object.defineProperty(window, 'matchMedia', {
    Example: t('actions.next') → "actions.next"
 ---------------------------------------------------------- */
 vi.mock('react-i18next', async () => {
-  const actual = await vi.importActual<typeof import('react-i18next')>('react-i18next')
+  const actual = await vi.importActual<typeof import('react-i18next')>('react-i18next');
   return {
     ...actual,
     useTranslation: () => ({
@@ -64,5 +64,5 @@ vi.mock('react-i18next', async () => {
     }),
     Trans: ({ i18nKey }: { i18nKey: string }) => i18nKey,
     initReactI18next: { type: '3rdParty', init: vi.fn() },
-  }
-})
+  };
+});

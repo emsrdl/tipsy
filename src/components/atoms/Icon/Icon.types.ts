@@ -43,15 +43,15 @@ export type IconName =
   | 'user'
   | 'star'
   | 'zap'
-  | 'edit-2'
+  | 'edit-2';
 
 export interface IconProps {
   /** Which icon to render. */
-  name: IconName
+  name: IconName;
   /** Visual size in pixels. @default 16 */
-  size?: number
+  size?: number;
   /** Additional CSS classes. */
-  className?: string
+  className?: string;
   /** Accessible label (omit for decorative icons). */
-  'aria-label'?: string
+  'aria-label'?: string;
 }

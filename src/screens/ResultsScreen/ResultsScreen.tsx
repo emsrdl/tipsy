@@ -8,102 +8,108 @@
  * // Rendered via React Router at route "/calculate/results"
  */
 
-import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer'
-import { DistributionTable } from '@/components/organisms/DistributionTable/DistributionTable'
-import { Button } from '@/components/atoms/Button/Button'
-import { Alert } from '@/components/molecules/Alert/Alert'
-import { Icon } from '@/components/atoms/Icon/Icon'
-import { Badge } from '@/components/atoms/Badge/Badge'
-import { useTipCalculator } from '@/hooks/useTipCalculator'
-import { useExport } from '@/hooks/useExport'
-import { useShifts } from '@/hooks/useShifts'
-import { useProfiles } from '@/hooks/useProfiles'
-import { useSmartSplitter } from '@/hooks/useSmartSplitter'
-import { useToast } from '@/context/ToastContext'
-import { useLocale } from '@/hooks/useLocale'
-import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog'
-import { formatEurFromCents } from '@/config/currency'
-import { DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit'
-import { cn } from '@/lib/utils'
-import type { Shift, DifferenceLine } from '@/types/shift'
+import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
+import { DistributionTable } from '@/components/organisms/DistributionTable/DistributionTable';
+import { Button } from '@/components/atoms/Button/Button';
+import { Alert } from '@/components/molecules/Alert/Alert';
+import { Icon } from '@/components/atoms/Icon/Icon';
+import { Badge } from '@/components/atoms/Badge/Badge';
+import { useTipCalculator } from '@/hooks/useTipCalculator';
+import { useExport } from '@/hooks/useExport';
+import { useShifts } from '@/hooks/useShifts';
+import { useProfiles } from '@/hooks/useProfiles';
+import { useSmartSplitter } from '@/hooks/useSmartSplitter';
+import { useToast } from '@/context/ToastContext';
+import { useLocale } from '@/hooks/useLocale';
+import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
+import { formatEurFromCents } from '@/config/currency';
+import { DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit';
+import { cn } from '@/lib/utils';
+import type { Shift, DifferenceLine } from '@/types/shift';
 
 function generateShiftId(): string {
-  return `shift-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  return `shift-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 /**
  * Results screen — step 3 of 3.
  */
 export function ResultsScreen() {
-  const { t } = useTranslation(['common', 'screens', 'errors'])
-  const navigate = useNavigate()
-  const { session, totalInCents, reset } = useTipCalculator()
-  const { exportPdf, exportCsv, isExporting } = useExport()
-  const { addShift } = useShifts()
-  const { activeProfile, isGuestMode } = useProfiles()
-  const { showToast } = useToast()
-  const { locale } = useLocale()
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
+  const { t } = useTranslation(['common', 'screens', 'errors']);
+  const navigate = useNavigate();
+  const { session, totalInCents, reset } = useTipCalculator();
+  const { exportPdf, exportCsv, isExporting } = useExport();
+  const { addShift } = useShifts();
+  const { activeProfile, isGuestMode } = useProfiles();
+  const { showToast } = useToast();
+  const { locale } = useLocale();
+  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
 
-  const [exportOpen, setExportOpen] = useState(false)
-  const [showThresholdHelp, setShowThresholdHelp] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false);
+  const [showThresholdHelp, setShowThresholdHelp] = useState(false);
 
   const smartOutput = useSmartSplitter(
     session.employees,
     totalInCents,
     session.split.kitchenPercent,
-    session.denominations
-  )
+    session.denominations,
+  );
 
-  const { isSmartMode, toggleSmartMode, thresholdInCents, setThreshold } = smartOutput
-  const [thresholdInput, setThresholdInput] = useState((thresholdInCents / 100).toFixed(2))
-  const thresholdInputRef = useRef<HTMLInputElement>(null)
+  const { isSmartMode, toggleSmartMode, thresholdInCents, setThreshold } = smartOutput;
+  const [thresholdInput, setThresholdInput] = useState((thresholdInCents / 100).toFixed(2));
+  const thresholdInputRef = useRef<HTMLInputElement>(null);
 
   function handleThresholdChange(value: string) {
-    setThresholdInput(value)
-    const parsed = parseFloat(value.replace(',', '.'))
+    setThresholdInput(value);
+    const parsed = parseFloat(value.replace(',', '.'));
     if (!isNaN(parsed) && parsed >= 0.5 && parsed <= 50) {
-      setThreshold(Math.round(parsed * 100))
+      setThreshold(Math.round(parsed * 100));
     }
   }
 
   function handleThresholdBlur() {
-    const parsed = parseFloat(thresholdInput.replace(',', '.'))
+    const parsed = parseFloat(thresholdInput.replace(',', '.'));
     if (isNaN(parsed) || parsed < 0.5) {
-      setThresholdInput((DEFAULT_FAIRNESS_THRESHOLD / 100).toFixed(2))
-      setThreshold(DEFAULT_FAIRNESS_THRESHOLD)
+      setThresholdInput((DEFAULT_FAIRNESS_THRESHOLD / 100).toFixed(2));
+      setThreshold(DEFAULT_FAIRNESS_THRESHOLD);
     } else {
-      const clamped = Math.min(Math.max(parsed, 0.5), 50)
-      setThresholdInput(clamped.toFixed(2))
-      setThreshold(Math.round(clamped * 100))
+      const clamped = Math.min(Math.max(parsed, 0.5), 50);
+      setThresholdInput(clamped.toFixed(2));
+      setThreshold(Math.round(clamped * 100));
     }
-    showToast(t('common:toast.thresholdUpdated', { amount: formatEurFromCents(thresholdInCents, fmtLocale) }), 'info')
+    showToast(
+      t('common:toast.thresholdUpdated', {
+        amount: formatEurFromCents(thresholdInCents, fmtLocale),
+      }),
+      'info',
+    );
   }
 
-  const results = session.results ?? []
-  const hasResults = results.length > 0
+  const results = session.results ?? [];
+  const hasResults = results.length > 0;
 
   // When smart mode is on, show actual (smart-adjusted) amounts; otherwise show proportional results
-  const displayResults = isSmartMode && smartOutput.output
-    ? smartOutput.output.distribution.personShares.map((s) => ({
-        employeeId: s.id,
-        name: s.name,
-        group: s.role,
-        hours: s.hoursWorked,
-        amountInCents: s.actualShareInCents,
-      }))
-    : results
+  const displayResults =
+    isSmartMode && smartOutput.output
+      ? smartOutput.output.distribution.personShares.map((s) => ({
+          employeeId: s.id,
+          name: s.name,
+          group: s.role,
+          hours: s.hoursWorked,
+          amountInCents: s.actualShareInCents,
+        }))
+      : results;
 
   function handleToggleSmartMode() {
-    toggleSmartMode()
-    showToast(t('common:toast.calculationUpdated'), 'info')
+    toggleSmartMode();
+    showToast(t('common:toast.calculationUpdated'), 'info');
   }
 
   function handleSaveAndFinish() {
-    if (!hasResults) return
+    if (!hasResults) return;
 
     const distribution = smartOutput.output?.distribution ?? {
       personShares: results.map((r) => ({
@@ -118,7 +124,7 @@ export function ResultsScreen() {
       remainingCents: 0,
       fairnessScore: 100,
       denominationsUsed: [],
-    }
+    };
 
     const shift: Shift = {
       id: generateShiftId(),
@@ -132,21 +138,21 @@ export function ResultsScreen() {
       smartSplitting: isSmartMode,
       differences: smartOutput.output?.differences ?? [],
       savedAt: new Date().toISOString(),
-    }
+    };
 
-    addShift(shift)
-    showToast(t('common:toast.shiftSaved'), 'success')
-    reset()
-    void navigate('/history')
+    addShift(shift);
+    showToast(t('common:toast.shiftSaved'), 'success');
+    reset();
+    void navigate('/history');
   }
 
   function handleReset() {
-    reset()
-    void navigate('/calculate')
+    reset();
+    void navigate('/calculate');
   }
 
-  const fairnessScore = smartOutput.output?.distribution.fairnessScore
-  const transfers: DifferenceLine[] = smartOutput.output?.differences ?? []
+  const fairnessScore = smartOutput.output?.distribution.fairnessScore;
+  const transfers: DifferenceLine[] = smartOutput.output?.differences ?? [];
 
   return (
     <ScreenContainer
@@ -172,26 +178,40 @@ export function ResultsScreen() {
           />
 
           {/* Smart mode toggle + threshold (card, matches SetupScreen style) */}
-          <div className="rounded-xl bg-surface-raised shadow-elevation-1 p-4 space-y-3">
+          <div className="space-y-3 rounded-xl bg-surface-raised p-4 shadow-elevation-1">
             <button
               type="button"
               onClick={handleToggleSmartMode}
-              className="w-full flex items-center justify-between gap-3 min-h-12"
+              className="flex min-h-12 w-full items-center justify-between gap-3"
               aria-pressed={isSmartMode}
             >
               <div className="flex items-center gap-3">
-                <div className={cn(
-                  'h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0',
-                  isSmartMode ? 'bg-accent/10' : 'bg-surface-overlay'
-                )}>
-                  <Icon name="zap" size={16} className={isSmartMode ? 'text-accent' : 'text-text-secondary'} />
+                <div
+                  className={cn(
+                    'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full',
+                    isSmartMode ? 'bg-accent/10' : 'bg-surface-overlay',
+                  )}
+                >
+                  <Icon
+                    name="zap"
+                    size={16}
+                    className={isSmartMode ? 'text-accent' : 'text-text-secondary'}
+                  />
                 </div>
                 <div className="text-left">
-                  <p className={cn('text-sm font-semibold', isSmartMode ? 'text-accent' : 'text-text-primary')}>
-                    {t('common:smartSplit.modeLabel')} — {isSmartMode ? t('common:smartSplit.smart') : t('common:smartSplit.normal')}
+                  <p
+                    className={cn(
+                      'text-sm font-semibold',
+                      isSmartMode ? 'text-accent' : 'text-text-primary',
+                    )}
+                  >
+                    {t('common:smartSplit.modeLabel')} —{' '}
+                    {isSmartMode ? t('common:smartSplit.smart') : t('common:smartSplit.normal')}
                   </p>
-                  <p className="text-xs text-text-secondary mt-0.5">
-                    {isSmartMode ? t('common:smartSplit.descSmart') : t('common:smartSplit.descNormal')}
+                  <p className="mt-0.5 text-xs text-text-secondary">
+                    {isSmartMode
+                      ? t('common:smartSplit.descSmart')
+                      : t('common:smartSplit.descNormal')}
                   </p>
                 </div>
               </div>
@@ -204,10 +224,10 @@ export function ResultsScreen() {
 
             {/* Threshold — same structure as SetupScreen */}
             {isSmartMode && (
-              <div className="pt-2 border-t border-border space-y-2">
+              <div className="space-y-2 border-t border-border pt-2">
                 <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 flex-1">
-                    <span className="text-xs font-medium text-text-secondary whitespace-nowrap">
+                  <div className="flex flex-1 items-center gap-2">
+                    <span className="whitespace-nowrap text-xs font-medium text-text-secondary">
                       {t('common:smartSplit.threshold')}:
                     </span>
                     <div className="flex items-center gap-1">
@@ -221,7 +241,7 @@ export function ResultsScreen() {
                         value={thresholdInput}
                         onChange={(e) => handleThresholdChange(e.target.value)}
                         onBlur={handleThresholdBlur}
-                        className="w-20 h-9 px-2 rounded-lg bg-surface-overlay text-sm font-mono text-text-primary border border-border focus:outline-none focus:border-accent text-center"
+                        className="h-9 w-20 rounded-lg border border-border bg-surface-overlay px-2 text-center font-mono text-sm text-text-primary focus:border-accent focus:outline-none"
                       />
                       <span className="text-sm text-text-secondary">€</span>
                     </div>
@@ -229,13 +249,15 @@ export function ResultsScreen() {
                   <button
                     type="button"
                     onClick={() => setShowThresholdHelp(!showThresholdHelp)}
-                    className="text-xs text-accent underline whitespace-nowrap"
+                    className="whitespace-nowrap text-xs text-accent underline"
                   >
-                    {showThresholdHelp ? t('common:smartSplit.helpClose') : t('common:smartSplit.helpWhat')}
+                    {showThresholdHelp
+                      ? t('common:smartSplit.helpClose')
+                      : t('common:smartSplit.helpWhat')}
                   </button>
                 </div>
                 {showThresholdHelp && (
-                  <p className="text-xs text-text-secondary bg-surface-overlay rounded-lg p-3">
+                  <p className="rounded-lg bg-surface-overlay p-3 text-xs text-text-secondary">
                     {t('common:smartSplit.helpText')}
                   </p>
                 )}
@@ -245,10 +267,12 @@ export function ResultsScreen() {
 
           {/* Fairness score (smart mode) */}
           {isSmartMode && fairnessScore !== undefined && (
-            <div className={cn(
-              'rounded-xl px-4 py-3 flex items-center justify-between shadow-elevation-1',
-              fairnessScore >= 95 ? 'bg-status-success/10' : 'bg-status-warning/10'
-            )}>
+            <div
+              className={cn(
+                'flex items-center justify-between rounded-xl px-4 py-3 shadow-elevation-1',
+                fairnessScore >= 95 ? 'bg-status-success/10' : 'bg-status-warning/10',
+              )}
+            >
               <div className="flex items-center gap-2">
                 <Icon
                   name="star"
@@ -260,16 +284,16 @@ export function ResultsScreen() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-24 h-2 rounded-full bg-surface-overlay overflow-hidden">
+                <div className="h-2 w-24 overflow-hidden rounded-full bg-surface-overlay">
                   <div
                     className={cn(
                       'h-full rounded-full transition-all',
-                      fairnessScore >= 95 ? 'bg-status-success' : 'bg-status-warning'
+                      fairnessScore >= 95 ? 'bg-status-success' : 'bg-status-warning',
                     )}
                     style={{ width: `${fairnessScore}%` }}
                   />
                 </div>
-                <span className="text-sm font-bold font-mono text-text-primary">
+                <span className="font-mono text-sm font-bold text-text-primary">
                   {fairnessScore}%
                 </span>
               </div>
@@ -278,17 +302,22 @@ export function ResultsScreen() {
 
           {/* Transfers (smart mode) */}
           {isSmartMode && transfers.length > 0 && (
-            <div className="rounded-xl bg-status-warning/10 shadow-elevation-1 overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-status-warning/20">
+            <div className="bg-status-warning/10 overflow-hidden rounded-xl shadow-elevation-1">
+              <div className="border-status-warning/20 flex items-center gap-2 border-b px-4 py-3">
                 <Icon name="arrow-right" size={14} className="text-status-warning" />
                 <span className="text-sm font-semibold text-text-primary">
                   {t('common:smartSplit.transfers')}
                 </span>
-                <Badge variant="default" className="ml-auto text-xs bg-status-warning/20 text-status-warning border-0">
-                  {t('common:smartSplit.aboveThreshold', { amount: formatEurFromCents(thresholdInCents, fmtLocale) })}
+                <Badge
+                  variant="default"
+                  className="bg-status-warning/20 ml-auto border-0 text-xs text-status-warning"
+                >
+                  {t('common:smartSplit.aboveThreshold', {
+                    amount: formatEurFromCents(thresholdInCents, fmtLocale),
+                  })}
                 </Badge>
               </div>
-              <div className="divide-y divide-status-warning/10">
+              <div className="divide-status-warning/10 divide-y">
                 {transfers.map((diff, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <span className="text-sm text-text-primary">
@@ -305,11 +334,14 @@ export function ResultsScreen() {
             </div>
           )}
 
-          {isSmartMode && transfers.length === 0 && fairnessScore !== undefined && fairnessScore >= 95 && (
-            <p className="text-xs text-text-secondary text-center py-1">
-              {t('common:smartSplit.noTransfers')}
-            </p>
-          )}
+          {isSmartMode &&
+            transfers.length === 0 &&
+            fairnessScore !== undefined &&
+            fairnessScore >= 95 && (
+              <p className="py-1 text-center text-xs text-text-secondary">
+                {t('common:smartSplit.noTransfers')}
+              </p>
+            )}
         </div>
       )}
 
@@ -321,19 +353,17 @@ export function ResultsScreen() {
             <Button
               type="button"
               onClick={handleSaveAndFinish}
-              className="w-full min-h-14 text-base font-semibold"
+              className="min-h-14 w-full text-base font-semibold"
             >
               <Icon name="save" size={18} />
-              {isGuestMode
-                ? t('screens:results.finishNoSave')
-                : t('screens:results.saveAndFinish')}
+              {isGuestMode ? t('screens:results.finishNoSave') : t('screens:results.saveAndFinish')}
             </Button>
 
             {/* Export button */}
             <Button
               type="button"
               variant="outline"
-              className="w-full min-h-12"
+              className="min-h-12 w-full"
               isLoading={isExporting}
               onClick={() => setExportOpen(true)}
             >
@@ -349,17 +379,12 @@ export function ResultsScreen() {
             type="button"
             variant="ghost"
             onClick={() => void navigate('/calculate/cash')}
-            className="flex-1 min-h-12"
+            className="min-h-12 flex-1"
           >
             <Icon name="chevron-left" size={16} />
             {t('common:actions.back')}
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleReset}
-            className="flex-1 min-h-12"
-          >
+          <Button type="button" variant="ghost" onClick={handleReset} className="min-h-12 flex-1">
             <Icon name="refresh-cw" size={16} />
             {t('common:actions.reset')}
           </Button>
@@ -371,10 +396,16 @@ export function ResultsScreen() {
         isOpen={exportOpen}
         onClose={() => setExportOpen(false)}
         context="single"
-        onExportCsv={() => { exportCsv(results); showToast(t('common:toast.csvDownloaded'), 'success') }}
-        onExportPdf={() => { exportPdf(results); showToast(t('common:toast.pdfOpened'), 'success') }}
+        onExportCsv={() => {
+          exportCsv(results);
+          showToast(t('common:toast.csvDownloaded'), 'success');
+        }}
+        onExportPdf={() => {
+          exportPdf(results);
+          showToast(t('common:toast.pdfOpened'), 'success');
+        }}
         isProcessing={isExporting}
       />
     </ScreenContainer>
-  )
+  );
 }

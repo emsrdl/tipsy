@@ -8,18 +8,13 @@
  * import type { Employee, TipSession, DenominationMatchResult } from '@/types'
  */
 
-export type { Employee, EmployeeGroup } from './employee'
+export type { Employee, EmployeeGroup } from './employee';
 
-export type {
-  DenominationQuantity,
-  TipSplit,
-  DistributionResult,
-  TipSession,
-} from './session'
+export type { DenominationQuantity, TipSplit, DistributionResult, TipSession } from './session';
 
-export type { ThemeId, ColorMode, AccentColor, Theme } from './theme'
+export type { ThemeId, ColorMode, AccentColor, Theme } from './theme';
 
-export type { LocaleId, I18nNamespace } from './i18n'
+export type { LocaleId, I18nNamespace } from './i18n';
 
 export type {
   AvailableDenomination,
@@ -30,9 +25,9 @@ export type {
   DenominationMatchInput,
   HistoryEntry,
   ValidationResult,
-} from './calculation'
+} from './calculation';
 
-export type { Profile, ProfileRole, ProfileStats } from './profile'
+export type { Profile, ProfileRole, ProfileStats } from './profile';
 
 export type {
   PersonShare,
@@ -43,4 +38,4 @@ export type {
   ImportResult,
   SmartSplitInput,
   SmartSplitOutput,
-} from './shift'
+} from './shift';

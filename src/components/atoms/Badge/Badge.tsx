@@ -10,13 +10,13 @@
  * <Badge>Default</Badge>
  */
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 export interface BadgeProps {
   /** Visual style variant. @default "default" */
-  variant?: 'default' | 'kitchen' | 'service' | 'accent'
-  children: React.ReactNode
-  className?: string
+  variant?: 'default' | 'kitchen' | 'service' | 'accent';
+  children: React.ReactNode;
+  className?: string;
 }
 
 const VARIANT_CLASSES: Record<NonNullable<BadgeProps['variant']>, string> = {
@@ -24,7 +24,7 @@ const VARIANT_CLASSES: Record<NonNullable<BadgeProps['variant']>, string> = {
   kitchen: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
   service: 'bg-accent-subtle text-accent',
   accent: 'bg-accent text-accent-foreground',
-}
+};
 
 /**
  * Small inline badge.
@@ -41,10 +41,10 @@ export function Badge({ variant = 'default', children, className }: BadgeProps) 
       className={cn(
         'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
         VARIANT_CLASSES[variant],
-        className
+        className,
       )}
     >
       {children}
     </span>
-  )
+  );
 }

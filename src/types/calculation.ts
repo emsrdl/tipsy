@@ -11,7 +11,7 @@
  * @see src/types/session.ts for DistributionResult used as input
  */
 
-import type { DistributionResult } from './session'
+import type { DistributionResult } from './session';
 
 /**
  * Available physical denominations that can be handed out.
@@ -30,11 +30,11 @@ import type { DistributionResult } from './session'
  */
 export interface AvailableDenomination {
   /** References Denomination.id from src/config/currency.ts */
-  denominationId: string
+  denominationId: string;
   /** Count of this denomination physically available. Must be ≥ 0. */
-  available: number
+  available: number;
   /** Value per unit in euro cents. */
-  valueInCents: number
+  valueInCents: number;
 }
 
 /**
@@ -53,11 +53,11 @@ export interface AvailableDenomination {
  */
 export interface DenominationAssignment {
   /** References Denomination.id from src/config/currency.ts */
-  denominationId: string
+  denominationId: string;
   /** How many of this denomination to give. */
-  count: number
+  count: number;
   /** count × valueInCents — precomputed for display and summing. */
-  totalCents: number
+  totalCents: number;
 }
 
 /**
@@ -91,17 +91,17 @@ export interface DenominationAssignment {
  */
 export interface EmployeePayoutPlan {
   /** References Employee.id */
-  employeeId: string
+  employeeId: string;
   /** Copied from DistributionResult for display */
-  name: string
+  name: string;
   /** The ideal amount the employee should receive (from calculateDistribution). */
-  idealAmountInCents: number
+  idealAmountInCents: number;
   /** The actual amount they receive in physical cash. */
-  actualAmountInCents: number
+  actualAmountInCents: number;
   /** actual − ideal. Positive = overpaid, negative = underpaid. */
-  deviationInCents: number
+  deviationInCents: number;
   /** The list of physical bills/coins to hand them. */
-  assignments: DenominationAssignment[]
+  assignments: DenominationAssignment[];
 }
 
 /**
@@ -124,19 +124,19 @@ export interface EmployeePayoutPlan {
  */
 export interface FairnessScore {
   /** Largest absolute deviation of any single employee, in cents. */
-  maxDeviationInCents: number
+  maxDeviationInCents: number;
   /** Mean absolute deviation across all employees, in cents. */
-  meanDeviationInCents: number
+  meanDeviationInCents: number;
   /** Cash remaining that couldn't be assigned to any employee. */
-  totalUnallocatedCents: number
+  totalUnallocatedCents: number;
   /** True when every employee receives exactly their ideal amount. */
-  isPerfect: boolean
+  isPerfect: boolean;
   /**
    * 0–100 score. 100 = all employees get exactly their ideal amount.
    * Computed as: 100 − min(100, (meanDeviationInCents / totalInCents) × 10000).
    * The scale factor of 10000 means 1% mean deviation = score of 0.
    */
-  score: number
+  score: number;
 }
 
 /**
@@ -155,13 +155,13 @@ export interface FairnessScore {
  */
 export interface DenominationMatchResult {
   /** Per-employee payout plans with denomination assignments. */
-  payouts: EmployeePayoutPlan[]
+  payouts: EmployeePayoutPlan[];
   /** Aggregate fairness metrics for the entire distribution. */
-  fairness: FairnessScore
+  fairness: FairnessScore;
   /** Denominations remaining after distribution. */
-  unallocated: AvailableDenomination[]
+  unallocated: AvailableDenomination[];
   /** Wall-clock time the algorithm took, in milliseconds. */
-  durationMs: number
+  durationMs: number;
 }
 
 /**
@@ -184,15 +184,15 @@ export interface DenominationMatchResult {
  */
 export interface HistoryEntry {
   /** Unique history entry id. */
-  id: string
+  id: string;
   /** ISO 8601 timestamp of when the session was saved. */
-  timestamp: string
+  timestamp: string;
   /** Total amount distributed in euro cents. */
-  totalInCents: number
+  totalInCents: number;
   /** Number of employees in this session. */
-  employeeCount: number
+  employeeCount: number;
   /** Snapshot of the distribution results. */
-  results: DistributionResult[]
+  results: DistributionResult[];
 }
 
 /**
@@ -209,9 +209,9 @@ export interface HistoryEntry {
  */
 export interface DenominationMatchInput {
   /** Per-employee ideal amounts. */
-  distributions: DistributionResult[]
+  distributions: DistributionResult[];
   /** Physical denominations available to distribute. */
-  available: AvailableDenomination[]
+  available: AvailableDenomination[];
 }
 
 /**
@@ -228,7 +228,7 @@ export interface DenominationMatchInput {
  */
 export interface ValidationResult {
   /** Whether all validations passed. */
-  valid: boolean
+  valid: boolean;
   /** Map of field identifiers to i18n error key strings. Empty when valid. */
-  errors: Record<string, string>
+  errors: Record<string, string>;
 }

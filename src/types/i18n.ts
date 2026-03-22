@@ -6,7 +6,7 @@
  */
 
 /** Supported locale identifiers. */
-export type LocaleId = 'de' | 'en'
+export type LocaleId = 'de' | 'en';
 
 /** Available i18next namespaces. */
-export type I18nNamespace = 'common' | 'screens' | 'errors'
+export type I18nNamespace = 'common' | 'screens' | 'errors';

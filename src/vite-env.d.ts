@@ -8,23 +8,23 @@
  */
 interface ImportMetaEnv {
   /** Full domain where the app is deployed. Required. */
-  readonly VITE_APP_DOMAIN: string
+  readonly VITE_APP_DOMAIN: string;
   /** App display name. Optional, defaults to "Tipsy". */
-  readonly VITE_APP_NAME?: string
+  readonly VITE_APP_NAME?: string;
   /** Initial theme. Optional, defaults to "tipsy". */
-  readonly VITE_DEFAULT_THEME?: string
+  readonly VITE_DEFAULT_THEME?: string;
   /** Initial locale. Optional, defaults to "de". */
-  readonly VITE_DEFAULT_LANG?: string
+  readonly VITE_DEFAULT_LANG?: string;
   /** OIDC provider URL. Optional, auth not active in v1. */
-  readonly VITE_OIDC_AUTHORITY?: string
+  readonly VITE_OIDC_AUTHORITY?: string;
   /** OIDC client ID. Optional, auth not active in v1. */
-  readonly VITE_OIDC_CLIENT_ID?: string
+  readonly VITE_OIDC_CLIENT_ID?: string;
   /** OIDC redirect URI. Optional, auth not active in v1. */
-  readonly VITE_OIDC_REDIRECT_URI?: string
+  readonly VITE_OIDC_REDIRECT_URI?: string;
   /** OIDC scope string. Optional, auth not active in v1. */
-  readonly VITE_OIDC_SCOPE?: string
+  readonly VITE_OIDC_SCOPE?: string;
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+  readonly env: ImportMetaEnv;
 }

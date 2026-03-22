@@ -19,13 +19,13 @@
  * />
  */
 
-import { useTranslation } from 'react-i18next'
-import { Input } from '@/components/atoms/Input/Input'
-import { Icon } from '@/components/atoms/Icon/Icon'
-import { Badge } from '@/components/atoms/Badge/Badge'
-import { Stepper } from '../Stepper/Stepper'
-import { cn } from '@/lib/utils'
-import type { EmployeeRowProps } from './EmployeeRow.types'
+import { useTranslation } from 'react-i18next';
+import { Input } from '@/components/atoms/Input/Input';
+import { Icon } from '@/components/atoms/Icon/Icon';
+import { Badge } from '@/components/atoms/Badge/Badge';
+import { Stepper } from '../Stepper/Stepper';
+import { cn } from '@/lib/utils';
+import type { EmployeeRowProps } from './EmployeeRow.types';
 
 /**
  * Material card for editing a single employee's details.
@@ -37,16 +37,25 @@ import type { EmployeeRowProps } from './EmployeeRow.types'
  * @example
  * <EmployeeRow employee={e} onRemove={remove} onNameChange={update} ... />
  */
-export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, onGroupChange }: EmployeeRowProps) {
-  const { t } = useTranslation(['screens', 'common'])
+export function EmployeeRow({
+  employee,
+  onRemove,
+  onNameChange,
+  onHoursChange,
+  onGroupChange,
+}: EmployeeRowProps) {
+  const { t } = useTranslation(['screens', 'common']);
 
   return (
-    <div className="rounded-xl bg-surface-raised shadow-elevation-1 overflow-hidden">
+    <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
       {/* Header row: name input + remove button */}
-      <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-        <div className="flex-1 min-w-0 space-y-1">
+      <div className="flex items-center gap-2 px-4 pb-2 pt-4">
+        <div className="min-w-0 flex-1 space-y-1">
           {employee.isProfileOwner && (
-            <Badge variant="default" className="text-xs bg-accent/10 text-accent border-0 gap-1 w-fit">
+            <Badge
+              variant="default"
+              className="bg-accent/10 w-fit gap-1 border-0 text-xs text-accent"
+            >
               <Icon name="user" size={10} />
               {t('common:profile.thisIsYou')}
             </Badge>
@@ -55,7 +64,7 @@ export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, o
             value={employee.name}
             onChange={(e) => onNameChange(employee.id, e.target.value)}
             placeholder={t('screens:setup.employeeNamePlaceholder')}
-            className="w-full text-base h-12 rounded-lg border-border focus-visible:ring-accent"
+            className="h-12 w-full rounded-lg border-border text-base focus-visible:ring-accent"
             aria-label={t('screens:setup.employeeNameLabel')}
             autoComplete="off"
             autoCorrect="off"
@@ -68,9 +77,9 @@ export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, o
           onClick={() => onRemove(employee.id)}
           aria-label={t('common:actions.removeEmployee')}
           className={cn(
-            'ripple flex-shrink-0 h-12 w-12 flex items-center justify-center',
+            'ripple flex h-12 w-12 flex-shrink-0 items-center justify-center',
             'rounded-full text-text-secondary transition-colors',
-            'hover:text-status-error hover:bg-red-50',
+            'hover:bg-red-50 hover:text-status-error',
             'active:bg-red-100',
           )}
         >
@@ -85,10 +94,10 @@ export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, o
           onClick={() => onGroupChange(employee.id, 'kitchen')}
           aria-pressed={employee.group === 'kitchen'}
           className={cn(
-            'ripple flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all',
+            'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
             employee.group === 'kitchen'
               ? 'bg-orange-100 text-orange-800 shadow-elevation-1 dark:bg-orange-900/40 dark:text-orange-300'
-              : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80'
+              : 'hover:bg-surface-overlay/80 bg-surface-overlay text-text-secondary',
           )}
         >
           <Icon name="utensils-crossed" size={16} />
@@ -99,10 +108,10 @@ export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, o
           onClick={() => onGroupChange(employee.id, 'service')}
           aria-pressed={employee.group === 'service'}
           className={cn(
-            'ripple flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all',
+            'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
             employee.group === 'service'
               ? 'bg-accent-subtle text-accent shadow-elevation-1'
-              : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80'
+              : 'hover:bg-surface-overlay/80 bg-surface-overlay text-text-secondary',
           )}
         >
           <Icon name="users" size={16} />
@@ -111,7 +120,7 @@ export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, o
       </div>
 
       {/* Hours stepper */}
-      <div className="flex items-center justify-between px-4 pb-4 pt-1 border-t border-border">
+      <div className="flex items-center justify-between border-t border-border px-4 pb-4 pt-1">
         <div className="flex items-center gap-2">
           <Icon name="clock" size={15} className="text-text-secondary" />
           <span className="text-sm text-text-secondary">{t('screens:setup.hoursLabel')}</span>
@@ -128,5 +137,5 @@ export function EmployeeRow({ employee, onRemove, onNameChange, onHoursChange, o
         />
       </div>
     </div>
-  )
+  );
 }

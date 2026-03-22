@@ -14,27 +14,27 @@
  * />
  */
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 export interface SliderProps {
   /** Current value (0–100). */
-  value: number
+  value: number;
   /** Called with the new integer value on change. */
-  onChange: (value: number) => void
+  onChange: (value: number) => void;
   /** Minimum value. @default 0 */
-  min?: number
+  min?: number;
   /** Maximum value. @default 100 */
-  max?: number
+  max?: number;
   /** Label for the left side (lower values). */
-  label?: string
+  label?: string;
   /** Label for the right side (higher values) — shown as complement. */
-  counterLabel?: string
+  counterLabel?: string;
   /** Whether the slider is disabled. */
-  disabled?: boolean
+  disabled?: boolean;
   /** Accessible label for the range input. */
-  'aria-label'?: string
+  'aria-label'?: string;
   /** Additional CSS classes for the wrapper. */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -57,8 +57,8 @@ export function Slider({
   'aria-label': ariaLabel,
   className,
 }: SliderProps) {
-  const percent = ((value - min) / (max - min)) * 100
-  const counterValue = max - value
+  const percent = ((value - min) / (max - min)) * 100;
+  const counterValue = max - value;
 
   return (
     <div className={cn('space-y-3', className)}>
@@ -68,18 +68,14 @@ export function Slider({
           {label && (
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-medium text-text-primary">{label}</span>
-              <span
-                className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-accent px-2 text-sm font-bold text-accent-foreground"
-              >
+              <span className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-accent px-2 text-sm font-bold text-accent-foreground">
                 {value}%
               </span>
             </div>
           )}
           {counterLabel && (
             <div className="flex items-center gap-1.5">
-              <span
-                className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-surface-overlay px-2 text-sm font-bold text-text-primary"
-              >
+              <span className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-surface-overlay px-2 text-sm font-bold text-text-primary">
                 {counterValue}%
               </span>
               <span className="text-sm font-medium text-text-primary">{counterLabel}</span>
@@ -91,9 +87,15 @@ export function Slider({
       {/* Slider track */}
       <div className="relative flex items-center py-2">
         {/* Filled track */}
-        <div className="absolute left-0 h-1 rounded-full bg-accent" style={{ width: `${percent}%` }} />
+        <div
+          className="absolute left-0 h-1 rounded-full bg-accent"
+          style={{ width: `${percent}%` }}
+        />
         {/* Empty track */}
-        <div className="absolute right-0 h-1 rounded-full bg-surface-overlay" style={{ width: `${100 - percent}%` }} />
+        <div
+          className="absolute right-0 h-1 rounded-full bg-surface-overlay"
+          style={{ width: `${100 - percent}%` }}
+        />
 
         <input
           type="range"
@@ -106,16 +108,16 @@ export function Slider({
           aria-valuemax={max}
           aria-valuenow={value}
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
-          className="relative z-10 w-full cursor-pointer opacity-0 h-8"
+          className="relative z-10 h-8 w-full cursor-pointer opacity-0"
           style={{ touchAction: 'none' }}
         />
 
         {/* Custom thumb */}
         <div
-          className="pointer-events-none absolute z-20 h-6 w-6 rounded-full bg-accent border-2 border-surface shadow-elevation-2 transition-transform"
+          className="pointer-events-none absolute z-20 h-6 w-6 rounded-full border-2 border-surface bg-accent shadow-elevation-2 transition-transform"
           style={{ left: `calc(${percent}% - 12px)` }}
         />
       </div>
     </div>
-  )
+  );
 }

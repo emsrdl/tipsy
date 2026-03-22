@@ -14,7 +14,7 @@ services:
         VITE_OIDC_REDIRECT_URI: ${VITE_OIDC_REDIRECT_URI:-}
         VITE_OIDC_SCOPE: ${VITE_OIDC_SCOPE:-}
     ports:
-      - "3000:80"
+      - '3000:80'
     restart: unless-stopped
 
   # Dev server: Vite with HMR (use: docker compose --profile dev up)
@@ -27,7 +27,7 @@ services:
       - /app/node_modules
     command: sh -c "npm install && npm run dev -- --host"
     ports:
-      - "5173:5173"
+      - '5173:5173'
     env_file:
       - .env
     environment:

@@ -27,7 +27,7 @@
  * const [history, setHistory] = useLocalStorage<HistoryEntry[]>('tipsy-history', [])
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react';
 
 /**
  * React hook that synchronizes state with localStorage.
@@ -45,55 +45,55 @@ import { useState, useEffect, useCallback } from 'react'
  */
 export function useLocalStorage<T>(
   key: string,
-  initialValue: T
+  initialValue: T,
 ): [T, (value: T | ((prev: T) => T)) => void, () => void] {
   // Lazy initializer reads from localStorage once on mount
   const [storedValue, setStoredValue] = useState<T>(() => {
-    return readFromStorage(key, initialValue)
-  })
+    return readFromStorage(key, initialValue);
+  });
 
   // Write to localStorage whenever the value changes
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       setStoredValue((prev) => {
-        const nextValue = value instanceof Function ? value(prev) : value
-        writeToStorage(key, nextValue)
-        return nextValue
-      })
+        const nextValue = value instanceof Function ? value(prev) : value;
+        writeToStorage(key, nextValue);
+        return nextValue;
+      });
     },
-    [key]
-  )
+    [key],
+  );
 
   // Remove the key from localStorage and reset to initial
   const removeValue = useCallback(() => {
     try {
-      localStorage.removeItem(key)
+      localStorage.removeItem(key);
     } catch {
       // localStorage unavailable — silently ignore
     }
-    setStoredValue(initialValue)
-  }, [key, initialValue])
+    setStoredValue(initialValue);
+  }, [key, initialValue]);
 
   // Listen for storage events from other tabs
   useEffect(() => {
     function handleStorageChange(e: StorageEvent) {
-      if (e.key !== key) return
+      if (e.key !== key) return;
       if (e.newValue === null) {
-        setStoredValue(initialValue)
+        setStoredValue(initialValue);
       } else {
         try {
-          setStoredValue(JSON.parse(e.newValue) as T)
+          setStoredValue(JSON.parse(e.newValue) as T);
         } catch {
-          setStoredValue(initialValue)
+          setStoredValue(initialValue);
         }
       }
     }
 
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [key, initialValue])
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [key, initialValue]);
 
-  return [storedValue, setValue, removeValue]
+  return [storedValue, setValue, removeValue];
 }
 
 /**
@@ -106,12 +106,12 @@ export function useLocalStorage<T>(
  */
 function readFromStorage<T>(key: string, initialValue: T): T {
   try {
-    const item = localStorage.getItem(key)
-    if (item === null) return initialValue
-    return JSON.parse(item) as T
+    const item = localStorage.getItem(key);
+    if (item === null) return initialValue;
+    return JSON.parse(item) as T;
   } catch {
     // localStorage unavailable or JSON parse error — use initial value
-    return initialValue
+    return initialValue;
   }
 }
 
@@ -124,7 +124,7 @@ function readFromStorage<T>(key: string, initialValue: T): T {
  */
 function writeToStorage<T>(key: string, value: T): void {
   try {
-    localStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(key, JSON.stringify(value));
   } catch {
     // localStorage unavailable or quota exceeded — silently ignore
   }

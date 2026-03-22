@@ -17,24 +17,24 @@
  * </FormGroup>
  */
 
-import type { ReactNode } from 'react'
-import { Label } from '@/components/atoms/Label/Label'
+import type { ReactNode } from 'react';
+import { Label } from '@/components/atoms/Label/Label';
 
 export interface FormGroupProps {
   /** id passed to the Label's htmlFor. */
-  id: string
+  id: string;
   /** Label text. */
-  label: string
+  label: string;
   /** Whether to show a required asterisk on the label. */
-  required?: boolean
+  required?: boolean;
   /** Whether the field is in error state. */
-  error?: boolean
+  error?: boolean;
   /** Error message to display below the input. */
-  errorMessage?: string
+  errorMessage?: string;
   /** The input element (Input atom or CurrencyInput). */
-  children: ReactNode
+  children: ReactNode;
   /** Additional CSS classes for the wrapper div. */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -57,7 +57,7 @@ export function FormGroup({
   children,
   className,
 }: FormGroupProps) {
-  const errorId = errorMessage ? `${id}-error` : undefined
+  const errorId = errorMessage ? `${id}-error` : undefined;
 
   return (
     <div className={className}>
@@ -71,5 +71,5 @@ export function FormGroup({
         </p>
       )}
     </div>
-  )
+  );
 }

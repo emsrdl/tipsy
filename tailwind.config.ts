@@ -9,8 +9,8 @@
  * @see src/styles/globals.css for CSS variable definitions
  * @see src/context/ThemeContext.tsx for runtime theme switching
  */
-import type { Config } from 'tailwindcss'
-import tailwindcssAnimate from 'tailwindcss-animate'
+import type { Config } from 'tailwindcss';
+import tailwindcssAnimate from 'tailwindcss-animate';
 
 export default {
   darkMode: ['class', '[data-mode="dark"]'],
@@ -34,10 +34,10 @@ export default {
         'elevation-8': '0 12px 17px rgba(0,0,0,0.14), 0 5px 22px rgba(0,0,0,0.08)',
       },
       spacing: {
-        '18': '4.5rem',   // 72px
-        '14': '3.5rem',   // 56px — AppBar / bottom nav
-        '13': '3.25rem',  // 52px
-        '12': '3rem',     // 48px — Material min touch target
+        '18': '4.5rem', // 72px
+        '14': '3.5rem', // 56px — AppBar / bottom nav
+        '13': '3.25rem', // 52px
+        '12': '3rem', // 48px — Material min touch target
       },
       colors: {
         accent: {
@@ -99,4 +99,4 @@ export default {
     },
   },
   plugins: [tailwindcssAnimate],
-} satisfies Config
+} satisfies Config;

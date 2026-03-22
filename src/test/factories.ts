@@ -11,14 +11,19 @@
  * const session = makeSession({ employees: [emp] })
  */
 
-import type { Employee, EmployeeGroup } from '@/types/employee'
-import type { TipSession, TipSplit, DenominationQuantity, DistributionResult } from '@/types/session'
-import type { Profile, ProfileStats } from '@/types/profile'
-import type { Shift, PersonShare, SmartDistributionResult, DifferenceLine } from '@/types/shift'
+import type { Employee, EmployeeGroup } from '@/types/employee';
+import type {
+  TipSession,
+  TipSplit,
+  DenominationQuantity,
+  DistributionResult,
+} from '@/types/session';
+import type { Profile, ProfileStats } from '@/types/profile';
+import type { Shift, PersonShare, SmartDistributionResult, DifferenceLine } from '@/types/shift';
 
-let _idCounter = 0
+let _idCounter = 0;
 function nextId(): string {
-  return `test-${++_idCounter}`
+  return `test-${++_idCounter}`;
 }
 
 /**
@@ -37,7 +42,7 @@ export function makeEmployee(opts: Partial<Employee> = {}): Employee {
     hours: 8,
     group: 'service' as EmployeeGroup,
     ...opts,
-  }
+  };
 }
 
 /**
@@ -54,7 +59,7 @@ export function makeSplit(opts: Partial<TipSplit> = {}): TipSplit {
     kitchenPercent: 30,
     servicePercent: 70,
     ...opts,
-  }
+  };
 }
 
 /**
@@ -68,7 +73,7 @@ export function makeSplit(opts: Partial<TipSplit> = {}): TipSplit {
  * makeDenomQty('eur_10', 5) // 5× €10 = €50
  */
 export function makeDenomQty(denominationId: string, quantity: number): DenominationQuantity {
-  return { denominationId, quantity }
+  return { denominationId, quantity };
 }
 
 /**
@@ -87,7 +92,7 @@ export function makeSession(opts: Partial<TipSession> = {}): TipSession {
     denominations: [makeDenomQty('eur_10', 10)], // €100 default
     results: null,
     ...opts,
-  }
+  };
 }
 
 /**
@@ -107,7 +112,7 @@ export function makeResult(opts: Partial<DistributionResult> = {}): Distribution
     hours: 8,
     amountInCents: 1000,
     ...opts,
-  }
+  };
 }
 
 /**
@@ -119,7 +124,7 @@ export function makeProfileStats(opts: Partial<ProfileStats> = {}): ProfileStats
     totalTipsInCents: 0,
     hourlyRateAvgInCents: 0,
     ...opts,
-  }
+  };
 }
 
 /**
@@ -134,7 +139,7 @@ export function makeProfile(opts: Partial<Profile> = {}): Profile {
     isActive: false,
     stats: makeProfileStats(),
     ...opts,
-  }
+  };
 }
 
 /**
@@ -150,20 +155,22 @@ export function makePersonShare(opts: Partial<PersonShare> = {}): PersonShare {
     actualShareInCents: 5000,
     deviationInCents: 0,
     ...opts,
-  }
+  };
 }
 
 /**
  * Creates a SmartDistributionResult with sensible defaults.
  */
-export function makeSmartDistribution(opts: Partial<SmartDistributionResult> = {}): SmartDistributionResult {
+export function makeSmartDistribution(
+  opts: Partial<SmartDistributionResult> = {},
+): SmartDistributionResult {
   return {
     personShares: [makePersonShare()],
     remainingCents: 0,
     fairnessScore: 100,
     denominationsUsed: [],
     ...opts,
-  }
+  };
 }
 
 /**
@@ -177,7 +184,7 @@ export function makeDifferenceLine(opts: Partial<DifferenceLine> = {}): Differen
     method: 'paypal',
     reason: 'Denomination constraint optimization',
     ...opts,
-  }
+  };
 }
 
 /**
@@ -197,5 +204,5 @@ export function makeShift(opts: Partial<Shift> = {}): Shift {
     differences: [],
     savedAt: '2026-03-21T18:05:00.000Z',
     ...opts,
-  }
+  };
 }

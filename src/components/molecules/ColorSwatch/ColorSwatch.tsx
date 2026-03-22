@@ -14,19 +14,19 @@
  * />
  */
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 export interface ColorSwatchProps {
   /** Unique color id (used as key). */
-  colorId: string
+  colorId: string;
   /** Hex color value for the swatch background. */
-  hex: string
+  hex: string;
   /** Accessible label. */
-  label: string
+  label: string;
   /** Whether this swatch is currently selected. */
-  selected: boolean
+  selected: boolean;
   /** Called with the colorId when clicked. */
-  onClick: (colorId: string) => void
+  onClick: (colorId: string) => void;
 }
 
 /**
@@ -48,9 +48,9 @@ export function ColorSwatch({ colorId, hex, label, selected, onClick }: ColorSwa
       onClick={() => onClick(colorId)}
       className={cn(
         'h-7 w-7 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        selected ? 'ring-2 ring-offset-2 scale-110' : 'hover:scale-105'
+        selected ? 'scale-110 ring-2 ring-offset-2' : 'hover:scale-105',
       )}
       style={{ backgroundColor: hex, '--tw-ring-color': hex } as React.CSSProperties}
     />
-  )
+  );
 }

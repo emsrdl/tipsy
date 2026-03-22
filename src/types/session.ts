@@ -12,7 +12,7 @@
  * @see src/context/TipSessionContext.tsx for runtime state
  */
 
-import type { Employee } from './employee'
+import type { Employee } from './employee';
 
 /**
  * A quantity of a specific EUR denomination.
@@ -23,9 +23,9 @@ import type { Employee } from './employee'
  */
 export interface DenominationQuantity {
   /** References a denomination id from DENOMINATIONS in src/config/currency.ts */
-  denominationId: string
+  denominationId: string;
   /** How many of this denomination were counted. Must be ≥ 0. */
-  quantity: number
+  quantity: number;
 }
 
 /**
@@ -37,9 +37,9 @@ export interface DenominationQuantity {
  */
 export interface TipSplit {
   /** Percentage of total tips going to kitchen staff (0–100). */
-  kitchenPercent: number
+  kitchenPercent: number;
   /** Percentage of total tips going to service staff (0–100). */
-  servicePercent: number
+  servicePercent: number;
 }
 
 /**
@@ -56,15 +56,15 @@ export interface TipSplit {
  */
 export interface DistributionResult {
   /** References Employee.id */
-  employeeId: string
+  employeeId: string;
   /** Copied from Employee for display without needing a lookup */
-  name: string
+  name: string;
   /** @see EmployeeGroup */
-  group: 'kitchen' | 'service'
+  group: 'kitchen' | 'service';
   /** Hours worked, for display */
-  hours: number
+  hours: number;
   /** Calculated tip amount in euro cents */
-  amountInCents: number
+  amountInCents: number;
 }
 
 /**
@@ -83,11 +83,11 @@ export interface DistributionResult {
  */
 export interface TipSession {
   /** Staff members participating in this round. */
-  employees: Employee[]
+  employees: Employee[];
   /** How to split the total between kitchen and service pools. */
-  split: TipSplit
+  split: TipSplit;
   /** Cash amounts entered in the denomination grid. */
-  denominations: DenominationQuantity[]
+  denominations: DenominationQuantity[];
   /** Calculated results, or null if not yet computed. */
-  results: DistributionResult[] | null
+  results: DistributionResult[] | null;
 }

@@ -15,15 +15,15 @@
  * <Logo variant="katzentempel" size={32} />
  */
 
-import { useTheme } from '@/hooks/useTheme'
+import { useTheme } from '@/hooks/useTheme';
 
 export interface LogoProps {
   /** Override theme detection and force a specific logo. */
-  variant?: 'tipsy' | 'katzentempel'
+  variant?: 'tipsy' | 'katzentempel';
   /** Size in pixels for both width and height. @default 32 */
-  size?: number
+  size?: number;
   /** Additional CSS classes. */
-  className?: string
+  className?: string;
 }
 
 /** Tipsy cocktail SVG icon */
@@ -41,13 +41,29 @@ function TipsyLogo({ size }: { size: number }) {
       <path d="M6 4L16 18L26 4H6Z" fill="currentColor" opacity="0.2" />
       <path d="M6 4L16 18L26 4" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
       <line x1="16" y1="18" x2="16" y2="26" stroke="currentColor" strokeWidth="2" />
-      <line x1="11" y1="26" x2="21" y2="26" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line
+        x1="11"
+        y1="26"
+        x2="21"
+        y2="26"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
       {/* Straw */}
-      <line x1="20" y1="8" x2="24" y2="4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line
+        x1="20"
+        y1="8"
+        x2="24"
+        y2="4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
       {/* Cherry */}
       <circle cx="24" cy="4" r="2" fill="var(--color-accent)" />
     </svg>
-  )
+  );
 }
 
 /** Katzentempel cat SVG icon */
@@ -62,7 +78,15 @@ function KatzentempelLogo({ size }: { size: number }) {
       aria-hidden
     >
       {/* Cat head */}
-      <circle cx="16" cy="18" r="10" fill="currentColor" opacity="0.15" stroke="currentColor" strokeWidth="2" />
+      <circle
+        cx="16"
+        cy="18"
+        r="10"
+        fill="currentColor"
+        opacity="0.15"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
       {/* Left ear */}
       <path d="M8 12L6 4L12 10Z" fill="currentColor" />
       {/* Right ear */}
@@ -76,7 +100,7 @@ function KatzentempelLogo({ size }: { size: number }) {
       <line x1="7" y1="19" x2="12" y2="20" stroke="currentColor" strokeWidth="1" />
       <line x1="20" y1="20" x2="25" y2="19" stroke="currentColor" strokeWidth="1" />
     </svg>
-  )
+  );
 }
 
 /**
@@ -89,16 +113,12 @@ function KatzentempelLogo({ size }: { size: number }) {
  * <Logo size={24} />
  */
 export function Logo({ variant, size = 32, className }: LogoProps) {
-  const { theme } = useTheme()
-  const resolved = variant ?? theme.logoVariant
+  const { theme } = useTheme();
+  const resolved = variant ?? theme.logoVariant;
 
   return (
     <span className={className}>
-      {resolved === 'katzentempel' ? (
-        <KatzentempelLogo size={size} />
-      ) : (
-        <TipsyLogo size={size} />
-      )}
+      {resolved === 'katzentempel' ? <KatzentempelLogo size={size} /> : <TipsyLogo size={size} />}
     </span>
-  )
+  );
 }

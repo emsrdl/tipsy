@@ -8,4 +8,4 @@
  * const { theme, accentColor, colorMode, toggleColorMode } = useTheme()
  */
 
-export { useThemeContext as useTheme } from '@/context/ThemeContext'
+export { useThemeContext as useTheme } from '@/context/ThemeContext';

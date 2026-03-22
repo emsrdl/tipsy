@@ -13,9 +13,9 @@
  * import { formatResultsForExport, buildCsvString } from '@/utils/export'
  */
 
-import type { DistributionResult } from '@/types/session'
-import type { EmployeePayoutPlan } from '@/types/calculation'
-import { formatEurFromCents } from '@/lib/formatCurrency'
+import type { DistributionResult } from '@/types/session';
+import type { EmployeePayoutPlan } from '@/types/calculation';
+import { formatEurFromCents } from '@/lib/formatCurrency';
 
 /**
  * A single row of export data, ready for CSV or PDF rendering.
@@ -27,11 +27,11 @@ import { formatEurFromCents } from '@/lib/formatCurrency'
  * @property perHour - Formatted per-hour rate (optional)
  */
 export interface ExportRow {
-  name: string
-  group: string
-  hours: string
-  amount: string
-  perHour: string
+  name: string;
+  group: string;
+  hours: string;
+  amount: string;
+  perHour: string;
 }
 
 /**
@@ -52,17 +52,15 @@ export interface ExportRow {
 export function formatResultsForExport(
   results: DistributionResult[],
   locale: string,
-  groupLabels: { kitchen: string; service: string }
+  groupLabels: { kitchen: string; service: string },
 ): ExportRow[] {
   return results.map((r) => ({
     name: r.name,
     group: r.group === 'kitchen' ? groupLabels.kitchen : groupLabels.service,
     hours: r.hours.toString(),
     amount: formatEurFromCents(r.amountInCents, locale),
-    perHour: r.hours > 0
-      ? formatEurFromCents(Math.round(r.amountInCents / r.hours), locale)
-      : '—',
-  }))
+    perHour: r.hours > 0 ? formatEurFromCents(Math.round(r.amountInCents / r.hours), locale) : '—',
+  }));
 }
 
 /**
@@ -81,11 +79,17 @@ export function formatResultsForExport(
  */
 export function buildCsvString(
   rows: ExportRow[],
-  headers: { name: string; group: string; hours: string; amount: string; perHour: string }
+  headers: { name: string; group: string; hours: string; amount: string; perHour: string },
 ): string {
-  const headerLine = [headers.name, headers.group, headers.hours, headers.amount, headers.perHour].join(';')
-  const dataLines = rows.map((r) => [r.name, r.group, r.hours, r.amount, r.perHour].join(';'))
-  return [headerLine, ...dataLines].join('\n')
+  const headerLine = [
+    headers.name,
+    headers.group,
+    headers.hours,
+    headers.amount,
+    headers.perHour,
+  ].join(';');
+  const dataLines = rows.map((r) => [r.name, r.group, r.hours, r.amount, r.perHour].join(';'));
+  return [headerLine, ...dataLines].join('\n');
 }
 
 /**
@@ -101,20 +105,20 @@ export function buildCsvString(
  */
 export function buildExportSummary(
   results: DistributionResult[],
-  locale: string
+  locale: string,
 ): { kitchenTotal: string; serviceTotal: string; grandTotal: string } {
   const kitchenCents = results
     .filter((r) => r.group === 'kitchen')
-    .reduce((s, r) => s + r.amountInCents, 0)
+    .reduce((s, r) => s + r.amountInCents, 0);
   const serviceCents = results
     .filter((r) => r.group === 'service')
-    .reduce((s, r) => s + r.amountInCents, 0)
+    .reduce((s, r) => s + r.amountInCents, 0);
 
   return {
     kitchenTotal: formatEurFromCents(kitchenCents, locale),
     serviceTotal: formatEurFromCents(serviceCents, locale),
     grandTotal: formatEurFromCents(kitchenCents + serviceCents, locale),
-  }
+  };
 }
 
 /**
@@ -129,16 +133,13 @@ export function buildExportSummary(
  * const lines = formatPayoutDetails(payouts, 'de-DE')
  * // ["Anna: 2×€20 + 1×€5 + 1×€2 = 47,00 €", ...]
  */
-export function formatPayoutDetails(
-  payouts: EmployeePayoutPlan[],
-  locale: string
-): string[] {
+export function formatPayoutDetails(payouts: EmployeePayoutPlan[], locale: string): string[] {
   return payouts.map((p) => {
     const parts = p.assignments
       .filter((a) => a.count > 0)
       .map((a) => `${a.count}×${a.denominationId.replace('eur_', '€').replace('ct', ' ct')}`)
-      .join(' + ')
-    const total = formatEurFromCents(p.actualAmountInCents, locale)
-    return `${p.name}: ${parts || '—'} = ${total}`
-  })
+      .join(' + ');
+    const total = formatEurFromCents(p.actualAmountInCents, locale);
+    return `${p.name}: ${parts || '—'} = ${total}`;
+  });
 }

@@ -12,31 +12,31 @@
  * const { output, isSmartMode, toggleSmartMode } = useSmartSplitter()
  */
 
-import { useMemo, useState, useCallback } from 'react'
-import { smartSplit } from '@/lib/smartSplitter'
-import { useLocalStorage } from './useLocalStorage'
+import { useMemo, useState, useCallback } from 'react';
+import { smartSplit } from '@/lib/smartSplitter';
+import { useLocalStorage } from './useLocalStorage';
 import {
   DEFAULT_FAIRNESS_THRESHOLD,
   SMART_SPLIT_ENABLED,
   SMART_SPLIT_THRESHOLD_KEY,
-} from '@/config/smartSplit'
-import type { SmartSplitInput, SmartSplitOutput } from '@/types/shift'
-import type { Employee } from '@/types/employee'
-import type { DenominationQuantity } from '@/types/session'
+} from '@/config/smartSplit';
+import type { SmartSplitInput, SmartSplitOutput } from '@/types/shift';
+import type { Employee } from '@/types/employee';
+import type { DenominationQuantity } from '@/types/session';
 
 export interface UseSmartSplitterReturn {
   /** The smart split result, or null if input is insufficient. */
-  output: SmartSplitOutput | null
+  output: SmartSplitOutput | null;
   /** Whether smart mode is enabled. */
-  isSmartMode: boolean
+  isSmartMode: boolean;
   /** Toggle between smart and normal mode. */
-  toggleSmartMode: () => void
+  toggleSmartMode: () => void;
   /** Set smart mode explicitly. */
-  setSmartMode: (enabled: boolean) => void
+  setSmartMode: (enabled: boolean) => void;
   /** Current fairness threshold in cents. */
-  thresholdInCents: number
+  thresholdInCents: number;
   /** Update the fairness threshold. */
-  setThreshold: (cents: number) => void
+  setThreshold: (cents: number) => void;
 }
 
 /**
@@ -52,31 +52,31 @@ export function useSmartSplitter(
   employees: Employee[],
   totalInCents: number,
   kitchenPercent: number,
-  denominations: DenominationQuantity[]
+  denominations: DenominationQuantity[],
 ): UseSmartSplitterReturn {
-  const [isSmartMode, setIsSmartMode] = useState(SMART_SPLIT_ENABLED)
+  const [isSmartMode, setIsSmartMode] = useState(SMART_SPLIT_ENABLED);
   const [thresholdInCents, setThresholdInCents] = useLocalStorage<number>(
     SMART_SPLIT_THRESHOLD_KEY,
-    DEFAULT_FAIRNESS_THRESHOLD
-  )
+    DEFAULT_FAIRNESS_THRESHOLD,
+  );
 
   const toggleSmartMode = useCallback(() => {
-    setIsSmartMode((prev) => !prev)
-  }, [])
+    setIsSmartMode((prev) => !prev);
+  }, []);
 
   const setSmartMode = useCallback((enabled: boolean) => {
-    setIsSmartMode(enabled)
-  }, [])
+    setIsSmartMode(enabled);
+  }, []);
 
   const setThreshold = useCallback(
     (cents: number) => {
-      setThresholdInCents(cents)
+      setThresholdInCents(cents);
     },
-    [setThresholdInCents]
-  )
+    [setThresholdInCents],
+  );
 
   const output = useMemo<SmartSplitOutput | null>(() => {
-    if (employees.length === 0 || totalInCents <= 0) return null
+    if (employees.length === 0 || totalInCents <= 0) return null;
 
     const input: SmartSplitInput = {
       employees,
@@ -85,10 +85,10 @@ export function useSmartSplitter(
       denominations,
       smartMode: isSmartMode,
       fairnessThresholdInCents: thresholdInCents,
-    }
+    };
 
-    return smartSplit(input)
-  }, [employees, totalInCents, kitchenPercent, denominations, isSmartMode, thresholdInCents])
+    return smartSplit(input);
+  }, [employees, totalInCents, kitchenPercent, denominations, isSmartMode, thresholdInCents]);
 
   return {
     output,
@@ -97,5 +97,5 @@ export function useSmartSplitter(
     setSmartMode,
     thresholdInCents,
     setThreshold,
-  }
+  };
 }

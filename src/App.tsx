@@ -9,13 +9,13 @@
  * @see src/layouts/AppLayout/AppLayout.tsx for the shell
  */
 
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { AppLayout } from '@/layouts/AppLayout/AppLayout'
-import { SetupScreen } from '@/screens/SetupScreen/SetupScreen'
-import { CashInputScreen } from '@/screens/CashInputScreen/CashInputScreen'
-import { ResultsScreen } from '@/screens/ResultsScreen/ResultsScreen'
-import { HistoryScreen } from '@/screens/HistoryScreen/HistoryScreen'
-import { SettingsScreen } from '@/screens/SettingsScreen/SettingsScreen'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AppLayout } from '@/layouts/AppLayout/AppLayout';
+import { SetupScreen } from '@/screens/SetupScreen/SetupScreen';
+import { CashInputScreen } from '@/screens/CashInputScreen/CashInputScreen';
+import { ResultsScreen } from '@/screens/ResultsScreen/ResultsScreen';
+import { HistoryScreen } from '@/screens/HistoryScreen/HistoryScreen';
+import { SettingsScreen } from '@/screens/SettingsScreen/SettingsScreen';
 
 /**
  * Root app with 3-tab route definitions.
@@ -30,19 +30,19 @@ export function App() {
         <Route path="/" element={<Navigate to="/calculate" replace />} />
 
         {/* Calculate tab — stepper flow */}
-        <Route path="/calculate"         element={<SetupScreen />} />
-        <Route path="/calculate/cash"    element={<CashInputScreen />} />
+        <Route path="/calculate" element={<SetupScreen />} />
+        <Route path="/calculate/cash" element={<CashInputScreen />} />
         <Route path="/calculate/results" element={<ResultsScreen />} />
 
         {/* History tab */}
-        <Route path="/history"    element={<HistoryScreen />} />
+        <Route path="/history" element={<HistoryScreen />} />
 
         {/* Settings tab */}
-        <Route path="/settings"   element={<SettingsScreen />} />
+        <Route path="/settings" element={<SettingsScreen />} />
 
         {/* Catch-all */}
         <Route path="*" element={<Navigate to="/calculate" replace />} />
       </Routes>
     </AppLayout>
-  )
+  );
 }

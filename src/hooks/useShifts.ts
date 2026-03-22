@@ -8,25 +8,25 @@
  * const { shifts, addShift, deleteShift, clearHistory } = useShifts()
  */
 
-import { useCallback } from 'react'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
-import type { Shift } from '@/types/shift'
+import { useCallback } from 'react';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import type { Shift } from '@/types/shift';
 
-const SHIFTS_KEY = 'tipsy_shifts'
+const SHIFTS_KEY = 'tipsy_shifts';
 
 export interface UseShiftsReturn {
   /** All saved shifts. */
-  shifts: Shift[]
+  shifts: Shift[];
   /** Add a new shift to history. */
-  addShift: (shift: Shift) => void
+  addShift: (shift: Shift) => void;
   /** Add multiple shifts (e.g. from import). */
-  addShifts: (newShifts: Shift[]) => void
+  addShifts: (newShifts: Shift[]) => void;
   /** Update an existing shift by ID. */
-  updateShift: (id: string, updates: Partial<Omit<Shift, 'id'>>) => void
+  updateShift: (id: string, updates: Partial<Omit<Shift, 'id'>>) => void;
   /** Delete a shift by ID. */
-  deleteShift: (id: string) => void
+  deleteShift: (id: string) => void;
   /** Clear all shift history. */
-  clearHistory: () => void
+  clearHistory: () => void;
 }
 
 /**
@@ -34,41 +34,39 @@ export interface UseShiftsReturn {
  * Must be used within a component tree (uses useLocalStorage internally).
  */
 export function useShifts(): UseShiftsReturn {
-  const [shifts, setShifts] = useLocalStorage<Shift[]>(SHIFTS_KEY, [])
+  const [shifts, setShifts] = useLocalStorage<Shift[]>(SHIFTS_KEY, []);
 
   const addShift = useCallback(
     (shift: Shift) => {
-      setShifts((prev) => [shift, ...prev])
+      setShifts((prev) => [shift, ...prev]);
     },
-    [setShifts]
-  )
+    [setShifts],
+  );
 
   const addShifts = useCallback(
     (newShifts: Shift[]) => {
-      setShifts((prev) => [...newShifts, ...prev])
+      setShifts((prev) => [...newShifts, ...prev]);
     },
-    [setShifts]
-  )
+    [setShifts],
+  );
 
   const updateShift = useCallback(
     (id: string, updates: Partial<Omit<Shift, 'id'>>) => {
-      setShifts((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
-      )
+      setShifts((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
     },
-    [setShifts]
-  )
+    [setShifts],
+  );
 
   const deleteShift = useCallback(
     (id: string) => {
-      setShifts((prev) => prev.filter((s) => s.id !== id))
+      setShifts((prev) => prev.filter((s) => s.id !== id));
     },
-    [setShifts]
-  )
+    [setShifts],
+  );
 
   const clearHistory = useCallback(() => {
-    setShifts([])
-  }, [setShifts])
+    setShifts([]);
+  }, [setShifts]);
 
-  return { shifts, addShift, addShifts, updateShift, deleteShift, clearHistory }
+  return { shifts, addShift, addShifts, updateShift, deleteShift, clearHistory };
 }

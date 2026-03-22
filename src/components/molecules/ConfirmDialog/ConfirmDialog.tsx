@@ -14,25 +14,25 @@
  * />
  */
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/atoms/Button/Button'
+} from '@/components/ui/dialog';
+import { Button } from '@/components/atoms/Button/Button';
 
 export interface ConfirmDialogProps {
-  isOpen: boolean
-  title: string
-  message?: string
-  confirmLabel: string
-  cancelLabel?: string
-  onConfirm: () => void
-  onCancel: () => void
-  variant?: 'danger' | 'default'
+  isOpen: boolean;
+  title: string;
+  message?: string;
+  confirmLabel: string;
+  cancelLabel?: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  variant?: 'danger' | 'default';
 }
 
 /**
@@ -50,24 +50,22 @@ export function ConfirmDialog({
   onCancel,
   variant = 'default',
 }: ConfirmDialogProps) {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation('common');
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onCancel() }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onCancel();
+      }}
+    >
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {message && (
-            <DialogDescription>{message}</DialogDescription>
-          )}
+          {message && <DialogDescription>{message}</DialogDescription>}
         </DialogHeader>
         <div className="flex gap-2 pt-2">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onCancel}
-            className="flex-1 min-h-11"
-          >
+          <Button type="button" variant="ghost" onClick={onCancel} className="min-h-11 flex-1">
             {cancelLabel ?? t('actions.cancel')}
           </Button>
           <Button
@@ -75,8 +73,8 @@ export function ConfirmDialog({
             onClick={onConfirm}
             className={
               variant === 'danger'
-                ? 'flex-1 min-h-11 bg-status-error hover:bg-status-error/90 text-white border-0'
-                : 'flex-1 min-h-11'
+                ? 'hover:bg-status-error/90 min-h-11 flex-1 border-0 bg-status-error text-white'
+                : 'min-h-11 flex-1'
             }
           >
             {confirmLabel}
@@ -84,5 +82,5 @@ export function ConfirmDialog({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

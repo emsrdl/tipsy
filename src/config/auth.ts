@@ -18,7 +18,7 @@
  * const config = getOidcConfig() // null in v1
  */
 
-import { env, isAuthConfigured } from '@/config/env'
+import { env, isAuthConfigured } from '@/config/env';
 
 /**
  * OIDC configuration shaped for oidc-client-ts UserManager.
@@ -30,11 +30,11 @@ import { env, isAuthConfigured } from '@/config/env'
  * @property response_type - Always "code" (PKCE flow)
  */
 export interface OidcConfig {
-  authority: string
-  client_id: string
-  redirect_uri: string
-  scope: string
-  response_type: 'code'
+  authority: string;
+  client_id: string;
+  redirect_uri: string;
+  scope: string;
+  response_type: 'code';
 }
 
 /**
@@ -50,7 +50,7 @@ export interface OidcConfig {
  * }
  */
 export function getOidcConfig(): OidcConfig | null {
-  if (!isAuthConfigured()) return null
+  if (!isAuthConfigured()) return null;
 
   // These are guaranteed non-undefined when isAuthConfigured() is true
   return {
@@ -59,5 +59,5 @@ export function getOidcConfig(): OidcConfig | null {
     redirect_uri: env.OIDC_REDIRECT_URI as string,
     scope: env.OIDC_SCOPE as string,
     response_type: 'code',
-  }
+  };
 }

@@ -11,8 +11,8 @@
  * @see src/lib/formatCurrency.ts for EUR formatting
  */
 
-import { formatEurFromCents } from './formatCurrency'
-import type { Shift, ImportResult } from '@/types/shift'
+import { formatEurFromCents } from './formatCurrency';
+import type { Shift, ImportResult } from '@/types/shift';
 
 /**
  * Exports shifts to a semicolon-separated CSV string.
@@ -27,18 +27,18 @@ import type { Shift, ImportResult } from '@/types/shift'
  * // "Date;Employee;Role;Hours;Amount (€);Notes\n2026-03-21;Anna;Service;8;€36,40;Smart Split\n..."
  */
 export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
-  const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE'
-  const header = 'Date;Employee;Role;Hours;Amount (€);Notes\n'
+  const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE';
+  const header = 'Date;Employee;Role;Hours;Amount (€);Notes\n';
 
-  const rows: string[] = []
+  const rows: string[] = [];
 
   for (const shift of shifts) {
-    const date = shift.date.split('T')[0] ?? shift.date
-    const mode = shift.smartSplitting ? 'Smart Split' : 'Normal'
+    const date = shift.date.split('T')[0] ?? shift.date;
+    const mode = shift.smartSplitting ? 'Smart Split' : 'Normal';
 
     for (const share of shift.distribution.personShares) {
-      const denomNote = buildDenominationNote(shift, share.id, fmtLocale)
-      const notes = denomNote ? `${mode} [${denomNote}]` : mode
+      const denomNote = buildDenominationNote(shift, share.id, fmtLocale);
+      const notes = denomNote ? `${mode} [${denomNote}]` : mode;
 
       rows.push(
         [
@@ -48,12 +48,12 @@ export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
           share.hoursWorked.toString(),
           formatEurFromCents(share.actualShareInCents, fmtLocale),
           notes,
-        ].join(';')
-      )
+        ].join(';'),
+      );
     }
   }
 
-  return '\uFEFF' + header + rows.join('\n')
+  return '\uFEFF' + header + rows.join('\n');
 }
 
 /**
@@ -63,10 +63,14 @@ export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
  * @param filename - File name without extension
  * @param locale - BCP 47 locale
  */
-export function downloadShiftsCsv(shifts: Shift[], filename = 'tipsy-shifts', locale = 'de-DE'): void {
-  const csv = exportShiftsCsv(shifts, locale)
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  triggerDownload(blob, `${filename}.csv`)
+export function downloadShiftsCsv(
+  shifts: Shift[],
+  filename = 'tipsy-shifts',
+  locale = 'de-DE',
+): void {
+  const csv = exportShiftsCsv(shifts, locale);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  triggerDownload(blob, `${filename}.csv`);
 }
 
 /**
@@ -79,15 +83,15 @@ export function downloadShiftsCsv(shifts: Shift[], filename = 'tipsy-shifts', lo
 export function exportShiftsPdf(
   shifts: Shift[],
   locale = 'de-DE',
-  title = 'Tipsy — Schichtübersicht'
+  title = 'Tipsy — Schichtübersicht',
 ): void {
-  const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE'
-  const lang = locale.startsWith('de') ? 'de' : 'en'
+  const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE';
+  const lang = locale.startsWith('de') ? 'de' : 'en';
 
   const shiftBlocks = shifts.map((shift) => {
-    const date = new Date(shift.date).toLocaleDateString(fmtLocale)
-    const mode = shift.smartSplitting ? 'Smart Split' : 'Normal'
-    const total = formatEurFromCents(shift.totalTipsInCents, fmtLocale)
+    const date = new Date(shift.date).toLocaleDateString(fmtLocale);
+    const mode = shift.smartSplitting ? 'Smart Split' : 'Normal';
+    const total = formatEurFromCents(shift.totalTipsInCents, fmtLocale);
 
     const rows = shift.distribution.personShares
       .map(
@@ -96,9 +100,9 @@ export function exportShiftsPdf(
           <td>${s.role === 'kitchen' ? 'Küche' : 'Service'}</td>
           <td>${s.hoursWorked}</td>
           <td>${formatEurFromCents(s.actualShareInCents, fmtLocale)}</td>
-        </tr>`
+        </tr>`,
       )
-      .join('')
+      .join('');
 
     return `
       <div class="shift">
@@ -108,12 +112,12 @@ export function exportShiftsPdf(
           <tbody>${rows}</tbody>
           <tfoot><tr class="total"><td colspan="3">Gesamt</td><td>${total}</td></tr></tfoot>
         </table>
-      </div>`
-  })
+      </div>`;
+  });
 
   // Summary stats
-  const totalShifts = shifts.length
-  const totalTips = shifts.reduce((s, sh) => s + sh.totalTipsInCents, 0)
+  const totalShifts = shifts.length;
+  const totalTips = shifts.reduce((s, sh) => s + sh.totalTipsInCents, 0);
 
   const html = `<!DOCTYPE html>
 <html lang="${lang}">
@@ -139,12 +143,12 @@ export function exportShiftsPdf(
   ${shiftBlocks.join('')}
   <script>window.onload = () => { window.print(); window.close(); }<\/script>
 </body>
-</html>`
+</html>`;
 
-  const printWindow = window.open('', '_blank')
-  if (!printWindow) return
-  printWindow.document.write(html)
-  printWindow.document.close()
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+  printWindow.document.write(html);
+  printWindow.document.close();
 }
 
 /**
@@ -159,11 +163,15 @@ export function exportShiftsPdf(
  * downloadFile(new Blob([json]), 'backup.json')
  */
 export function exportBackupJson(shifts: Shift[]): string {
-  return JSON.stringify({
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    shifts,
-  }, null, 2)
+  return JSON.stringify(
+    {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      shifts,
+    },
+    null,
+    2,
+  );
 }
 
 /**
@@ -173,9 +181,9 @@ export function exportBackupJson(shifts: Shift[]): string {
  * @param filename - File name without extension
  */
 export function downloadBackupJson(shifts: Shift[], filename = 'tipsy-backup'): void {
-  const json = exportBackupJson(shifts)
-  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' })
-  triggerDownload(blob, `${filename}.json`)
+  const json = exportBackupJson(shifts);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+  triggerDownload(blob, `${filename}.json`);
 }
 
 /**
@@ -192,55 +200,55 @@ export function downloadBackupJson(shifts: Shift[], filename = 'tipsy-backup'): 
  */
 export function importShiftsJson(
   json: string,
-  existingIds: Set<string>
+  existingIds: Set<string>,
 ): { shifts: Shift[]; result: ImportResult } {
-  const result: ImportResult = { added: 0, skipped: 0, errors: [] }
-  const newShifts: Shift[] = []
+  const result: ImportResult = { added: 0, skipped: 0, errors: [] };
+  const newShifts: Shift[] = [];
 
-  let parsed: unknown
+  let parsed: unknown;
   try {
-    parsed = JSON.parse(json) as unknown
+    parsed = JSON.parse(json) as unknown;
   } catch {
-    result.errors.push('Invalid JSON format')
-    return { shifts: newShifts, result }
+    result.errors.push('Invalid JSON format');
+    return { shifts: newShifts, result };
   }
 
   // Support both raw array and { version, shifts } wrapper
-  let shiftsArray: unknown[]
+  let shiftsArray: unknown[];
   if (Array.isArray(parsed)) {
-    shiftsArray = parsed
+    shiftsArray = parsed;
   } else if (
     typeof parsed === 'object' &&
     parsed !== null &&
     'shifts' in parsed &&
     Array.isArray((parsed as Record<string, unknown>).shifts)
   ) {
-    shiftsArray = (parsed as Record<string, unknown>).shifts as unknown[]
+    shiftsArray = (parsed as Record<string, unknown>).shifts as unknown[];
   } else {
-    result.errors.push('Expected array of shifts or { shifts: [...] } object')
-    return { shifts: newShifts, result }
+    result.errors.push('Expected array of shifts or { shifts: [...] } object');
+    return { shifts: newShifts, result };
   }
 
   for (let i = 0; i < shiftsArray.length; i++) {
-    const item = shiftsArray[i]
+    const item = shiftsArray[i];
 
     if (!isValidShift(item)) {
-      result.errors.push(`Invalid shift at index ${i}`)
-      continue
+      result.errors.push(`Invalid shift at index ${i}`);
+      continue;
     }
 
-    const shift = item as Shift
+    const shift = item as Shift;
 
     if (existingIds.has(shift.id)) {
-      result.skipped++
-      continue
+      result.skipped++;
+      continue;
     }
 
-    newShifts.push(shift)
-    result.added++
+    newShifts.push(shift);
+    result.added++;
   }
 
-  return { shifts: newShifts, result }
+  return { shifts: newShifts, result };
 }
 
 /**
@@ -250,8 +258,8 @@ export function importShiftsJson(
  * @internal
  */
 function isValidShift(value: unknown): value is Shift {
-  if (typeof value !== 'object' || value === null) return false
-  const obj = value as Record<string, unknown>
+  if (typeof value !== 'object' || value === null) return false;
+  const obj = value as Record<string, unknown>;
 
   return (
     typeof obj.id === 'string' &&
@@ -266,7 +274,7 @@ function isValidShift(value: unknown): value is Shift {
     typeof obj.smartSplitting === 'boolean' &&
     Array.isArray(obj.differences) &&
     typeof obj.savedAt === 'string'
-  )
+  );
 }
 
 /**
@@ -276,14 +284,14 @@ function isValidShift(value: unknown): value is Shift {
  * @internal
  */
 function buildDenominationNote(shift: Shift, employeeId: string, locale: string): string {
-  if (!shift.smartSplitting) return ''
+  if (!shift.smartSplitting) return '';
 
-  const share = shift.distribution.personShares.find((s) => s.id === employeeId)
-  if (!share || share.deviationInCents === 0) return ''
+  const share = shift.distribution.personShares.find((s) => s.id === employeeId);
+  if (!share || share.deviationInCents === 0) return '';
 
-  const deviation = share.deviationInCents
-  const sign = deviation > 0 ? '+' : ''
-  return `${sign}${formatEurFromCents(deviation, locale)} deviation`
+  const deviation = share.deviationInCents;
+  const sign = deviation > 0 ? '+' : '';
+  return `${sign}${formatEurFromCents(deviation, locale)} deviation`;
 }
 
 function escapeHtml(str: string): string {
@@ -292,16 +300,16 @@ function escapeHtml(str: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+    .replace(/'/g, '&#39;');
 }
 
 function triggerDownload(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.setAttribute('href', url)
-  link.setAttribute('download', filename)
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }

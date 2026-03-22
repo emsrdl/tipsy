@@ -10,9 +10,9 @@
  * @see src/hooks/useShifts.ts for shift persistence
  */
 
-import type { Employee } from './employee'
-import type { DenominationQuantity } from './session'
-import type { EmployeePayoutPlan } from './calculation'
+import type { Employee } from './employee';
+import type { DenominationQuantity } from './session';
+import type { EmployeePayoutPlan } from './calculation';
 
 /**
  * Per-person share with deviation tracking for smart splitting.
@@ -28,19 +28,19 @@ import type { EmployeePayoutPlan } from './calculation'
  */
 export interface PersonShare {
   /** References Employee.id */
-  id: string
+  id: string;
   /** Display name. */
-  name: string
+  name: string;
   /** Role (kitchen/service). */
-  role: 'kitchen' | 'service'
+  role: 'kitchen' | 'service';
   /** Hours worked. */
-  hoursWorked: number
+  hoursWorked: number;
   /** What this person should ideally receive, in cents. */
-  idealShareInCents: number
+  idealShareInCents: number;
   /** What this person actually receives (with denomination constraints), in cents. */
-  actualShareInCents: number
+  actualShareInCents: number;
   /** actual − ideal (positive = overpaid, negative = underpaid), in cents. */
-  deviationInCents: number
+  deviationInCents: number;
 }
 
 /**
@@ -56,17 +56,17 @@ export interface PersonShare {
  */
 export interface SmartDistributionResult {
   /** Per-person distribution with deviation tracking. */
-  personShares: PersonShare[]
+  personShares: PersonShare[];
   /** Cents remaining that couldn't be distributed. */
-  remainingCents: number
+  remainingCents: number;
   /** 0–100 fairness score (100 = perfect distribution). */
-  fairnessScore: number
+  fairnessScore: number;
   /** Which denominations were used in the distribution. */
-  denominationsUsed: { denominationId: string; quantity: number }[]
+  denominationsUsed: { denominationId: string; quantity: number }[];
 }
 
 /** Method for reconciling deviations between persons. */
-export type TransferMethod = 'direct' | 'paypal' | 'transfer'
+export type TransferMethod = 'direct' | 'paypal' | 'transfer';
 
 /**
  * A suggested transfer between two people to reconcile deviations.
@@ -82,15 +82,15 @@ export type TransferMethod = 'direct' | 'paypal' | 'transfer'
  */
 export interface DifferenceLine {
   /** Person who should pay. */
-  fromPerson: { id: string; name: string }
+  fromPerson: { id: string; name: string };
   /** Person who should receive. */
-  toPerson: { id: string; name: string }
+  toPerson: { id: string; name: string };
   /** Transfer amount in cents. */
-  amountInCents: number
+  amountInCents: number;
   /** Suggested transfer method. */
-  method: TransferMethod
+  method: TransferMethod;
   /** Human-readable reason for this transfer. */
-  reason: string
+  reason: string;
 }
 
 /**
@@ -113,27 +113,27 @@ export interface DifferenceLine {
  */
 export interface Shift {
   /** Unique identifier (for import/export dedup). */
-  id: string
+  id: string;
   /** References Profile.id, or null for guest sessions. */
-  profileId: string | null
+  profileId: string | null;
   /** ISO 8601 date of the shift. */
-  date: string
+  date: string;
   /** Kitchen percentage used (0–100). */
-  kitchenPercent: number
+  kitchenPercent: number;
   /** Employees participating in this shift. */
-  employees: Employee[]
+  employees: Employee[];
   /** Total tip amount in cents. */
-  totalTipsInCents: number
+  totalTipsInCents: number;
   /** Denomination quantities entered. */
-  denominationInput: DenominationQuantity[]
+  denominationInput: DenominationQuantity[];
   /** The distribution results (basic or smart). */
-  distribution: SmartDistributionResult
+  distribution: SmartDistributionResult;
   /** Whether smart splitting was used. */
-  smartSplitting: boolean
+  smartSplitting: boolean;
   /** Suggested transfers to reconcile deviations. */
-  differences: DifferenceLine[]
+  differences: DifferenceLine[];
   /** ISO 8601 timestamp when this shift was saved. */
-  savedAt: string
+  savedAt: string;
 }
 
 /**
@@ -144,11 +144,11 @@ export interface Shift {
  */
 export interface ImportResult {
   /** Number of shifts successfully added. */
-  added: number
+  added: number;
   /** Number of shifts skipped (already exist by ID). */
-  skipped: number
+  skipped: number;
   /** Error messages for invalid entries. */
-  errors: string[]
+  errors: string[];
 }
 
 /**
@@ -166,17 +166,17 @@ export interface ImportResult {
  */
 export interface SmartSplitInput {
   /** Employees to distribute tips among. */
-  employees: Employee[]
+  employees: Employee[];
   /** Total tip amount in cents. */
-  totalInCents: number
+  totalInCents: number;
   /** Kitchen percentage (0–100). */
-  kitchenPercent: number
+  kitchenPercent: number;
   /** Available denominations with quantities. */
-  denominations: DenominationQuantity[]
+  denominations: DenominationQuantity[];
   /** Whether to use smart splitting (true) or normal splitting (false). */
-  smartMode: boolean
+  smartMode: boolean;
   /** Max acceptable deviation per person in cents. Transfers suggested above this. */
-  fairnessThresholdInCents: number
+  fairnessThresholdInCents: number;
 }
 
 /**
@@ -191,11 +191,11 @@ export interface SmartSplitInput {
  */
 export interface SmartSplitOutput {
   /** The distribution result. */
-  distribution: SmartDistributionResult
+  distribution: SmartDistributionResult;
   /** Suggested transfers to reconcile deviations above threshold. */
-  differences: DifferenceLine[]
+  differences: DifferenceLine[];
   /** Per-employee payout plans with denomination assignments (smart mode only). */
-  payoutPlans?: EmployeePayoutPlan[]
+  payoutPlans?: EmployeePayoutPlan[];
   /** Algorithm execution time in milliseconds. */
-  durationMs: number
+  durationMs: number;
 }

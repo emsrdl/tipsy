@@ -19,17 +19,17 @@
  * import '@/lib/i18n'
  */
 
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 // Locale imports
-import deCommon from '@/locales/de/common.json'
-import deScreens from '@/locales/de/screens.json'
-import deErrors from '@/locales/de/errors.json'
-import enCommon from '@/locales/en/common.json'
-import enScreens from '@/locales/en/screens.json'
-import enErrors from '@/locales/en/errors.json'
+import deCommon from '@/locales/de/common.json';
+import deScreens from '@/locales/de/screens.json';
+import deErrors from '@/locales/de/errors.json';
+import enCommon from '@/locales/en/common.json';
+import enScreens from '@/locales/en/screens.json';
+import enErrors from '@/locales/en/errors.json';
 
 void i18n
   .use(LanguageDetector)
@@ -58,6 +58,6 @@ void i18n
       caches: ['localStorage'],
       lookupLocalStorage: 'tipsy-lang',
     },
-  })
+  });
 
-export default i18n
+export default i18n;

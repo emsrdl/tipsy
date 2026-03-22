@@ -10,7 +10,7 @@
  */
 
 /** Which tip pool an employee belongs to. */
-export type EmployeeGroup = 'kitchen' | 'service'
+export type EmployeeGroup = 'kitchen' | 'service';
 
 /**
  * A single staff member participating in tip distribution.
@@ -20,13 +20,13 @@ export type EmployeeGroup = 'kitchen' | 'service'
  */
 export interface Employee {
   /** Unique identifier (generated at creation time). */
-  id: string
+  id: string;
   /** Display name. */
-  name: string
+  name: string;
   /** Hours worked this period (used for proportional distribution). */
-  hours: number
+  hours: number;
   /** Which tip pool this employee draws from. */
-  group: EmployeeGroup
+  group: EmployeeGroup;
   /** Whether this employee was auto-added from the active profile. */
-  isProfileOwner?: boolean
+  isProfileOwner?: boolean;
 }

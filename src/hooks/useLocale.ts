@@ -9,15 +9,15 @@
  * setLocale('en')
  */
 
-import { useTranslation } from 'react-i18next'
-import { useCallback } from 'react'
-import type { LocaleId } from '@/types/i18n'
+import { useTranslation } from 'react-i18next';
+import { useCallback } from 'react';
+import type { LocaleId } from '@/types/i18n';
 
 export interface UseLocaleReturn {
   /** Current active locale. */
-  locale: LocaleId
+  locale: LocaleId;
   /** Switch to a different locale. */
-  setLocale: (locale: LocaleId) => void
+  setLocale: (locale: LocaleId) => void;
 }
 
 /**
@@ -29,17 +29,17 @@ export interface UseLocaleReturn {
  * setLocale('en')
  */
 export function useLocale(): UseLocaleReturn {
-  const { i18n } = useTranslation()
+  const { i18n } = useTranslation();
 
   const setLocale = useCallback(
     (locale: LocaleId) => {
-      void i18n.changeLanguage(locale)
-      localStorage.setItem('tipsy-lang', locale)
+      void i18n.changeLanguage(locale);
+      localStorage.setItem('tipsy-lang', locale);
     },
-    [i18n]
-  )
+    [i18n],
+  );
 
-  const locale = (i18n.language?.slice(0, 2) ?? 'de') as LocaleId
+  const locale = (i18n.language?.slice(0, 2) ?? 'de') as LocaleId;
 
-  return { locale, setLocale }
+  return { locale, setLocale };
 }

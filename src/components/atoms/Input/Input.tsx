@@ -14,10 +14,10 @@
  * <Input type="number" error errorMessage="errors.validation.required" id="hours" />
  */
 
-import { forwardRef } from 'react'
-import { Input as ShadcnInput } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
-import type { InputProps } from './Input.types'
+import { forwardRef } from 'react';
+import { Input as ShadcnInput } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import type { InputProps } from './Input.types';
 
 /**
  * App-level Input atom.
@@ -30,7 +30,7 @@ import type { InputProps } from './Input.types'
  */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ error, errorMessage, id, className, ...props }, ref) => {
-    const errorDescId = errorMessage && id ? `${id}-error` : undefined
+    const errorDescId = errorMessage && id ? `${id}-error` : undefined;
 
     return (
       <ShadcnInput
@@ -41,8 +41,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         className={cn(error && 'border-status-error focus-visible:ring-status-error', className)}
         {...props}
       />
-    )
-  }
-)
+    );
+  },
+);
 
-Input.displayName = 'Input'
+Input.displayName = 'Input';

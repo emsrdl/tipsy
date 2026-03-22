@@ -23,64 +23,57 @@
  * const { theme, accentColor, colorMode, setAccentColor, toggleColorMode } = useTheme()
  */
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  type ReactNode,
-} from 'react'
-import { THEMES } from '@/config/themes'
-import type { ThemeId, ColorMode, AccentColor, Theme } from '@/types/theme'
-import { env } from '@/config/env'
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import { THEMES } from '@/config/themes';
+import type { ThemeId, ColorMode, AccentColor, Theme } from '@/types/theme';
+import { env } from '@/config/env';
 
-const LS_THEME_KEY = 'tipsy-theme'
-const LS_ACCENT_KEY = 'tipsy-accent'
-const LS_MODE_KEY = 'tipsy-mode'
+const LS_THEME_KEY = 'tipsy-theme';
+const LS_ACCENT_KEY = 'tipsy-accent';
+const LS_MODE_KEY = 'tipsy-mode';
 
 export interface ThemeContextValue {
   /** Current active theme object. */
-  theme: Theme
+  theme: Theme;
   /** Current active accent color. */
-  accentColor: AccentColor
+  accentColor: AccentColor;
   /** Current color mode. */
-  colorMode: ColorMode
+  colorMode: ColorMode;
   /** Switch to a different theme by id. */
-  setTheme: (id: ThemeId) => void
+  setTheme: (id: ThemeId) => void;
   /** Change the accent color (Tipsy theme only; no-op for Katzentempel). */
-  setAccentColor: (accentId: string) => void
+  setAccentColor: (accentId: string) => void;
   /** Toggle between light and dark mode. */
-  toggleColorMode: () => void
+  toggleColorMode: () => void;
   /** Set color mode explicitly. */
-  setColorMode: (mode: ColorMode) => void
+  setColorMode: (mode: ColorMode) => void;
 }
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 interface ThemeProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /** Injects accent CSS custom properties onto document.documentElement */
 function injectAccentVars(accent: AccentColor, mode: ColorMode): void {
-  const subtle = mode === 'dark' ? accent.subtleDarkHex : accent.subtleHex
-  document.documentElement.style.setProperty('--color-accent', accent.hex)
-  document.documentElement.style.setProperty('--color-accent-hover', accent.hoverHex)
-  document.documentElement.style.setProperty('--color-accent-subtle', subtle)
+  const subtle = mode === 'dark' ? accent.subtleDarkHex : accent.subtleHex;
+  document.documentElement.style.setProperty('--color-accent', accent.hex);
+  document.documentElement.style.setProperty('--color-accent-hover', accent.hoverHex);
+  document.documentElement.style.setProperty('--color-accent-subtle', subtle);
 }
 
 function getInitialColorMode(): ColorMode {
-  const stored = localStorage.getItem(LS_MODE_KEY)
-  if (stored === 'light' || stored === 'dark') return stored
+  const stored = localStorage.getItem(LS_MODE_KEY);
+  if (stored === 'light' || stored === 'dark') return stored;
   // Fall back to OS preference
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function getInitialThemeId(): ThemeId {
-  const stored = localStorage.getItem(LS_THEME_KEY)
-  if (stored === 'tipsy' || stored === 'katzentempel') return stored
-  return env.DEFAULT_THEME
+  const stored = localStorage.getItem(LS_THEME_KEY);
+  if (stored === 'tipsy' || stored === 'katzentempel') return stored;
+  return env.DEFAULT_THEME;
 }
 
 /**
@@ -88,55 +81,62 @@ function getInitialThemeId(): ThemeId {
  * Must wrap the entire app (in main.tsx).
  */
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [themeId, setThemeId] = useState<ThemeId>(getInitialThemeId)
+  const [themeId, setThemeId] = useState<ThemeId>(getInitialThemeId);
   const [accentId, setAccentId] = useState<string>(() => {
-    const stored = localStorage.getItem(LS_ACCENT_KEY)
-    return stored ?? THEMES[themeId]?.defaultAccentId ?? 'blue'
-  })
-  const [colorMode, setColorModeState] = useState<ColorMode>(getInitialColorMode)
+    const stored = localStorage.getItem(LS_ACCENT_KEY);
+    return stored ?? THEMES[themeId]?.defaultAccentId ?? 'blue';
+  });
+  const [colorMode, setColorModeState] = useState<ColorMode>(getInitialColorMode);
 
-  const theme = THEMES[themeId]!
-  const accentColor =
-    theme.accentColors.find((c) => c.id === accentId) ?? theme.accentColors[0]!
+  const theme = THEMES[themeId]!;
+  const accentColor = theme.accentColors.find((c) => c.id === accentId) ?? theme.accentColors[0]!;
 
   // Apply theme/mode to DOM and inject accent vars
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', themeId)
-    document.documentElement.setAttribute('data-mode', colorMode)
-    document.documentElement.lang = env.DEFAULT_LANG
-    injectAccentVars(accentColor, colorMode)
-  }, [themeId, accentColor, colorMode])
+    document.documentElement.setAttribute('data-theme', themeId);
+    document.documentElement.setAttribute('data-mode', colorMode);
+    document.documentElement.lang = env.DEFAULT_LANG;
+    injectAccentVars(accentColor, colorMode);
+  }, [themeId, accentColor, colorMode]);
 
   const setTheme = useCallback((id: ThemeId) => {
-    setThemeId(id)
-    localStorage.setItem(LS_THEME_KEY, id)
+    setThemeId(id);
+    localStorage.setItem(LS_THEME_KEY, id);
     // Reset accent to this theme's default
-    const newDefault = THEMES[id]?.defaultAccentId ?? 'blue'
-    setAccentId(newDefault)
-    localStorage.setItem(LS_ACCENT_KEY, newDefault)
-  }, [])
+    const newDefault = THEMES[id]?.defaultAccentId ?? 'blue';
+    setAccentId(newDefault);
+    localStorage.setItem(LS_ACCENT_KEY, newDefault);
+  }, []);
 
   const setAccentColor = useCallback((id: string) => {
-    setAccentId(id)
-    localStorage.setItem(LS_ACCENT_KEY, id)
-  }, [])
+    setAccentId(id);
+    localStorage.setItem(LS_ACCENT_KEY, id);
+  }, []);
 
   const setColorMode = useCallback((mode: ColorMode) => {
-    setColorModeState(mode)
-    localStorage.setItem(LS_MODE_KEY, mode)
-  }, [])
+    setColorModeState(mode);
+    localStorage.setItem(LS_MODE_KEY, mode);
+  }, []);
 
   const toggleColorMode = useCallback(() => {
-    setColorMode(colorMode === 'light' ? 'dark' : 'light')
-  }, [colorMode, setColorMode])
+    setColorMode(colorMode === 'light' ? 'dark' : 'light');
+  }, [colorMode, setColorMode]);
 
   return (
     <ThemeContext.Provider
-      value={{ theme, accentColor, colorMode, setTheme, setAccentColor, toggleColorMode, setColorMode }}
+      value={{
+        theme,
+        accentColor,
+        colorMode,
+        setTheme,
+        setAccentColor,
+        toggleColorMode,
+        setColorMode,
+      }}
     >
       {children}
     </ThemeContext.Provider>
-  )
+  );
 }
 
 /**
@@ -144,7 +144,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
  * Direct use is fine inside the context file only.
  */
 export function useThemeContext(): ThemeContextValue {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useThemeContext must be used inside ThemeProvider')
-  return ctx
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error('useThemeContext must be used inside ThemeProvider');
+  return ctx;
 }

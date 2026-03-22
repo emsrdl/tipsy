@@ -10,7 +10,7 @@
  */
 
 /** Employee role for profiles. */
-export type ProfileRole = 'kitchen' | 'service'
+export type ProfileRole = 'kitchen' | 'service';
 
 /**
  * Aggregated statistics for a user profile.
@@ -20,11 +20,11 @@ export type ProfileRole = 'kitchen' | 'service'
  */
 export interface ProfileStats {
   /** Total number of completed shifts. */
-  totalShifts: number
+  totalShifts: number;
   /** Total tips received across all shifts, in cents. */
-  totalTipsInCents: number
+  totalTipsInCents: number;
   /** Average hourly rate across all shifts, in cents. */
-  hourlyRateAvgInCents: number
+  hourlyRateAvgInCents: number;
 }
 
 /**
@@ -42,15 +42,15 @@ export interface ProfileStats {
  */
 export interface Profile {
   /** Unique identifier (UUID-style). */
-  id: string
+  id: string;
   /** Display name. */
-  name: string
+  name: string;
   /** Default role for this profile. */
-  role: ProfileRole
+  role: ProfileRole;
   /** ISO 8601 creation timestamp. */
-  createdAt: string
+  createdAt: string;
   /** Whether this profile is currently active. */
-  isActive: boolean
+  isActive: boolean;
   /** Aggregated career stats. */
-  stats: ProfileStats
+  stats: ProfileStats;
 }

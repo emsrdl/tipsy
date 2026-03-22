@@ -17,17 +17,17 @@
  * <AuthProvider><App /></AuthProvider>
  */
 
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react';
 
 export interface AuthContextValue {
   /** Whether the user is authenticated. Always false in v1. */
-  isAuthenticated: boolean
+  isAuthenticated: boolean;
   /** The authenticated user's name, or null. Always null in v1. */
-  userName: string | null
+  userName: string | null;
   /** Trigger login flow. Noop in v1. */
-  login: () => void
+  login: () => void;
   /** Trigger logout flow. Noop in v1. */
-  logout: () => void
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -35,7 +35,7 @@ const AuthContext = createContext<AuthContextValue>({
   userName: null,
   login: () => undefined,
   logout: () => undefined,
-})
+});
 
 /**
  * Auth provider stub. In v1 this provides unauthenticated state only.
@@ -48,11 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userName: null,
     login: () => undefined,
     logout: () => undefined,
-  }
+  };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {
-  return useContext(AuthContext)
+  return useContext(AuthContext);
 }

@@ -3,7 +3,7 @@
  * @description Type definitions for the Input atom.
  */
 
-import type { InputProps as ShadcnInputProps } from '@/components/ui/input'
+import type { InputProps as ShadcnInputProps } from '@/components/ui/input';
 
 /**
  * Props for the Tipsy Input atom.
@@ -13,7 +13,7 @@ import type { InputProps as ShadcnInputProps } from '@/components/ui/input'
  */
 export interface InputProps extends ShadcnInputProps {
   /** @property Applies error border and aria-invalid="true". */
-  error?: boolean
+  error?: boolean;
   /** @property Error message text (shown externally, linked via id). */
-  errorMessage?: string
+  errorMessage?: string;
 }

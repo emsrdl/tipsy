@@ -6,8 +6,8 @@
  * <LanguageToggle />
  */
 
-import { useLocale } from '@/hooks/useLocale'
-import { Button } from '@/components/atoms/Button/Button'
+import { useLocale } from '@/hooks/useLocale';
+import { Button } from '@/components/atoms/Button/Button';
 
 /**
  * Renders DE/EN toggle buttons. Active locale is visually highlighted.
@@ -18,10 +18,14 @@ import { Button } from '@/components/atoms/Button/Button'
  * <LanguageToggle />
  */
 export function LanguageToggle() {
-  const { locale, setLocale } = useLocale()
+  const { locale, setLocale } = useLocale();
 
   return (
-    <div className="flex items-center rounded-md border border-border" role="group" aria-label="Sprache">
+    <div
+      className="flex items-center rounded-md border border-border"
+      role="group"
+      aria-label="Sprache"
+    >
       <Button
         type="button"
         variant={locale === 'de' ? 'default' : 'ghost'}
@@ -43,5 +47,5 @@ export function LanguageToggle() {
         EN
       </Button>
     </div>
-  )
+  );
 }

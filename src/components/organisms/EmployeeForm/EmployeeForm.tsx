@@ -12,16 +12,16 @@
  * <EmployeeForm />
  */
 
-import { useTranslation } from 'react-i18next'
-import { EmployeeRow } from '@/components/molecules/EmployeeRow/EmployeeRow'
-import { Button } from '@/components/atoms/Button/Button'
-import { Icon } from '@/components/atoms/Icon/Icon'
-import { Slider } from '@/components/molecules/Slider/Slider'
-import { useTipCalculator } from '@/hooks/useTipCalculator'
-import type { Employee } from '@/types/employee'
+import { useTranslation } from 'react-i18next';
+import { EmployeeRow } from '@/components/molecules/EmployeeRow/EmployeeRow';
+import { Button } from '@/components/atoms/Button/Button';
+import { Icon } from '@/components/atoms/Icon/Icon';
+import { Slider } from '@/components/molecules/Slider/Slider';
+import { useTipCalculator } from '@/hooks/useTipCalculator';
+import type { Employee } from '@/types/employee';
 
 function generateId(): string {
-  return `emp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+  return `emp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 /**
@@ -34,20 +34,20 @@ function generateId(): string {
  * <EmployeeForm />
  */
 export function EmployeeForm() {
-  const { t } = useTranslation(['common', 'screens', 'errors'])
-  const { session, addEmployee, removeEmployee, updateEmployee, setSplit } = useTipCalculator()
+  const { t } = useTranslation(['common', 'screens', 'errors']);
+  const { session, addEmployee, removeEmployee, updateEmployee, setSplit } = useTipCalculator();
 
-  const splitError = session.split.kitchenPercent + session.split.servicePercent !== 100
+  const splitError = session.split.kitchenPercent + session.split.servicePercent !== 100;
 
   function handleAddEmployee() {
-    const n = session.employees.length + 1
+    const n = session.employees.length + 1;
     const employee: Employee = {
       id: generateId(),
       name: t('screens:setup.defaultEmployeeName', { n }),
       hours: 8,
       group: 'service',
-    }
-    addEmployee(employee)
+    };
+    addEmployee(employee);
   }
 
   return (
@@ -55,15 +55,13 @@ export function EmployeeForm() {
       {/* Employee cards */}
       {session.employees.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <div className="h-16 w-16 rounded-full bg-surface-overlay flex items-center justify-center mb-4">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-overlay">
             <Icon name="users" size={28} className="text-text-secondary" />
           </div>
-          <p className="text-base font-medium text-text-primary mb-1">
+          <p className="mb-1 text-base font-medium text-text-primary">
             {t('screens:setup.noEmployees')}
           </p>
-          <p className="text-sm text-text-secondary">
-            {t('screens:setup.subtitle')}
-          </p>
+          <p className="text-sm text-text-secondary">{t('screens:setup.subtitle')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -84,17 +82,17 @@ export function EmployeeForm() {
       <Button
         type="button"
         variant="outline"
-        className="w-full min-h-14 text-base gap-3 rounded-xl border-2 border-dashed border-accent/50 text-accent hover:bg-accent-subtle hover:border-accent"
+        className="border-accent/50 min-h-14 w-full gap-3 rounded-xl border-2 border-dashed text-base text-accent hover:border-accent hover:bg-accent-subtle"
         onClick={handleAddEmployee}
       >
-        <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center">
+        <div className="bg-accent/10 flex h-8 w-8 items-center justify-center rounded-full">
           <Icon name="plus" size={18} className="text-accent" />
         </div>
         {t('common:actions.addEmployee')}
       </Button>
 
       {/* Kitchen / Service split — Material Slider */}
-      <div className="rounded-xl bg-surface-raised shadow-elevation-1 p-4 space-y-4">
+      <div className="space-y-4 rounded-xl bg-surface-raised p-4 shadow-elevation-1">
         <div className="flex items-center gap-2">
           <Icon name="utensils-crossed" size={16} className="text-text-secondary" />
           <p className="text-sm font-semibold text-text-primary">{t('screens:setup.splitTitle')}</p>
@@ -109,11 +107,9 @@ export function EmployeeForm() {
         />
 
         {splitError && (
-          <p className="text-xs text-status-error">
-            {t('errors:validation.splitMustEqual100')}
-          </p>
+          <p className="text-xs text-status-error">{t('errors:validation.splitMustEqual100')}</p>
         )}
       </div>
     </div>
-  )
+  );
 }
