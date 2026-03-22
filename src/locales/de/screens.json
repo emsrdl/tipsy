@@ -56,7 +56,10 @@
   "settings": {
     "sectionProfiles": "Profile",
     "sectionAppearance": "Darstellung",
+    "sectionDefaults": "Voreinstellungen",
     "accentColor": "Akzentfarbe",
+    "defaultSplitTitle": "Standard Küche / Service Aufteilung",
+    "defaultSplitDesc": "Wird als Startaufteilung beim Einrichten einer neuen Schicht verwendet.",
     "smartSplitDesc": "Ausgleichszahlungen werden ab diesem Betrag vorgeschlagen."
   },
   "profile": {

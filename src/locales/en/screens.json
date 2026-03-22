@@ -56,7 +56,10 @@
   "settings": {
     "sectionProfiles": "Profiles",
     "sectionAppearance": "Appearance",
+    "sectionDefaults": "Defaults",
     "accentColor": "Accent colour",
+    "defaultSplitTitle": "Default Kitchen / Service split",
+    "defaultSplitDesc": "Used as the starting split when setting up a new shift.",
     "smartSplitDesc": "Balance transfers are suggested when the deviation exceeds this amount."
   },
   "profile": {

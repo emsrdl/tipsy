@@ -27,18 +27,24 @@ import type { Employee } from '@/types/employee';
 import { calculateDistribution } from '@/lib/tipCalculator';
 import { sumDenominations } from '@/lib/denominationParser';
 import { DENOMINATIONS } from '@/config/currency';
+import { readDefaultKitchenPercent } from '@/config/smartSplit';
 
 const SESSION_STORAGE_KEY = 'tipsy_session';
 
-const DEFAULT_SESSION: TipSession = {
-  employees: [],
-  split: { kitchenPercent: 40, servicePercent: 60 },
-  denominations: DENOMINATIONS.map((d) => ({
-    denominationId: d.id,
-    quantity: 0,
-  })),
-  results: null,
-};
+const DEFAULT_SESSION_DENOMINATIONS = DENOMINATIONS.map((d) => ({
+  denominationId: d.id,
+  quantity: 0,
+}));
+
+function makeDefaultSession(): TipSession {
+  const k = readDefaultKitchenPercent();
+  return {
+    employees: [],
+    split: { kitchenPercent: k, servicePercent: 100 - k },
+    denominations: DEFAULT_SESSION_DENOMINATIONS,
+    results: null,
+  };
+}
 
 function loadPersistedSession(): TipSession | null {
   try {
@@ -85,7 +91,7 @@ interface TipSessionProviderProps {
 export function TipSessionProvider({ children, initialSession }: TipSessionProviderProps) {
   const persisted = !initialSession ? loadPersistedSession() : null;
   const [session, setSession] = useState<TipSession>(
-    initialSession ?? persisted ?? DEFAULT_SESSION,
+    () => initialSession ?? persisted ?? makeDefaultSession(),
   );
   const [wasRestored] = useState(() => persisted !== null && !initialSession);
 
@@ -154,7 +160,7 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
     } catch {
       // ignore
     }
-    setSession(DEFAULT_SESSION);
+    setSession(makeDefaultSession());
   }, []);
 
   return (

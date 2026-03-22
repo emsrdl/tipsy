@@ -26,6 +26,7 @@ import {
   SMART_SPLIT_THRESHOLD_KEY,
   SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
   DEFAULT_FAIRNESS_THRESHOLD,
+  readDefaultKitchenPercent,
 } from '@/config/smartSplit';
 import { cn } from '@/lib/utils';
 
@@ -141,7 +142,8 @@ export function SetupScreen() {
       const profileEmpId = `${PROFILE_EMP_PREFIX}${activeProfile.id}`;
       updateEmployee(profileEmpId, { hours: 8, group: activeProfile.role });
     }
-    setSplit({ kitchenPercent: 40, servicePercent: 60 });
+    const k = readDefaultKitchenPercent();
+    setSplit({ kitchenPercent: k, servicePercent: 100 - k });
     setIsSmartMode(SMART_SPLIT_ENABLED);
     setThreshold(defaultThreshold);
     setThresholdInputValue((defaultThreshold / 100).toFixed(2));

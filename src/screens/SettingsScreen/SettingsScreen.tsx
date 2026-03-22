@@ -22,7 +22,13 @@ import { Icon } from '@/components/atoms/Icon/Icon';
 import { Button } from '@/components/atoms/Button/Button';
 import { Badge } from '@/components/atoms/Badge/Badge';
 import { THEMES, THEME_IDS } from '@/config/themes';
-import { SMART_SPLIT_DEFAULT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit';
+import {
+  SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
+  DEFAULT_FAIRNESS_THRESHOLD,
+  DEFAULT_SPLIT_KEY,
+  DEFAULT_KITCHEN_PERCENT,
+} from '@/config/smartSplit';
+import { Slider } from '@/components/molecules/Slider/Slider';
 import { formatEurFromCents } from '@/config/currency';
 import { cn } from '@/lib/utils';
 import type { ProfileRole } from '@/types/profile';
@@ -60,6 +66,11 @@ export function SettingsScreen() {
     DEFAULT_FAIRNESS_THRESHOLD,
   );
   const [thresholdInput, setThresholdInput] = useState((threshold / 100).toFixed(2));
+
+  const [defaultKitchenPercent, setDefaultKitchenPercent] = useLocalStorage<number>(
+    DEFAULT_SPLIT_KEY,
+    DEFAULT_KITCHEN_PERCENT,
+  );
 
   // Profile editing state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -538,13 +549,30 @@ export function SettingsScreen() {
           </div>
         </section>
 
-        {/* ── Smart Split ── */}
+        {/* ── Defaults ── */}
         <section>
           <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-            Smart Split
+            {t('screens:settings.sectionDefaults')}
           </h2>
 
           <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
+            <div className="space-y-2 px-4 py-4">
+              <p className="text-sm font-medium text-text-primary">
+                {t('screens:settings.defaultSplitTitle')}
+              </p>
+              <p className="text-xs text-text-secondary">
+                {t('screens:settings.defaultSplitDesc')}
+              </p>
+              <Slider
+                value={100 - defaultKitchenPercent}
+                onChange={(v) => setDefaultKitchenPercent(100 - v)}
+                label={t('screens:setup.groupService')}
+                counterLabel={t('screens:setup.groupKitchen')}
+                aria-label={t('screens:setup.splitTitle')}
+                className="pt-1"
+              />
+            </div>
+
             <div className="space-y-2 px-4 py-4">
               <p className="text-sm font-medium text-text-primary">
                 {t('common:smartSplit.thresholdDefault')}
