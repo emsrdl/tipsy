@@ -103,5 +103,13 @@ const ICON_MAP: Record<IconName, LucideIcon> = {
  */
 export function Icon({ name, size = 16, className, 'aria-label': ariaLabel }: IconProps) {
   const IconComponent = ICON_MAP[name];
-  return <IconComponent size={size} className={className} aria-hidden={!ariaLabel} />;
+  return (
+    <IconComponent
+      size={size}
+      className={className}
+      aria-hidden={ariaLabel ? undefined : true}
+      aria-label={ariaLabel}
+      role={ariaLabel ? 'img' : undefined}
+    />
+  );
 }

@@ -45,7 +45,7 @@ COPY --from=builder --chown=101:101 /app/dist /usr/share/nginx/html
 RUN chmod -R 755 /usr/share/nginx/html
 
 # Simple HTTP healthcheck for orchestration
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD curl -f http://localhost/ || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget -q --spider http://localhost/ || exit 1
 
 EXPOSE 80
 

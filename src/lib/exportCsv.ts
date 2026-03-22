@@ -10,7 +10,7 @@
  *
  * @example
  * import { exportTipsCsv } from '@/lib/exportCsv'
- * exportTipsCsv(results, { locale: 'de', filename: 'trinkgeld.csv' })
+ * exportTipsCsv(results, { locale: 'de', filename: 'trinkgeld.csv', labels: { name: 'Name', group: 'Gruppe', hours: 'Stunden', amount: 'Betrag', kitchen: 'Küche', service: 'Service' } })
  */
 
 import type { DistributionResult } from '@/types/session';
@@ -21,6 +21,15 @@ export interface ExportCsvOptions {
   locale?: string;
   /** Downloaded file name without extension. Defaults to 'tipsy-export'. */
   filename?: string;
+  /** Localized column headers and group labels. */
+  labels: {
+    name: string;
+    group: string;
+    hours: string;
+    amount: string;
+    kitchen: string;
+    service: string;
+  };
 }
 
 /**
@@ -30,18 +39,19 @@ export interface ExportCsvOptions {
  * @param options - Locale and filename overrides
  *
  * @example
- * exportTipsCsv(results, { locale: 'de', filename: 'schicht-2024' })
+ * exportTipsCsv(results, { locale: 'de', filename: 'schicht-2024', labels: { name: 'Name', group: 'Gruppe', hours: 'Stunden', amount: 'Betrag', kitchen: 'Küche', service: 'Service' } })
  */
-export function exportTipsCsv(results: DistributionResult[], options: ExportCsvOptions = {}): void {
+export function exportTipsCsv(results: DistributionResult[], options: ExportCsvOptions): void {
   const locale = options.locale === 'en' ? 'en-US' : 'de-DE';
   const filename = `${options.filename ?? 'tipsy-export'}.csv`;
+  const l = options.labels;
 
-  const header = 'Name;Gruppe;Stunden;Betrag\n';
+  const header = `${l.name};${l.group};${l.hours};${l.amount}\n`;
   const rows = results
     .map((r) =>
       [
         r.name,
-        r.group === 'kitchen' ? 'Küche' : 'Service',
+        r.group === 'kitchen' ? l.kitchen : l.service,
         r.hours.toString(),
         formatEurFromCents(r.amountInCents, locale),
       ].join(';'),

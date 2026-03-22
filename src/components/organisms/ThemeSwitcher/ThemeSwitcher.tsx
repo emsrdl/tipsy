@@ -73,7 +73,7 @@ export function ThemeSwitcher() {
         {theme.hasAccentPicker && (
           <div>
             <p className="mb-2 text-sm text-text-secondary">
-              {t('theme.accent.blue').replace('Blau', '').trim() || 'Farbe'}
+              {t('theme.accentColor')}
             </p>
             <div className="flex gap-3">
               {theme.accentColors.map((color) => (

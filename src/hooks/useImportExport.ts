@@ -85,7 +85,7 @@ export function useImportExport(exportShifts?: Shift[]): UseImportExportReturn {
       setError(null);
       downloadBackupJson(shifts);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'export.csvFailed');
+      setError(e instanceof Error ? e.message : 'export.jsonFailed');
     } finally {
       setIsProcessing(false);
     }

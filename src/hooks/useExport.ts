@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocale } from './useLocale';
 import { exportTipsPdf } from '@/lib/exportPdf';
 import { exportTipsCsv } from '@/lib/exportCsv';
@@ -31,6 +32,7 @@ export interface UseExportReturn {
  */
 export function useExport(): UseExportReturn {
   const { locale } = useLocale();
+  const { t } = useTranslation('common');
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
@@ -39,7 +41,19 @@ export function useExport(): UseExportReturn {
       setIsExporting(true);
       setExportError(null);
       try {
-        exportTipsPdf(results, { locale, ...(title !== undefined ? { title } : {}) });
+        exportTipsPdf(results, {
+          locale,
+          ...(title !== undefined ? { title } : {}),
+          labels: {
+            name: t('export.csv.name'),
+            group: t('export.csv.group'),
+            hours: t('export.csv.hours'),
+            amount: t('export.csv.amount'),
+            total: t('currency.total'),
+            kitchen: t('profile.role.kitchen'),
+            service: t('profile.role.service'),
+          },
+        });
       } catch {
         setExportError('export.pdfFailed');
       } finally {
@@ -54,7 +68,18 @@ export function useExport(): UseExportReturn {
       setIsExporting(true);
       setExportError(null);
       try {
-        exportTipsCsv(results, { locale, ...(filename !== undefined ? { filename } : {}) });
+        exportTipsCsv(results, {
+          locale,
+          ...(filename !== undefined ? { filename } : {}),
+          labels: {
+            name: t('export.csv.name'),
+            group: t('export.csv.group'),
+            hours: t('export.csv.hours'),
+            amount: t('export.csv.amount'),
+            kitchen: t('profile.role.kitchen'),
+            service: t('profile.role.service'),
+          },
+        });
       } catch {
         setExportError('export.csvFailed');
       } finally {

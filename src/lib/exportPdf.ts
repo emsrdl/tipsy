@@ -14,7 +14,7 @@
  *
  * @example
  * import { exportTipsPdf } from '@/lib/exportPdf'
- * exportTipsPdf(results, { locale: 'de', title: 'Trinkgeld 2024-03-21' })
+ * exportTipsPdf(results, { locale: 'de', title: 'Trinkgeld 2024-03-21', labels: { name: 'Name', group: 'Gruppe', hours: 'Stunden', amount: 'Betrag', total: 'Gesamt', kitchen: 'Küche', service: 'Service' } })
  */
 
 import type { DistributionResult } from '@/types/session';
@@ -25,6 +25,16 @@ export interface ExportPdfOptions {
   locale?: string;
   /** Document title shown in the print dialog. */
   title?: string;
+  /** Localized column headers, group names, and footer label. */
+  labels: {
+    name: string;
+    group: string;
+    hours: string;
+    amount: string;
+    total: string;
+    kitchen: string;
+    service: string;
+  };
 }
 
 /**
@@ -34,12 +44,13 @@ export interface ExportPdfOptions {
  * @param options - Locale and title overrides
  *
  * @example
- * exportTipsPdf(results, { title: 'Schicht 21.03.2024' })
+ * exportTipsPdf(results, { title: 'Schicht 21.03.2024', labels: { name: 'Name', group: 'Gruppe', hours: 'Stunden', amount: 'Betrag', total: 'Gesamt', kitchen: 'Küche', service: 'Service' } })
  */
-export function exportTipsPdf(results: DistributionResult[], options: ExportPdfOptions = {}): void {
+export function exportTipsPdf(results: DistributionResult[], options: ExportPdfOptions): void {
   const locale = options.locale === 'en' ? 'en-US' : 'de-DE';
-  const title = options.title ?? 'Tipsy — Trinkgeldverteilung';
+  const title = options.title ?? 'Tipsy';
   const date = new Date().toLocaleDateString(locale);
+  const { labels } = options;
 
   const totalCents = results.reduce((sum, r) => sum + r.amountInCents, 0);
 
@@ -48,7 +59,7 @@ export function exportTipsPdf(results: DistributionResult[], options: ExportPdfO
       (r) => `
     <tr>
       <td>${escapeHtml(r.name)}</td>
-      <td>${r.group === 'kitchen' ? 'Küche' : 'Service'}</td>
+      <td>${r.group === 'kitchen' ? labels.kitchen : labels.service}</td>
       <td>${r.hours}</td>
       <td>${formatEurFromCents(r.amountInCents, locale)}</td>
     </tr>`,
@@ -76,14 +87,14 @@ export function exportTipsPdf(results: DistributionResult[], options: ExportPdfO
   <p class="date">${date}</p>
   <table>
     <thead>
-      <tr><th>Name</th><th>Gruppe</th><th>Stunden</th><th>Betrag</th></tr>
+      <tr><th>${labels.name}</th><th>${labels.group}</th><th>${labels.hours}</th><th>${labels.amount}</th></tr>
     </thead>
     <tbody>
       ${rows}
     </tbody>
     <tfoot>
       <tr class="total">
-        <td colspan="3">Gesamt</td>
+        <td colspan="3">${labels.total}</td>
         <td>${formatEurFromCents(totalCents, locale)}</td>
       </tr>
     </tfoot>
@@ -93,7 +104,7 @@ export function exportTipsPdf(results: DistributionResult[], options: ExportPdfO
 </html>`;
 
   const printWindow = window.open('', '_blank');
-  if (!printWindow) return; // Popup blocked — silently fail
+  if (!printWindow) throw new Error('export.pdfFailed'); // Popup blocked
   printWindow.document.write(html);
   printWindow.document.close();
 }

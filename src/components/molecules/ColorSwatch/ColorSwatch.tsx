@@ -14,6 +14,7 @@
  * />
  */
 
+import { type CSSProperties } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface ColorSwatchProps {
@@ -50,7 +51,7 @@ export function ColorSwatch({ colorId, hex, label, selected, onClick }: ColorSwa
         'h-7 w-7 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         selected ? 'scale-110 ring-2 ring-offset-2' : 'hover:scale-105',
       )}
-      style={{ backgroundColor: hex, '--tw-ring-color': hex } as React.CSSProperties}
+      style={{ backgroundColor: hex, '--tw-ring-color': hex } as CSSProperties}
     />
   );
 }

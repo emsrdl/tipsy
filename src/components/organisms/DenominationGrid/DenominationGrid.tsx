@@ -87,14 +87,14 @@ export function DenominationGrid() {
           <span className="text-base font-semibold text-accent-foreground">
             {t('common:currency.total')}
           </span>
-          <span className="font-mono text-2xl font-bold text-accent-foreground">
+          <div className="font-mono text-2xl font-bold text-accent-foreground">
             <SummaryLine
               label=""
               amountInCents={totalInCents}
               prominent
               className="text-2xl text-accent-foreground"
             />
-          </span>
+          </div>
         </div>
       </div>
     </div>

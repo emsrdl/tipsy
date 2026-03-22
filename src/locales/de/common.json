@@ -85,6 +85,7 @@
     "thresholdLabel": "Fairness-Schwellwert"
   },
   "toast": {
+    "dismiss": "Schließen",
     "shiftSaved": "Schicht gespeichert",
     "shiftDeleted": "Schicht gelöscht",
     "profileSaved": "Profil gespeichert",
@@ -135,6 +136,7 @@
     "light": "Hell",
     "switchMode": "Modus wechseln",
     "switchTheme": "Theme wechseln",
+    "accentColor": "Farbe",
     "accent": {
       "blue": "Blau",
       "purple": "Lila",
@@ -147,6 +149,14 @@
     "de": "Deutsch",
     "en": "English",
     "switch": "Sprache wechseln"
+  },
+  "export": {
+    "csv": {
+      "name": "Name",
+      "group": "Gruppe",
+      "hours": "Stunden",
+      "amount": "Betrag"
+    }
   },
   "currency": {
     "denomination": {

@@ -181,13 +181,13 @@ export function SettingsScreen() {
     : 0;
 
   return (
-    <div className="flex min-h-full flex-col pb-24">
+    <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 pb-24">
       {/* Header */}
-      <div className="px-4 pb-4 pt-6">
+      <div className="pb-4 pt-6">
         <h1 className="text-2xl font-bold text-text-primary">{t('common:nav.settings')}</h1>
       </div>
 
-      <div className="space-y-6 px-4">
+      <div className="space-y-6">
         {/* ── Profiles ── */}
         <section>
           <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">

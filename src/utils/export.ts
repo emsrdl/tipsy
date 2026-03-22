@@ -65,11 +65,11 @@ export function formatResultsForExport(
 
 /**
  * Builds a semicolon-separated CSV string from export rows.
- * Uses BOM prefix for Excel UTF-8 compatibility.
+ * Fields containing `;`, `"`, or newlines are quoted per RFC 4180.
  *
  * @param rows - Export rows to convert
  * @param headers - Column headers (localized)
- * @returns CSV string (without BOM — caller adds if needed)
+ * @returns CSV string without BOM — caller adds BOM if needed (e.g. for Excel)
  *
  * @example
  * const csv = buildCsvString(
@@ -81,14 +81,19 @@ export function buildCsvString(
   rows: ExportRow[],
   headers: { name: string; group: string; hours: string; amount: string; perHour: string },
 ): string {
+  const escape = (v: string) => (/[;"'\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
   const headerLine = [
     headers.name,
     headers.group,
     headers.hours,
     headers.amount,
     headers.perHour,
-  ].join(';');
-  const dataLines = rows.map((r) => [r.name, r.group, r.hours, r.amount, r.perHour].join(';'));
+  ]
+    .map(escape)
+    .join(';');
+  const dataLines = rows.map((r) =>
+    [r.name, r.group, r.hours, r.amount, r.perHour].map(escape).join(';'),
+  );
   return [headerLine, ...dataLines].join('\n');
 }
 

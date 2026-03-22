@@ -10,12 +10,13 @@
  * <Badge>Default</Badge>
  */
 
+import { type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface BadgeProps {
   /** Visual style variant. @default "default" */
   variant?: 'default' | 'kitchen' | 'service' | 'accent';
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 

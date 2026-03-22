@@ -11,6 +11,7 @@
  */
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -35,6 +36,7 @@ const TYPE_STYLES: Record<ToastType, string> = {
 };
 
 function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string) => void }) {
+  const { t } = useTranslation('common');
   useEffect(() => {
     const timer = setTimeout(() => onDismiss(toast.id), 3500);
     return () => clearTimeout(timer);
@@ -59,7 +61,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
           onDismiss(toast.id);
         }}
         className="p-0.5 opacity-80 hover:opacity-100"
-        aria-label="Schließen"
+        aria-label={t('toast.dismiss')}
       >
         ✕
       </button>

@@ -95,7 +95,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', themeId);
     document.documentElement.setAttribute('data-mode', colorMode);
-    document.documentElement.lang = env.DEFAULT_LANG;
     injectAccentVars(accentColor, colorMode);
   }, [themeId, accentColor, colorMode]);
 

@@ -85,6 +85,7 @@
     "thresholdLabel": "Fairness threshold"
   },
   "toast": {
+    "dismiss": "Dismiss",
     "shiftSaved": "Shift saved",
     "shiftDeleted": "Shift deleted",
     "profileSaved": "Profile saved",
@@ -135,6 +136,7 @@
     "light": "Light",
     "switchMode": "Switch mode",
     "switchTheme": "Switch theme",
+    "accentColor": "Accent color",
     "accent": {
       "blue": "Blue",
       "purple": "Purple",
@@ -147,6 +149,14 @@
     "de": "Deutsch",
     "en": "English",
     "switch": "Switch language"
+  },
+  "export": {
+    "csv": {
+      "name": "Name",
+      "group": "Group",
+      "hours": "Hours",
+      "amount": "Amount"
+    }
   },
   "currency": {
     "denomination": {
