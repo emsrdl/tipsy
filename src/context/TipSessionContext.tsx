@@ -153,7 +153,6 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
   const reset = useCallback(() => {
     try {
       sessionStorage.removeItem(SESSION_STORAGE_KEY)
-      sessionStorage.removeItem('tipsy_restore_toast_shown')
     } catch {
       // ignore
     }

@@ -74,8 +74,8 @@ export function AppLayout({ children }: AppLayoutProps) {
               >
                 {/* Pill indicator for active tab */}
                 <div className={cn(
-                  'flex items-center justify-center h-8 rounded-full transition-all px-4',
-                  isActive ? 'bg-accent-subtle min-w-[4rem]' : 'w-8'
+                  'flex items-center justify-center h-8 rounded-full transition-all',
+                  isActive ? 'bg-accent-subtle min-w-[4rem] px-4' : 'w-8'
                 )}>
                   <Icon name={icon} size={20} />
                 </div>

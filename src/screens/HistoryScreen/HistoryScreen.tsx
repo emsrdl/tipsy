@@ -97,8 +97,7 @@ function centsToEur(cents: number): number {
  */
 export function HistoryScreen() {
   const { t } = useTranslation(['common', 'screens'])
-  const { shifts: allShifts, deleteShift, clearHistory } = useShifts()
-  const { exportCsv, exportPdf, exportJson, importJson, isProcessing } = useImportExport()
+  const { shifts: allShifts, deleteShift } = useShifts()
   const { locale } = useLocale()
   const { activeProfile, isGuestMode } = useProfiles()
   const { showToast } = useToast()
@@ -118,6 +117,9 @@ export function HistoryScreen() {
     ? allShifts.filter((s) => s.profileId === activeProfile.id)
     : allShifts
 
+  // Export only profile-filtered shifts; import reassigns to active profile
+  const { exportCsv, exportPdf, exportJson, importJson, isProcessing } = useImportExport(shifts)
+
   const myAmount = useCallback((shift: Shift) => getProfileAmount(shift, activeProfile?.id), [activeProfile?.id])
 
   const graphData = graphMode === 'week'
@@ -132,7 +134,7 @@ export function HistoryScreen() {
     const reader = new FileReader()
     reader.onload = (ev) => {
       const json = ev.target?.result as string
-      const result = importJson(json)
+      const result = importJson(json, activeProfile?.id ?? null)
       if (result.errors.length > 0) {
         showToast(t('common:toast.importFailed') + ': ' + result.errors[0], 'error')
       } else if (result.skipped > 0) {
@@ -142,10 +144,10 @@ export function HistoryScreen() {
       }
     }
     reader.readAsText(file)
-  }, [importJson, showToast, t])
+  }, [importJson, activeProfile?.id, showToast, t])
 
   function handleClearHistory() {
-    clearHistory()
+    shifts.forEach((shift) => deleteShift(shift.id))
     setConfirmClear(false)
     showToast(t('common:toast.historyCleared'), 'info')
   }

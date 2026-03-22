@@ -40,7 +40,6 @@ export function SettingsScreen() {
     createProfile,
     updateProfile,
     deleteProfile,
-    resetProfileStats,
     switchProfile,
     enterGuestMode,
   } = useProfiles()
@@ -110,9 +109,15 @@ export function SettingsScreen() {
     showToast(t('common:toast.profileCreated'), 'success')
   }
 
-  function handleResetStats(id: string) {
-    resetProfileStats(id)
-    showToast(t('common:toast.statsReset'), 'info')
+  function getProfileStats(profileId: string) {
+    const ps = shifts.filter((s) => s.profileId === profileId)
+    const totalTips = ps.reduce((acc, sh) => {
+      const myShare = sh.distribution.personShares.find(
+        (p) => p.id === `profile-emp-${profileId}`
+      )
+      return acc + (myShare?.actualShareInCents ?? sh.totalTipsInCents)
+    }, 0)
+    return { totalShifts: ps.length, totalTipsInCents: totalTips }
   }
 
   function handleThresholdInputChange(value: string) {
@@ -270,20 +275,11 @@ export function SettingsScreen() {
                         )}
                       </div>
                       <p className="text-xs text-text-secondary mt-0.5">
-                        {profile.stats.totalShifts} {t('screens:shifts.title').toLowerCase()} ·{' '}
-                        {formatEurFromCents(profile.stats.totalTipsInCents, fmtLocale)}
+                        {(() => { const s = getProfileStats(profile.id); return `${s.totalShifts} ${t('screens:shifts.title').toLowerCase()} · ${formatEurFromCents(s.totalTipsInCents, fmtLocale)}` })()}
                       </p>
                     </button>
 
                     <div className="flex gap-1 flex-shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleResetStats(profile.id)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg text-text-secondary hover:bg-surface-overlay transition-colors"
-                        title={t('common:actions.resetStats')}
-                      >
-                        <Icon name="refresh-cw" size={14} />
-                      </button>
                       <button
                         type="button"
                         onClick={() => handleStartEdit(profile.id)}

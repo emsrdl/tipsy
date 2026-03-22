@@ -49,6 +49,7 @@ export function ResultsScreen() {
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
 
   const [exportOpen, setExportOpen] = useState(false)
+  const [showThresholdHelp, setShowThresholdHelp] = useState(false)
 
   const smartOutput = useSmartSplitter(
     session.employees,
@@ -167,57 +168,77 @@ export function ResultsScreen() {
               : {})}
           />
 
-          {/* Smart mode toggle */}
-          <button
-            type="button"
-            onClick={handleToggleSmartMode}
-            className="w-full flex items-center justify-between gap-3 min-h-12 rounded-xl bg-surface-raised shadow-elevation-1 px-4 py-3"
-            aria-pressed={isSmartMode}
-          >
-            <div className="flex items-center gap-3">
-              <div className={cn(
-                'h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0',
-                isSmartMode ? 'bg-accent/10' : 'bg-surface-overlay'
-              )}>
-                <Icon name="zap" size={16} className={isSmartMode ? 'text-accent' : 'text-text-secondary'} />
+          {/* Smart mode toggle + threshold (card, matches SetupScreen style) */}
+          <div className="rounded-xl bg-surface-raised shadow-elevation-1 p-4 space-y-3">
+            <button
+              type="button"
+              onClick={handleToggleSmartMode}
+              className="w-full flex items-center justify-between gap-3 min-h-12"
+              aria-pressed={isSmartMode}
+            >
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  'h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0',
+                  isSmartMode ? 'bg-accent/10' : 'bg-surface-overlay'
+                )}>
+                  <Icon name="zap" size={16} className={isSmartMode ? 'text-accent' : 'text-text-secondary'} />
+                </div>
+                <div className="text-left">
+                  <p className={cn('text-sm font-semibold', isSmartMode ? 'text-accent' : 'text-text-primary')}>
+                    {t('common:smartSplit.modeLabel')} — {isSmartMode ? t('common:smartSplit.smart') : t('common:smartSplit.normal')}
+                  </p>
+                  <p className="text-xs text-text-secondary mt-0.5">
+                    {isSmartMode ? t('common:smartSplit.descSmart') : t('common:smartSplit.descNormal')}
+                  </p>
+                </div>
               </div>
-              <div className="text-left">
-                <p className={cn('text-sm font-semibold', isSmartMode ? 'text-accent' : 'text-text-primary')}>
-                  {t('common:smartSplit.modeLabel')} — {isSmartMode ? t('common:smartSplit.smart') : t('common:smartSplit.normal')}
-                </p>
-                <p className="text-xs text-text-secondary mt-0.5">
-                  {isSmartMode ? t('common:smartSplit.descSmart') : t('common:smartSplit.descNormal')}
-                </p>
-              </div>
-            </div>
-            <Icon
-              name={isSmartMode ? 'toggle-right' : 'toggle-left'}
-              size={28}
-              className={isSmartMode ? 'text-accent' : 'text-text-secondary'}
-            />
-          </button>
-
-          {/* Threshold input (smart mode) */}
-          {isSmartMode && (
-            <div className="rounded-xl bg-surface-raised shadow-elevation-1 px-4 py-3 flex items-center gap-3">
-              <span className="text-xs text-text-secondary whitespace-nowrap">
-                {t('common:smartSplit.thresholdLabel')}:
-              </span>
-              <input
-                ref={thresholdInputRef}
-                type="number"
-                inputMode="decimal"
-                min="0.50"
-                max="50"
-                step="0.50"
-                value={thresholdInput}
-                onChange={(e) => handleThresholdChange(e.target.value)}
-                onBlur={handleThresholdBlur}
-                className="w-20 h-9 px-2 rounded-lg bg-surface-overlay text-sm font-mono text-text-primary border border-border focus:outline-none focus:border-accent text-center"
+              <Icon
+                name={isSmartMode ? 'toggle-right' : 'toggle-left'}
+                size={28}
+                className={isSmartMode ? 'text-accent' : 'text-text-secondary'}
               />
-              <span className="text-sm text-text-secondary">€</span>
-            </div>
-          )}
+            </button>
+
+            {/* Threshold — same structure as SetupScreen */}
+            {isSmartMode && (
+              <div className="pt-2 border-t border-border space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-xs font-medium text-text-secondary whitespace-nowrap">
+                      {t('common:smartSplit.threshold')}:
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <input
+                        ref={thresholdInputRef}
+                        type="number"
+                        inputMode="decimal"
+                        min="0.50"
+                        max="50"
+                        step="0.50"
+                        value={thresholdInput}
+                        onChange={(e) => handleThresholdChange(e.target.value)}
+                        onBlur={handleThresholdBlur}
+                        className="w-20 h-9 px-2 rounded-lg bg-surface-overlay text-sm font-mono text-text-primary border border-border focus:outline-none focus:border-accent text-center"
+                      />
+                      <span className="text-sm text-text-secondary">€</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowThresholdHelp(!showThresholdHelp)}
+                    className="text-xs text-accent underline whitespace-nowrap"
+                  >
+                    {showThresholdHelp ? t('common:smartSplit.helpClose') : t('common:smartSplit.helpWhat')}
+                  </button>
+                </div>
+                {showThresholdHelp && (
+                  <p className="text-xs text-text-secondary bg-surface-overlay rounded-lg p-3">
+                    {t('common:smartSplit.helpText')}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Fairness score (smart mode) */}
           {isSmartMode && fairnessScore !== undefined && (

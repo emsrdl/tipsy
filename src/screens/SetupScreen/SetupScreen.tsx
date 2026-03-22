@@ -152,12 +152,7 @@ export function SetupScreen() {
       step={1}
       totalSteps={3}
     >
-      {/* Profile selector */}
-      <div className="mb-4">
-        <ProfileSelector />
-      </div>
-
-      {/* Employee form */}
+      {/* Reset employees — upper right, mirrors CashInputScreen */}
       {hasEmployees && (
         <div className="flex justify-end mb-2">
           <Button
@@ -171,6 +166,12 @@ export function SetupScreen() {
           </Button>
         </div>
       )}
+
+      {/* Profile selector */}
+      <div className="mb-4">
+        <ProfileSelector />
+      </div>
+
       <EmployeeForm />
 
       {/* Smart Split toggle */}

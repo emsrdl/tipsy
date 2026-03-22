@@ -21,7 +21,7 @@ import {
   downloadBackupJson,
   importShiftsJson,
 } from '@/lib/importExport'
-import type { ImportResult } from '@/types/shift'
+import type { ImportResult, Shift } from '@/types/shift'
 
 export interface UseImportExportReturn {
   /** Export shifts as CSV download. */
@@ -30,8 +30,11 @@ export interface UseImportExportReturn {
   exportPdf: () => void
   /** Export shifts as JSON backup download. */
   exportJson: () => void
-  /** Import shifts from JSON string. Returns import result. */
-  importJson: (json: string) => ImportResult
+  /**
+   * Import shifts from JSON string. Returns import result.
+   * @param profileId - If provided, all imported shifts are reassigned to this profile.
+   */
+  importJson: (json: string, profileId?: string | null) => ImportResult
   /** Whether an export/import operation is in progress. */
   isProcessing: boolean
   /** Last error message, or null. */
@@ -40,13 +43,16 @@ export interface UseImportExportReturn {
 
 /**
  * Hook for import/export operations on shift data.
+ *
+ * @param exportShifts - Optional subset of shifts to export. Defaults to all shifts.
  */
-export function useImportExport(): UseImportExportReturn {
-  const { shifts, addShifts } = useShifts()
+export function useImportExport(exportShifts?: Shift[]): UseImportExportReturn {
+  const { shifts: allShifts, addShifts } = useShifts()
   const { locale } = useLocale()
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const shifts = exportShifts ?? allShifts
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
 
   const exportCsv = useCallback(() => {
@@ -86,9 +92,9 @@ export function useImportExport(): UseImportExportReturn {
   }, [shifts])
 
   const importJson = useCallback(
-    (json: string): ImportResult => {
+    (json: string, profileId?: string | null): ImportResult => {
       setError(null)
-      const existingIds = new Set(shifts.map((s) => s.id))
+      const existingIds = new Set(allShifts.map((s) => s.id))
       const { shifts: newShifts, result } = importShiftsJson(json, existingIds)
 
       if (result.errors.length > 0) {
@@ -96,12 +102,15 @@ export function useImportExport(): UseImportExportReturn {
       }
 
       if (newShifts.length > 0) {
-        addShifts(newShifts)
+        const toAdd = profileId !== undefined
+          ? newShifts.map((s) => ({ ...s, profileId: profileId ?? null }))
+          : newShifts
+        addShifts(toAdd)
       }
 
       return result
     },
-    [shifts, addShifts]
+    [allShifts, addShifts]
   )
 
   return { exportCsv, exportPdf, exportJson, importJson, isProcessing, error }
