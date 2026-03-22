@@ -69,10 +69,27 @@ export function calculateDistribution(input: CalculateDistributionInput): Distri
   const kitchenEmployees = employees.filter((e) => e.group === 'kitchen')
   const serviceEmployees = employees.filter((e) => e.group === 'service')
 
-  // Pool sizes are floored; any lost cent goes into service pool
-  // (this is simpler and avoids a third rounding pass on pool allocation)
-  const kitchenPool = Math.floor((totalInCents * split.kitchenPercent) / 100)
-  const servicePool = totalInCents - kitchenPool
+  // When one group has no employees, give the entire total to the other group
+  // instead of losing that group's pool to nobody.
+  const hasKitchen = kitchenEmployees.length > 0
+  const hasService = serviceEmployees.length > 0
+
+  let kitchenPool: number
+  let servicePool: number
+
+  if (!hasKitchen && hasService) {
+    // No kitchen staff — all tips go to service
+    kitchenPool = 0
+    servicePool = totalInCents
+  } else if (hasKitchen && !hasService) {
+    // No service staff — all tips go to kitchen
+    kitchenPool = totalInCents
+    servicePool = 0
+  } else {
+    // Both groups present — apply the split (floor kitchen, remainder to service)
+    kitchenPool = Math.floor((totalInCents * split.kitchenPercent) / 100)
+    servicePool = totalInCents - kitchenPool
+  }
 
   const kitchenResults = distributePool(kitchenPool, kitchenEmployees)
   const serviceResults = distributePool(servicePool, serviceEmployees)

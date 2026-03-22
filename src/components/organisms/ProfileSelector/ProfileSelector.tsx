@@ -12,6 +12,7 @@
 import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useProfiles } from '@/hooks/useProfiles'
+import { useShifts } from '@/hooks/useShifts'
 import { Icon } from '@/components/atoms/Icon/Icon'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { Button } from '@/components/atoms/Button/Button'
@@ -30,6 +31,7 @@ export function ProfileSelector() {
     createProfile,
     enterGuestMode,
   } = useProfiles()
+  const { shifts } = useShifts()
 
   const [isOpen, setIsOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
@@ -141,7 +143,7 @@ export function ProfileSelector() {
                     ? t('common:profile.role.kitchen')
                     : t('common:profile.role.service')}
                   {' · '}
-                  {profile.stats.totalShifts} Schichten
+                  {shifts.filter((s) => s.profileId === profile.id).length} {t('screens:shifts.title').toLowerCase()}
                 </p>
               </div>
               {activeProfile?.id === profile.id && (

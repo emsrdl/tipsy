@@ -21,12 +21,16 @@ import { useLocale } from '@/hooks/useLocale'
 import { cn } from '@/lib/utils'
 import type { DistributionResult } from '@/types/session'
 import type { PersonShare } from '@/types/shift'
+import type { EmployeePayoutPlan } from '@/types/calculation'
+import { DENOMINATIONS } from '@/config/currency'
 
 export interface DistributionTableProps {
   results: DistributionResult[]
   totalInCents: number
   /** Optional smart-split person shares — enables expandable cards with ideal/actual/deviation. */
   personShares?: PersonShare[]
+  /** Optional payout plans with denomination assignments (from smart split). */
+  payoutPlans?: EmployeePayoutPlan[]
 }
 
 /**
@@ -38,7 +42,7 @@ export interface DistributionTableProps {
  * @example
  * <DistributionTable results={results} totalInCents={10000} />
  */
-export function DistributionTable({ results, totalInCents, personShares }: DistributionTableProps) {
+export function DistributionTable({ results, totalInCents, personShares, payoutPlans }: DistributionTableProps) {
   const { t } = useTranslation(['common', 'screens'])
   const { locale } = useLocale()
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
@@ -142,38 +146,61 @@ export function DistributionTable({ results, totalInCents, personShares }: Distr
               )}
 
               {/* Expanded detail */}
-              {isExpandable && isExpanded && share && (
-                <div className="border-t border-border px-4 py-3 space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-text-secondary">{t('screens:results.idealColumn')}</span>
-                    <span className="font-mono text-text-primary">
-                      {formatEurFromCents(share.idealShareInCents, fmtLocale)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-text-secondary">{t('screens:results.actualColumn')}</span>
-                    <span className="font-mono font-semibold text-text-primary">
-                      {formatEurFromCents(share.actualShareInCents, fmtLocale)}
-                    </span>
-                  </div>
-                  {share.deviationInCents !== 0 && (
+              {isExpandable && isExpanded && share && (() => {
+                const payout = payoutPlans?.find((p) => p.employeeId === r.employeeId)
+                const assignments = payout?.assignments?.filter((a) => a.count > 0) ?? []
+
+                return (
+                  <div className="border-t border-border px-4 py-3 space-y-2">
                     <div className="flex justify-between text-xs">
-                      <span className="text-text-secondary">{t('screens:results.deviationColumn')}</span>
-                      <span className={cn(
-                        'font-mono font-semibold',
-                        share.deviationInCents > 0 ? 'text-status-success' : 'text-status-error'
-                      )}>
-                        {share.deviationInCents > 0 ? '+' : ''}
-                        {formatEurFromCents(share.deviationInCents, fmtLocale)}
+                      <span className="text-text-secondary">{t('screens:results.idealColumn')}</span>
+                      <span className="font-mono text-text-primary">
+                        {formatEurFromCents(share.idealShareInCents, fmtLocale)}
                       </span>
                     </div>
-                  )}
-                  <div className="border-t border-border/50 mt-2 pt-2">
-                    <p className="text-xs text-text-secondary mb-1">{t('screens:results.denominationsTitle')}</p>
-                    <p className="text-xs text-text-secondary italic">{t('screens:results.denominationsPlaceholder')}</p>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-text-secondary">{t('screens:results.actualColumn')}</span>
+                      <span className="font-mono font-semibold text-text-primary">
+                        {formatEurFromCents(share.actualShareInCents, fmtLocale)}
+                      </span>
+                    </div>
+                    {share.deviationInCents !== 0 && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-text-secondary">{t('screens:results.deviationColumn')}</span>
+                        <span className={cn(
+                          'font-mono font-semibold',
+                          share.deviationInCents > 0 ? 'text-status-success' : 'text-status-error'
+                        )}>
+                          {share.deviationInCents > 0 ? '+' : ''}
+                          {formatEurFromCents(share.deviationInCents, fmtLocale)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="border-t border-border/50 mt-2 pt-2">
+                      <p className="text-xs text-text-secondary mb-1">{t('screens:results.denominationsTitle')}</p>
+                      {assignments.length > 0 ? (
+                        <div className="space-y-1">
+                          {assignments.map((a) => {
+                            const denom = DENOMINATIONS.find((d) => d.id === a.denominationId)
+                            return (
+                              <div key={a.denominationId} className="flex justify-between text-xs">
+                                <span className="text-text-primary">
+                                  {a.count}× {denom ? formatEurFromCents(denom.valueInCents, fmtLocale) : a.denominationId}
+                                </span>
+                                <span className="font-mono text-text-secondary">
+                                  {formatEurFromCents(a.totalCents, fmtLocale)}
+                                </span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-text-secondary italic">—</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )
+              })()}
             </div>
           )
         })}

@@ -164,7 +164,10 @@ export function ResultsScreen() {
             results={displayResults}
             totalInCents={totalInCents}
             {...(isSmartMode && smartOutput.output
-              ? { personShares: smartOutput.output.distribution.personShares }
+              ? {
+                  personShares: smartOutput.output.distribution.personShares,
+                  payoutPlans: smartOutput.output.payoutPlans,
+                }
               : {})}
           />
 

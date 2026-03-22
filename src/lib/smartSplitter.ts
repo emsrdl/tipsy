@@ -204,6 +204,7 @@ function buildSmartResult(
       denominationsUsed,
     },
     differences,
+    payoutPlans: matchResult.payouts,
     durationMs: performance.now() - startTime,
   }
 }

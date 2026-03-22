@@ -12,6 +12,7 @@
 
 import type { Employee } from './employee'
 import type { DenominationQuantity } from './session'
+import type { EmployeePayoutPlan } from './calculation'
 
 /**
  * Per-person share with deviation tracking for smart splitting.
@@ -193,6 +194,8 @@ export interface SmartSplitOutput {
   distribution: SmartDistributionResult
   /** Suggested transfers to reconcile deviations above threshold. */
   differences: DifferenceLine[]
+  /** Per-employee payout plans with denomination assignments (smart mode only). */
+  payoutPlans?: EmployeePayoutPlan[]
   /** Algorithm execution time in milliseconds. */
   durationMs: number
 }

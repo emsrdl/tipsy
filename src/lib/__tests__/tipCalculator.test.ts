@@ -121,22 +121,27 @@ describe('calculateDistribution', () => {
       expect(sResult.amountInCents).toBe(0)
     })
 
-    it('returns 0 for kitchen employees when kitchen has no employees but has pool', () => {
-      // Edge: only service employees, 30% goes to nobody
+    it('gives all tips to service when no kitchen employees exist', () => {
+      // When no kitchen staff, the kitchen pool should redirect to service
       const service = makeEmployee({ hours: 8, group: 'service' })
       const results = calculateDistribution({
         totalInCents: 10000,
         employees: [service],
         split: { kitchenPercent: 30, servicePercent: 70 },
       })
-      // Service pool is 70% of total = 7000, but because no kitchen employees
-      // the kitchen pool is lost... Actually let's check: servicePool = total - kitchenPool
-      // kitchenPool = floor(10000 * 30 / 100) = 3000
-      // servicePool = 10000 - 3000 = 7000
-      // single service emp gets 7000
       expect(results).toHaveLength(1)
-      expect(results[0]!.amountInCents).toBe(7000)
-      // Note: 3000 from kitchen pool is unallocated when no kitchen staff
+      expect(results[0]!.amountInCents).toBe(10000)
+    })
+
+    it('gives all tips to kitchen when no service employees exist', () => {
+      const kitchen = makeEmployee({ hours: 8, group: 'kitchen' })
+      const results = calculateDistribution({
+        totalInCents: 10000,
+        employees: [kitchen],
+        split: { kitchenPercent: 30, servicePercent: 70 },
+      })
+      expect(results).toHaveLength(1)
+      expect(results[0]!.amountInCents).toBe(10000)
     })
   })
 
