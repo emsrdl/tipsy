@@ -6,8 +6,9 @@
  * and exports a single typed `env` object. Components and hooks
  * should import from here rather than accessing import.meta.env directly.
  *
- * Throws at startup if VITE_APP_DOMAIN is missing — the app cannot
- * function without knowing its own domain.
+ * VITE_APP_DOMAIN can be set to a fixed hostname, omitted, or set to "auto".
+ * In the latter two cases the domain is resolved at runtime via
+ * window.location.hostname, which covers preview and local deployments.
  *
  * Auth is considered configured only when all four OIDC variables are set.
  * Partial OIDC configuration is ignored with a console warning.
@@ -60,14 +61,17 @@ export interface Env {
   OIDC_SCOPE: string | undefined;
 }
 
-function buildEnv(): Env {
-  const domain = import.meta.env.VITE_APP_DOMAIN;
-  if (!domain || domain.trim() === '') {
-    throw new Error(
-      '[Tipsy] VITE_APP_DOMAIN is required but not set. ' +
-        'Copy .env.example to .env and set VITE_APP_DOMAIN.',
-    );
+function resolveAppDomain(): string {
+  const envDomain = import.meta.env.VITE_APP_DOMAIN;
+  if (envDomain && envDomain.trim() !== '' && envDomain.trim() !== 'auto') {
+    return envDomain.trim();
   }
+  // Preview deployments or local dev: detect at runtime.
+  return window.location.hostname;
+}
+
+function buildEnv(): Env {
+  const domain = resolveAppDomain();
 
   const rawTheme = import.meta.env.VITE_DEFAULT_THEME ?? 'tipsy';
   const defaultTheme: ThemeId = isThemeId(rawTheme) ? rawTheme : 'tipsy';
