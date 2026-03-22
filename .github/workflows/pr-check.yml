@@ -1,0 +1,49 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, labeled, unlabeled, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR title and label consistency
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          CONVENTIONAL_PATTERN='^(feat|fix|perf|refactor|chore|docs|style|test|build|ci|revert)(\(.+\))?: .+'
+
+          if ! echo "$PR_TITLE" | grep -qE "$CONVENTIONAL_PATTERN"; then
+            echo "❌ PR title must follow Conventional Commits format."
+            echo ""
+            echo "   feat: <title>      → minor release (use with 'enhancement' label)"
+            echo "   fix: <title>       → patch release"
+            echo "   perf: <title>      → patch release"
+            echo "   refactor: <title>  → patch release"
+            echo "   chore/docs/...     → no release"
+            echo ""
+            echo "   Got: '$PR_TITLE'"
+            exit 1
+          fi
+
+          HAS_ENHANCEMENT=$(echo "$PR_LABELS" | grep -c '"enhancement"' || true)
+          HAS_FEAT=$(echo "$PR_TITLE" | grep -cE '^feat(\(.+\))?: ' || true)
+
+          if [ "$HAS_ENHANCEMENT" -gt 0 ] && [ "$HAS_FEAT" -eq 0 ]; then
+            echo "❌ PRs with the 'enhancement' label must use 'feat:' prefix in the title."
+            echo "   Got: '$PR_TITLE'"
+            exit 1
+          fi
+
+          if [ "$HAS_FEAT" -gt 0 ] && [ "$HAS_ENHANCEMENT" -eq 0 ]; then
+            echo "⚠️  PR title starts with 'feat:' but the 'enhancement' label is missing."
+            echo "   This will still trigger a minor release — add the label for consistency."
+          fi
+
+          echo "✅ PR title is valid: $PR_TITLE"
