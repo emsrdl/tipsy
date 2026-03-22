@@ -22,6 +22,7 @@ ARG VITE_APP_DOMAIN=auto
 ARG VITE_APP_NAME=Tipsy
 ARG VITE_DEFAULT_THEME=tipsy
 ARG VITE_DEFAULT_LANG=de
+ARG VITE_APP_VERSION
 ARG VITE_OIDC_AUTHORITY
 ARG VITE_OIDC_CLIENT_ID
 ARG VITE_OIDC_REDIRECT_URI
@@ -29,7 +30,9 @@ ARG VITE_OIDC_SCOPE
 
 # Copy source and build
 COPY . .
-RUN npm run build
+
+# VITE_APP_VERSION falls back to package.json if not passed as build arg
+RUN VITE_APP_VERSION=${VITE_APP_VERSION:-$(node -p "require('./package.json').version")} npm run build
 
 # ---- Stage 2: Serve ----
 FROM nginx:1.27-alpine AS serve
