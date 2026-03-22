@@ -3,6 +3,9 @@ dist
 .git
 .env
 .env.*
+.github
+README.md
+*.md
 coverage
 .vscode
 .DS_Store

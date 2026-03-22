@@ -18,7 +18,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --frozen-lockfile
 
 # Build-time environment variables (Vite bakes these into the bundle)
-ARG VITE_APP_DOMAIN
+ARG VITE_APP_DOMAIN=auto
 ARG VITE_APP_NAME=Tipsy
 ARG VITE_DEFAULT_THEME=tipsy
 ARG VITE_DEFAULT_LANG=de
