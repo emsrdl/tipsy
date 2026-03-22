@@ -13,6 +13,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
+import { version } from './package.json';
 
 function r(path: string) {
   return fileURLToPath(new URL(path, import.meta.url));
@@ -20,6 +21,11 @@ function r(path: string) {
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(
+      process.env.VITE_APP_VERSION ?? version
+    ),
+  },
   resolve: {
     alias: {
       '@/components': r('src/components'),

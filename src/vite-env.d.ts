@@ -23,6 +23,8 @@ interface ImportMetaEnv {
   readonly VITE_OIDC_REDIRECT_URI?: string;
   /** OIDC scope string. Optional, auth not active in v1. */
   readonly VITE_OIDC_SCOPE?: string;
+  /** App version from package.json, overridable by CI (git describe). */
+  readonly VITE_APP_VERSION: string;
 }
 
 interface ImportMeta {
