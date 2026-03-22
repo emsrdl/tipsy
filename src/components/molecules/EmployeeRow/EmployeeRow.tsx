@@ -64,27 +64,30 @@ export function EmployeeRow({
             value={employee.name}
             onChange={(e) => onNameChange(employee.id, e.target.value)}
             placeholder={t('screens:setup.employeeNamePlaceholder')}
-            className="h-12 w-full rounded-lg border-border text-base focus-visible:ring-accent"
+            className="h-12 w-full rounded-lg border-border text-base focus-visible:ring-accent disabled:cursor-default disabled:bg-surface-overlay disabled:text-text-secondary"
             aria-label={t('screens:setup.employeeNameLabel')}
             autoComplete="off"
             autoCorrect="off"
             spellCheck={false}
+            disabled={employee.isProfileOwner}
           />
         </div>
-        {/* Remove button */}
-        <button
-          type="button"
-          onClick={() => onRemove(employee.id)}
-          aria-label={t('common:actions.removeEmployee')}
-          className={cn(
-            'ripple flex h-12 w-12 flex-shrink-0 items-center justify-center',
-            'rounded-full text-text-secondary transition-colors',
-            'hover:bg-red-50 hover:text-status-error',
-            'active:bg-red-100',
-          )}
-        >
-          <Icon name="trash" size={18} />
-        </button>
+        {/* Remove button — hidden for the profile owner */}
+        {!employee.isProfileOwner && (
+          <button
+            type="button"
+            onClick={() => onRemove(employee.id)}
+            aria-label={t('common:actions.removeEmployee')}
+            className={cn(
+              'ripple flex h-12 w-12 flex-shrink-0 items-center justify-center',
+              'rounded-full text-text-secondary transition-colors',
+              'hover:bg-red-50 hover:text-status-error',
+              'active:bg-red-100',
+            )}
+          >
+            <Icon name="trash" size={18} />
+          </button>
+        )}
       </div>
 
       {/* Group chips */}

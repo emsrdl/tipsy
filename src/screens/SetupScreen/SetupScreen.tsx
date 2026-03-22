@@ -15,7 +15,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { EmployeeForm } from '@/components/organisms/EmployeeForm/EmployeeForm';
-import { ProfileSelector } from '@/components/organisms/ProfileSelector/ProfileSelector';
 import { Button } from '@/components/atoms/Button/Button';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
@@ -134,7 +133,7 @@ export function SetupScreen() {
     });
     if (activeProfile) {
       const profileEmpId = `${PROFILE_EMP_PREFIX}${activeProfile.id}`;
-      updateEmployee(profileEmpId, { hours: 8 });
+      updateEmployee(profileEmpId, { hours: 8, group: activeProfile.role });
     }
     showToast(t('common:toast.employeesReset'), 'info');
   }
@@ -168,11 +167,6 @@ export function SetupScreen() {
           </Button>
         </div>
       )}
-
-      {/* Profile selector */}
-      <div className="mb-4">
-        <ProfileSelector />
-      </div>
 
       <EmployeeForm />
 
