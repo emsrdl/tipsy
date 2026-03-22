@@ -52,6 +52,7 @@ export function EmployeeRow({
   onNameChange,
   onHoursChange,
   onGroupChange,
+  fallbackName,
 }: EmployeeRowProps) {
   const { t } = useTranslation(['screens', 'common']);
   const navigate = useNavigate();
@@ -65,21 +66,21 @@ export function EmployeeRow({
             <Icon name="user" size={11} />
             {t('common:profile.thisIsYou')}
           </div>
-          <div className="flex items-center gap-3 px-4 pb-3 pt-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
-            {getInitials(employee.name) || '?'}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-text-primary">{employee.name}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => void navigate('/settings')}
-            aria-label={t('common:profile.headerMenu.editProfile')}
-            className="ripple flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-overlay hover:text-accent"
-          >
-            <Icon name="edit-2" size={18} />
-          </button>
+          <div className="flex items-center gap-3 px-4 pb-3 pt-1.5">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
+              {getInitials(employee.name) || '?'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-text-primary">{employee.name}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void navigate('/settings')}
+              aria-label={t('common:profile.headerMenu.editProfile')}
+              className="ripple flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-overlay hover:text-accent"
+            >
+              <Icon name="edit-2" size={18} />
+            </button>
           </div>
         </>
       ) : (
@@ -88,7 +89,7 @@ export function EmployeeRow({
           <Input
             value={employee.name}
             onChange={(e) => onNameChange(employee.id, e.target.value)}
-            placeholder={t('screens:setup.employeeNamePlaceholder')}
+            placeholder={fallbackName}
             className="h-12 w-full rounded-lg border-border text-base focus-visible:ring-accent"
             aria-label={t('screens:setup.employeeNameLabel')}
             autoComplete="off"

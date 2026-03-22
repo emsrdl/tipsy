@@ -40,10 +40,9 @@ export function EmployeeForm() {
   const splitError = session.split.kitchenPercent + session.split.servicePercent !== 100;
 
   function handleAddEmployee() {
-    const n = session.employees.length + 1;
     const employee: Employee = {
       id: generateId(),
-      name: t('screens:setup.defaultEmployeeName', { n }),
+      name: '',
       hours: 8,
       group: 'service',
     };
@@ -65,10 +64,11 @@ export function EmployeeForm() {
         </div>
       ) : (
         <div className="space-y-3">
-          {session.employees.map((emp) => (
+          {session.employees.map((emp, index) => (
             <EmployeeRow
               key={emp.id}
               employee={emp}
+              fallbackName={t('screens:setup.defaultEmployeeName', { n: index + 1 })}
               onRemove={removeEmployee}
               onNameChange={(id, name) => updateEmployee(id, { name })}
               onHoursChange={(id, hours) => updateEmployee(id, { hours })}

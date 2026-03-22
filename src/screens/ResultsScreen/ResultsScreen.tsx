@@ -8,7 +8,7 @@
  * // Rendered via React Router at route "/calculate/results"
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
@@ -27,6 +27,7 @@ import { useLocale } from '@/hooks/useLocale';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
 import { formatEurFromCents } from '@/config/currency';
 import { DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit';
+import { resolveEmployeeName } from '@/lib/employeeUtils';
 import { cn } from '@/lib/utils';
 import type { Shift, DifferenceLine } from '@/types/shift';
 
@@ -51,8 +52,19 @@ export function ResultsScreen() {
   const [exportOpen, setExportOpen] = useState(false);
   const [showThresholdHelp, setShowThresholdHelp] = useState(false);
 
+  const results = session.results ?? [];
+
+  const normalizedEmployees = useMemo(
+    () =>
+      session.employees.map((emp, i) => ({
+        ...emp,
+        name: resolveEmployeeName(emp.name, t('screens:setup.defaultEmployeeName', { n: i + 1 })),
+      })),
+    [session.employees, t],
+  );
+
   const smartOutput = useSmartSplitter(
-    session.employees,
+    normalizedEmployees,
     totalInCents,
     session.split.kitchenPercent,
     session.denominations,
@@ -88,10 +100,9 @@ export function ResultsScreen() {
     );
   }
 
-  const results = session.results ?? [];
   const hasResults = results.length > 0;
 
-  // When smart mode is on, show actual (smart-adjusted) amounts; otherwise show proportional results
+  // When smart mode is on, show actual (smart-adjusted) amounts; otherwise show proportional results.
   const displayResults =
     isSmartMode && smartOutput.output
       ? smartOutput.output.distribution.personShares.map((s) => ({
