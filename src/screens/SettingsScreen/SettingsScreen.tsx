@@ -213,24 +213,26 @@ export function SettingsScreen() {
                         type="button"
                         onClick={() => setEditRole('service')}
                         className={cn(
-                          'flex-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                          'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
                           editRole === 'service'
-                            ? 'bg-accent text-accent-foreground'
-                            : 'bg-surface-overlay text-text-secondary',
+                            ? 'bg-teal-100 text-teal-800 shadow-elevation-1 dark:bg-teal-900/40 dark:text-teal-300'
+                            : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
                         )}
                       >
+                        <Icon name="users" size={16} />
                         {t('common:profile.role.service')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setEditRole('kitchen')}
                         className={cn(
-                          'flex-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                          'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
                           editRole === 'kitchen'
-                            ? 'bg-accent text-accent-foreground'
-                            : 'bg-surface-overlay text-text-secondary',
+                            ? 'bg-orange-100 text-orange-800 shadow-elevation-1 dark:bg-orange-900/40 dark:text-orange-300'
+                            : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
                         )}
                       >
+                        <Icon name="utensils-crossed" size={16} />
                         {t('common:profile.role.kitchen')}
                       </button>
                     </div>
@@ -367,24 +369,26 @@ export function SettingsScreen() {
                       type="button"
                       onClick={() => setNewRole('service')}
                       className={cn(
-                        'flex-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                        'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
                         newRole === 'service'
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-surface-overlay text-text-secondary',
+                          ? 'bg-teal-100 text-teal-800 shadow-elevation-1 dark:bg-teal-900/40 dark:text-teal-300'
+                          : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
                       )}
                     >
+                      <Icon name="users" size={16} />
                       {t('common:profile.role.service')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setNewRole('kitchen')}
                       className={cn(
-                        'flex-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                        'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
                         newRole === 'kitchen'
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-surface-overlay text-text-secondary',
+                          ? 'bg-orange-100 text-orange-800 shadow-elevation-1 dark:bg-orange-900/40 dark:text-orange-300'
+                          : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
                       )}
                     >
+                      <Icon name="utensils-crossed" size={16} />
                       {t('common:profile.role.kitchen')}
                     </button>
                   </div>
