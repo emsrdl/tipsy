@@ -1,3 +1,10 @@
+## [0.1.2](https://github.com/emsrdl/tipsy/compare/v0.1.1...v0.1.2) (2026-03-22)
+
+
+### Bug Fixes
+
+* update Dockerfile to ensure VITE_APP_VERSION falls back to package.json during build ([847d330](https://github.com/emsrdl/tipsy/commit/847d330326f6bf3ddfae1288423b24b1865e4d74))
+
 ## [0.1.1](https://github.com/emsrdl/tipsy/compare/v0.1.0...v0.1.1) (2026-03-22)
 
 
