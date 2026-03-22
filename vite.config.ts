@@ -21,10 +21,9 @@ function r(path: string) {
 
 export default defineConfig({
   plugins: [react()],
+  base: '/',
   define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify(
-      process.env.VITE_APP_VERSION ?? version
-    ),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(process.env.VITE_APP_VERSION ?? version),
   },
   resolve: {
     alias: {
