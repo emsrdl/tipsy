@@ -231,39 +231,39 @@ export function DistributionTable({
 
   return (
     <div className="space-y-6">
+      {renderGroup(serviceResults, t('screens:results.groupService'), 'service', 'users')}
       {renderGroup(
         kitchenResults,
         t('screens:results.groupKitchen'),
         'kitchen',
         'utensils-crossed',
       )}
-      {renderGroup(serviceResults, t('screens:results.groupService'), 'service', 'users')}
 
       {/* Summary card */}
       <div className="overflow-hidden rounded-xl shadow-elevation-2">
-        {kitchenResults.length > 0 && (
-          <div className="flex items-center justify-between border-b border-border bg-surface-raised px-4 py-3">
-            <div className="flex items-center gap-2">
-              <Icon name="utensils-crossed" size={14} className="text-orange-600" />
-              <span className="text-sm text-text-secondary">
-                {t('screens:results.kitchenPoolLabel')}
-              </span>
-            </div>
-            <span className="font-mono text-sm font-semibold">
-              {formatEurFromCents(kitchenTotal, fmtLocale)}
-            </span>
-          </div>
-        )}
         {serviceResults.length > 0 && (
           <div className="flex items-center justify-between border-b border-border bg-surface-raised px-4 py-3">
             <div className="flex items-center gap-2">
-              <Icon name="users" size={14} className="text-accent" />
+              <Icon name="users" size={14} className="text-teal-600 dark:text-teal-400" />
               <span className="text-sm text-text-secondary">
                 {t('screens:results.servicePoolLabel')}
               </span>
             </div>
             <span className="font-mono text-sm font-semibold">
               {formatEurFromCents(serviceTotal, fmtLocale)}
+            </span>
+          </div>
+        )}
+        {kitchenResults.length > 0 && (
+          <div className="flex items-center justify-between border-b border-border bg-surface-raised px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Icon name="utensils-crossed" size={14} className="text-orange-600 dark:text-orange-400" />
+              <span className="text-sm text-text-secondary">
+                {t('screens:results.kitchenPoolLabel')}
+              </span>
+            </div>
+            <span className="font-mono text-sm font-semibold">
+              {formatEurFromCents(kitchenTotal, fmtLocale)}
             </span>
           </div>
         )}

@@ -116,6 +116,20 @@ export function EmployeeRow({
       <div className="flex gap-2 px-4 pb-3">
         <button
           type="button"
+          onClick={() => onGroupChange(employee.id, 'service')}
+          aria-pressed={employee.group === 'service'}
+          className={cn(
+            'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
+            employee.group === 'service'
+              ? 'bg-teal-100 text-teal-800 shadow-elevation-1 dark:bg-teal-900/40 dark:text-teal-300'
+              : 'hover:bg-surface-overlay/80 bg-surface-overlay text-text-secondary',
+          )}
+        >
+          <Icon name="users" size={16} />
+          {t('screens:setup.groupService')}
+        </button>
+        <button
+          type="button"
           onClick={() => onGroupChange(employee.id, 'kitchen')}
           aria-pressed={employee.group === 'kitchen'}
           className={cn(
@@ -127,20 +141,6 @@ export function EmployeeRow({
         >
           <Icon name="utensils-crossed" size={16} />
           {t('screens:setup.groupKitchen')}
-        </button>
-        <button
-          type="button"
-          onClick={() => onGroupChange(employee.id, 'service')}
-          aria-pressed={employee.group === 'service'}
-          className={cn(
-            'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
-            employee.group === 'service'
-              ? 'bg-accent-subtle text-accent shadow-elevation-1'
-              : 'hover:bg-surface-overlay/80 bg-surface-overlay text-text-secondary',
-          )}
-        >
-          <Icon name="users" size={16} />
-          {t('screens:setup.groupService')}
         </button>
       </div>
 

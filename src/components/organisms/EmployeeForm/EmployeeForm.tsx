@@ -99,10 +99,10 @@ export function EmployeeForm() {
         </div>
 
         <Slider
-          value={session.split.kitchenPercent}
-          onChange={(k) => setSplit({ kitchenPercent: k, servicePercent: 100 - k })}
-          label={t('screens:setup.groupKitchen')}
-          counterLabel={t('screens:setup.groupService')}
+          value={session.split.servicePercent}
+          onChange={(s) => setSplit({ kitchenPercent: 100 - s, servicePercent: s })}
+          label={t('screens:setup.groupService')}
+          counterLabel={t('screens:setup.groupKitchen')}
           aria-label={t('screens:setup.splitTitle')}
         />
 

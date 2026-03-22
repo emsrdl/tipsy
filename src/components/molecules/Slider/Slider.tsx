@@ -68,14 +68,14 @@ export function Slider({
           {label && (
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-medium text-text-primary">{label}</span>
-              <span className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-accent px-2 text-sm font-bold text-accent-foreground">
+              <span className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-teal-100 px-2 text-sm font-bold text-teal-800 dark:bg-teal-900/30 dark:text-teal-300">
                 {value}%
               </span>
             </div>
           )}
           {counterLabel && (
             <div className="flex items-center gap-1.5">
-              <span className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-surface-overlay px-2 text-sm font-bold text-text-primary">
+              <span className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-orange-100 px-2 text-sm font-bold text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
                 {counterValue}%
               </span>
               <span className="text-sm font-medium text-text-primary">{counterLabel}</span>
