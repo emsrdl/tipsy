@@ -1,0 +1,87 @@
+{
+  "setup": {
+    "title": "Mitarbeiter einrichten",
+    "subtitle": "Füge alle Mitarbeiter hinzu und konfiguriere die Trinkgeldverteilung.",
+    "employeeNameLabel": "Name",
+    "employeeNamePlaceholder": "z. B. Anna",
+    "hoursLabel": "Stunden",
+    "hoursPlaceholder": "8",
+    "groupLabel": "Gruppe",
+    "groupKitchen": "Küche",
+    "groupService": "Service",
+    "splitTitle": "Küche / Service Aufteilung",
+    "kitchenPercent": "Küche (%)",
+    "servicePercent": "Service (%)",
+    "noEmployees": "Noch keine Mitarbeiter hinzugefügt.",
+    "employeeCount_one": "{{count}} Mitarbeiter",
+    "employeeCount_other": "{{count}} Mitarbeiter",
+    "resetEmployees": "Mitarbeiter zurücksetzen",
+    "defaultEmployeeName": "Mitarbeiter {{n}}"
+  },
+  "cashInput": {
+    "title": "Bargeld eingeben",
+    "subtitle": "Gib die Anzahl jeder Stückelung ein.",
+    "quantityLabel": "Anzahl",
+    "totalLabel": "Gesamtbetrag",
+    "denominationSection": "Scheine",
+    "resetCash": "Bargeld zurücksetzen",
+    "coinSection": "Münzen"
+  },
+  "results": {
+    "title": "Verteilung",
+    "subtitle": "Trinkgeld für diese Schicht.",
+    "employeeColumn": "Mitarbeiter",
+    "amountColumn": "Betrag",
+    "hoursColumn": "Stunden",
+    "groupKitchen": "Küche",
+    "groupService": "Service",
+    "perHourLabel": "pro Stunde",
+    "totalLabel": "Gesamt",
+    "kitchenPoolLabel": "Küchenpool",
+    "servicePoolLabel": "Servicepool",
+    "exportSection": "Exportieren",
+    "smartSplitLabel": "Smart Split",
+    "deviationColumn": "Abweichung",
+    "idealColumn": "Ideal",
+    "actualColumn": "Tatsächlich",
+    "transfersTitle": "Ausgleichszahlungen",
+    "noTransfersNeeded": "Keine Ausgleichszahlungen nötig.",
+    "saveAndFinish": "Beenden & Speichern",
+    "finishNoSave": "Beenden (nicht gespeichert)",
+    "denominationsTitle": "Scheine & Münzen",
+    "denominationsPlaceholder": "Wird berechnet..."
+  },
+  "settings": {
+    "sectionProfiles": "Profile",
+    "sectionAppearance": "Darstellung",
+    "accentColor": "Akzentfarbe",
+    "smartSplitDesc": "Ausgleichszahlungen werden ab diesem Betrag vorgeschlagen."
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Verwalte dein Profil und Statistiken.",
+    "createTitle": "Neues Profil",
+    "editTitle": "Profil bearbeiten",
+    "nameLabel": "Name",
+    "namePlaceholder": "z. B. Anna",
+    "roleLabel": "Rolle",
+    "deleteConfirm": "Möchtest du dieses Profil wirklich löschen?",
+    "resetConfirm": "Statistiken wirklich zurücksetzen?"
+  },
+  "shifts": {
+    "title": "Schichten",
+    "subtitle": "Verlauf deiner Trinkgeldverteilungen.",
+    "noShifts": "Noch keine Schichten gespeichert.",
+    "noShiftsSub": "Berechne eine Schicht und speichere sie, um sie hier zu sehen.",
+    "shiftDate": "Datum",
+    "shiftTotal": "Gesamt",
+    "shiftEmployees": "Mitarbeiter",
+    "deleteConfirm": "Diese Schicht wirklich löschen?"
+  },
+  "importExport": {
+    "title": "Import / Export",
+    "subtitle": "Sichere deine Daten oder importiere ein Backup.",
+    "importSuccess": "{{added}} Schichten importiert, {{skipped}} übersprungen.",
+    "importErrors": "{{count}} Fehler beim Import."
+  }
+}

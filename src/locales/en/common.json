@@ -1,0 +1,182 @@
+{
+  "app": {
+    "name": "Tipsy",
+    "tagline": "Split tips fairly"
+  },
+  "nav": {
+    "setup": "Staff",
+    "cashInput": "Cash",
+    "results": "Results",
+    "calculate": "Calculate",
+    "history": "History",
+    "settings": "Settings",
+    "main": "Main navigation"
+  },
+  "actions": {
+    "next": "Next",
+    "back": "Back",
+    "reset": "Reset",
+    "exportPdf": "Export PDF",
+    "exportCsv": "Export CSV",
+    "addEmployee": "Add employee",
+    "removeEmployee": "Remove",
+    "calculate": "Calculate",
+    "exportJson": "Export backup",
+    "importJson": "Import backup",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "createProfile": "Create profile",
+    "switchProfile": "Switch profile",
+    "editProfile": "Edit profile",
+    "deleteProfile": "Delete profile",
+    "resetStats": "Reset stats",
+    "guestMode": "Guest mode",
+    "exitGuestMode": "Exit guest mode",
+    "signOut": "Sign out",
+    "export": "Export",
+    "import": "Import"
+  },
+  "profile": {
+    "guest": "Guest",
+    "guestBadge": "Guest Mode",
+    "thisIsYou": "That's you",
+    "role": {
+      "kitchen": "Kitchen",
+      "service": "Service"
+    },
+    "stats": {
+      "totalShifts": "Total shifts",
+      "totalTips": "Total tips",
+      "hourlyAvg": "Avg. hourly rate"
+    },
+    "headerMenu": {
+      "editProfile": "Edit profile",
+      "switchProfile": "Switch profile",
+      "signOut": "Sign out",
+      "settings": "Settings"
+    },
+    "noShiftsGuest": "No shifts (Guest Mode)",
+    "noShiftsGuestSub": "Switch to a profile to save shifts.",
+    "deleteWithShifts_one": "Delete profile and {{count}} shift?",
+    "deleteWithShifts_other": "Delete profile and {{count}} shifts?",
+    "deleteWithShiftsInfo_one": "This cannot be undone. {{count}} shift will be deleted.",
+    "deleteWithShiftsInfo_other": "This cannot be undone. {{count}} shifts will be deleted."
+  },
+  "smartSplit": {
+    "normal": "Normal",
+    "smart": "Smart",
+    "modeLabel": "Distribution mode",
+    "threshold": "Threshold",
+    "thresholdDefault": "Default balance threshold",
+    "fairnessScore": "Fairness score",
+    "deviation": "Deviation",
+    "transfers": "Balance transfers",
+    "noTransfers": "No balance transfers needed",
+    "transferFrom": "{{from}} pays {{amount}} to {{to}}",
+    "remaining": "Remaining",
+    "descSmart": "Optimises coin & note usage",
+    "descNormal": "Proportional distribution",
+    "helpClose": "Close",
+    "helpWhat": "What is this?",
+    "helpText": "Balance transfers are suggested when the deviation exceeds this amount.",
+    "aboveThreshold": "above {{amount}} threshold",
+    "thresholdLabel": "Fairness threshold"
+  },
+  "toast": {
+    "dismiss": "Dismiss",
+    "shiftSaved": "Shift saved",
+    "shiftDeleted": "Shift deleted",
+    "profileSaved": "Profile saved",
+    "profileCreated": "Profile created",
+    "profileDeleted": "Profile deleted",
+    "profileDeletedWithShifts_one": "Profile deleted, {{count}} shift removed",
+    "profileDeletedWithShifts_other": "Profile deleted, {{count}} shifts removed",
+    "statsReset": "Statistics reset",
+    "historyCleared": "History cleared",
+    "backupExported": "Backup exported",
+    "csvExported": "CSV exported",
+    "pdfExported": "PDF exported",
+    "importSuccess": "{{added}} shifts imported",
+    "importPartial": "{{added}} shifts imported, {{skipped}} skipped",
+    "importFailed": "Import failed",
+    "sessionRestored": "Shift restored",
+    "cashReset": "Cash reset",
+    "employeesReset": "Employees reset",
+    "thresholdUpdated": "Threshold: {{amount}}",
+    "calculationUpdated": "Calculation updated",
+    "backupDownloaded": "Backup downloaded",
+    "csvDownloaded": "CSV downloaded",
+    "pdfOpened": "Opening PDF"
+  },
+  "history": {
+    "totalAllTime": "All-time total",
+    "shiftsCount_one": "{{count}} shift",
+    "shiftsCount_other": "{{count}} shifts",
+    "avgPerShift": "Avg. per shift",
+    "perWeek": "Per week",
+    "perDay": "Per day",
+    "hourlyRate": "Hourly rate",
+    "chartTips": "Tips (€)",
+    "chartHourly": "Hourly rate (€/h)",
+    "shifts": "Shifts",
+    "clearAll": "Clear history",
+    "clearConfirm": "Really delete all shifts? This cannot be undone.",
+    "importBackup": "Import backup",
+    "deleteShift": "Delete shift",
+    "smartSplitTag": "Smart Split",
+    "employees_one": "{{count}} employee",
+    "employees_other": "{{count}} employees"
+  },
+  "theme": {
+    "tipsy": "Tipsy",
+    "katzentempel": "Katzentempel",
+    "dark": "Dark",
+    "light": "Light",
+    "switchMode": "Switch mode",
+    "switchTheme": "Switch theme",
+    "accentColor": "Accent color",
+    "accent": {
+      "blue": "Blue",
+      "purple": "Purple",
+      "pink": "Pink",
+      "orange": "Orange",
+      "green": "Green"
+    }
+  },
+  "language": {
+    "de": "Deutsch",
+    "en": "English",
+    "switch": "Switch language"
+  },
+  "export": {
+    "csv": {
+      "name": "Name",
+      "group": "Group",
+      "hours": "Hours",
+      "amount": "Amount"
+    }
+  },
+  "currency": {
+    "denomination": {
+      "500": "€500",
+      "200": "€200",
+      "100": "€100",
+      "50": "€50",
+      "20": "€20",
+      "10": "€10",
+      "5": "€5",
+      "2": "€2",
+      "1": "€1",
+      "50ct": "50 ct",
+      "20ct": "20 ct",
+      "10ct": "10 ct",
+      "5ct": "5 ct",
+      "2ct": "2 ct",
+      "1ct": "1 ct"
+    },
+    "total": "Total",
+    "perHour": "per hour"
+  }
+}

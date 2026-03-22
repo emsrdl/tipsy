@@ -8,9 +8,9 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# vite
+/dist
+/dist-ssr
 
 # production
 /build
@@ -34,3 +34,25 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDEs
+.idea/
+.vscode/
+
+# editor cache/history
+.eslintcache
+.history
+
+# tool caches
+.cache
+.parcel-cache
+.vite
+
+# pnpm
+pnpm-debug.log*
+
+# windows thumbnails
+Thumbs.db
+
+# lerna
+lerna-debug.log*

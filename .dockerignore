@@ -1,0 +1,22 @@
+node_modules
+dist
+.git
+.env
+.env.*
+.github
+README.md
+*.md
+coverage
+.vscode
+.DS_Store
+npm-debug.log
+yarn-error.log
+.turbo
+build
+
+# local config
+*.local
+
+# editor/temp
+*.swp
+*~

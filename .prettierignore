@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+coverage
+.vscode
+*.log
+public/assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+.idea
+.DS_Store

@@ -1,0 +1,87 @@
+{
+  "setup": {
+    "title": "Set up staff",
+    "subtitle": "Add all employees and configure tip distribution.",
+    "employeeNameLabel": "Name",
+    "employeeNamePlaceholder": "e.g. Anna",
+    "hoursLabel": "Hours",
+    "hoursPlaceholder": "8",
+    "groupLabel": "Group",
+    "groupKitchen": "Kitchen",
+    "groupService": "Service",
+    "splitTitle": "Kitchen / Service split",
+    "kitchenPercent": "Kitchen (%)",
+    "servicePercent": "Service (%)",
+    "noEmployees": "No employees added yet.",
+    "employeeCount_one": "{{count}} employee",
+    "employeeCount_other": "{{count}} employees",
+    "resetEmployees": "Reset employees",
+    "defaultEmployeeName": "Employee {{n}}"
+  },
+  "cashInput": {
+    "title": "Enter cash",
+    "subtitle": "Enter the quantity of each denomination.",
+    "quantityLabel": "Quantity",
+    "totalLabel": "Total amount",
+    "denominationSection": "Banknotes",
+    "resetCash": "Reset cash",
+    "coinSection": "Coins"
+  },
+  "results": {
+    "title": "Distribution",
+    "subtitle": "Tips for this shift.",
+    "employeeColumn": "Employee",
+    "amountColumn": "Amount",
+    "hoursColumn": "Hours",
+    "groupKitchen": "Kitchen",
+    "groupService": "Service",
+    "perHourLabel": "per hour",
+    "totalLabel": "Total",
+    "kitchenPoolLabel": "Kitchen pool",
+    "servicePoolLabel": "Service pool",
+    "exportSection": "Export",
+    "smartSplitLabel": "Smart Split",
+    "deviationColumn": "Deviation",
+    "idealColumn": "Ideal",
+    "actualColumn": "Actual",
+    "transfersTitle": "Balance transfers",
+    "noTransfersNeeded": "No balance transfers needed.",
+    "saveAndFinish": "Finish & Save",
+    "finishNoSave": "Finish (not saved)",
+    "denominationsTitle": "Notes & Coins",
+    "denominationsPlaceholder": "Calculating..."
+  },
+  "settings": {
+    "sectionProfiles": "Profiles",
+    "sectionAppearance": "Appearance",
+    "accentColor": "Accent colour",
+    "smartSplitDesc": "Balance transfers are suggested when the deviation exceeds this amount."
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your profile and statistics.",
+    "createTitle": "New profile",
+    "editTitle": "Edit profile",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Anna",
+    "roleLabel": "Role",
+    "deleteConfirm": "Are you sure you want to delete this profile?",
+    "resetConfirm": "Really reset statistics?"
+  },
+  "shifts": {
+    "title": "Shifts",
+    "subtitle": "Your tip distribution history.",
+    "noShifts": "No shifts saved yet.",
+    "noShiftsSub": "Calculate a shift and save it to see it here.",
+    "shiftDate": "Date",
+    "shiftTotal": "Total",
+    "shiftEmployees": "Employees",
+    "deleteConfirm": "Really delete this shift?"
+  },
+  "importExport": {
+    "title": "Import / Export",
+    "subtitle": "Back up your data or import a backup.",
+    "importSuccess": "{{added}} shifts imported, {{skipped}} skipped.",
+    "importErrors": "{{count}} errors during import."
+  }
+}

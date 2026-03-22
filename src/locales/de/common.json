@@ -1,0 +1,182 @@
+{
+  "app": {
+    "name": "Tipsy",
+    "tagline": "Trinkgeld fair verteilen"
+  },
+  "nav": {
+    "setup": "Mitarbeiter",
+    "cashInput": "Bargeld",
+    "results": "Ergebnis",
+    "calculate": "Berechnen",
+    "history": "Verlauf",
+    "settings": "Einstellungen",
+    "main": "Hauptnavigation"
+  },
+  "actions": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "reset": "Zurücksetzen",
+    "exportPdf": "PDF exportieren",
+    "exportCsv": "CSV exportieren",
+    "addEmployee": "Mitarbeiter hinzufügen",
+    "removeEmployee": "Entfernen",
+    "calculate": "Berechnen",
+    "exportJson": "Backup exportieren",
+    "importJson": "Backup importieren",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "confirm": "Bestätigen",
+    "createProfile": "Profil erstellen",
+    "switchProfile": "Profil wechseln",
+    "editProfile": "Profil bearbeiten",
+    "deleteProfile": "Profil löschen",
+    "resetStats": "Statistiken zurücksetzen",
+    "guestMode": "Gastmodus",
+    "exitGuestMode": "Gastmodus beenden",
+    "signOut": "Abmelden",
+    "export": "Exportieren",
+    "import": "Importieren"
+  },
+  "profile": {
+    "guest": "Gast",
+    "guestBadge": "Gast Modus",
+    "thisIsYou": "Das bist du",
+    "role": {
+      "kitchen": "Küche",
+      "service": "Service"
+    },
+    "stats": {
+      "totalShifts": "Schichten gesamt",
+      "totalTips": "Trinkgeld gesamt",
+      "hourlyAvg": "⌀ Stundensatz"
+    },
+    "headerMenu": {
+      "editProfile": "Profil bearbeiten",
+      "switchProfile": "Profil wechseln",
+      "signOut": "Abmelden",
+      "settings": "Einstellungen"
+    },
+    "noShiftsGuest": "Keine Schichten (Gast Modus)",
+    "noShiftsGuestSub": "Wechsle zu einem Profil, um Schichten zu speichern.",
+    "deleteWithShifts_one": "Profil und {{count}} Schicht löschen?",
+    "deleteWithShifts_other": "Profil und {{count}} Schichten löschen?",
+    "deleteWithShiftsInfo_one": "Dies kann nicht rückgängig gemacht werden. {{count}} Schicht wird gelöscht.",
+    "deleteWithShiftsInfo_other": "Dies kann nicht rückgängig gemacht werden. {{count}} Schichten werden gelöscht."
+  },
+  "smartSplit": {
+    "normal": "Normal",
+    "smart": "Smart",
+    "modeLabel": "Verteilungsmodus",
+    "threshold": "Schwellwert",
+    "thresholdDefault": "Standard Ausgleichsschwellwert",
+    "fairnessScore": "Fairness-Score",
+    "deviation": "Abweichung",
+    "transfers": "Ausgleichszahlungen",
+    "noTransfers": "Keine Ausgleichszahlungen nötig",
+    "transferFrom": "{{from}} zahlt {{amount}} an {{to}}",
+    "remaining": "Restbetrag",
+    "descSmart": "Optimiert Münzen & Scheine Nutzung",
+    "descNormal": "Proportionale Verteilung",
+    "helpClose": "Schließen",
+    "helpWhat": "Was ist das?",
+    "helpText": "Ausgleichszahlungen werden vorgeschlagen, wenn die Abweichung diesen Betrag überschreitet.",
+    "aboveThreshold": "über {{amount}} Schwellwert",
+    "thresholdLabel": "Fairness-Schwellwert"
+  },
+  "toast": {
+    "dismiss": "Schließen",
+    "shiftSaved": "Schicht gespeichert",
+    "shiftDeleted": "Schicht gelöscht",
+    "profileSaved": "Profil gespeichert",
+    "profileCreated": "Profil erstellt",
+    "profileDeleted": "Profil gelöscht",
+    "profileDeletedWithShifts_one": "Profil gelöscht, {{count}} Schicht entfernt",
+    "profileDeletedWithShifts_other": "Profil gelöscht, {{count}} Schichten entfernt",
+    "statsReset": "Statistiken zurückgesetzt",
+    "historyCleared": "Verlauf gelöscht",
+    "backupExported": "Backup exportiert",
+    "csvExported": "CSV exportiert",
+    "pdfExported": "PDF exportiert",
+    "importSuccess": "{{added}} Schichten importiert",
+    "importPartial": "{{added}} Schichten importiert, {{skipped}} übersprungen",
+    "importFailed": "Import fehlgeschlagen",
+    "sessionRestored": "Schicht wiederhergestellt",
+    "cashReset": "Bargeld zurückgesetzt",
+    "employeesReset": "Mitarbeiter zurückgesetzt",
+    "thresholdUpdated": "Schwellwert: {{amount}}",
+    "calculationUpdated": "Berechnung aktualisiert",
+    "backupDownloaded": "Backup heruntergeladen",
+    "csvDownloaded": "CSV heruntergeladen",
+    "pdfOpened": "PDF wird geöffnet"
+  },
+  "history": {
+    "totalAllTime": "Gesamt aller Schichten",
+    "shiftsCount_one": "{{count}} Schicht",
+    "shiftsCount_other": "{{count}} Schichten",
+    "avgPerShift": "⌀ pro Schicht",
+    "perWeek": "Pro Woche",
+    "perDay": "Pro Tag",
+    "hourlyRate": "Stundensatz",
+    "chartTips": "Trinkgeld (€)",
+    "chartHourly": "Stundensatz (€/h)",
+    "shifts": "Schichten",
+    "clearAll": "Verlauf löschen",
+    "clearConfirm": "Alle Schichten wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
+    "importBackup": "Backup importieren",
+    "deleteShift": "Schicht löschen",
+    "smartSplitTag": "Smart Split",
+    "employees_one": "{{count}} Mitarbeiter",
+    "employees_other": "{{count}} Mitarbeiter"
+  },
+  "theme": {
+    "tipsy": "Tipsy",
+    "katzentempel": "Katzentempel",
+    "dark": "Dunkel",
+    "light": "Hell",
+    "switchMode": "Modus wechseln",
+    "switchTheme": "Theme wechseln",
+    "accentColor": "Farbe",
+    "accent": {
+      "blue": "Blau",
+      "purple": "Lila",
+      "pink": "Pink",
+      "orange": "Orange",
+      "green": "Grün"
+    }
+  },
+  "language": {
+    "de": "Deutsch",
+    "en": "English",
+    "switch": "Sprache wechseln"
+  },
+  "export": {
+    "csv": {
+      "name": "Name",
+      "group": "Gruppe",
+      "hours": "Stunden",
+      "amount": "Betrag"
+    }
+  },
+  "currency": {
+    "denomination": {
+      "500": "€500",
+      "200": "€200",
+      "100": "€100",
+      "50": "€50",
+      "20": "€20",
+      "10": "€10",
+      "5": "€5",
+      "2": "€2",
+      "1": "€1",
+      "50ct": "50 Ct",
+      "20ct": "20 Ct",
+      "10ct": "10 Ct",
+      "5ct": "5 Ct",
+      "2ct": "2 Ct",
+      "1ct": "1 Ct"
+    },
+    "total": "Gesamt",
+    "perHour": "pro Stunde"
+  }
+}
