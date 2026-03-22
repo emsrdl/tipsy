@@ -78,15 +78,15 @@ export function AppLayout({ children }: AppLayoutProps) {
                 key={to}
                 to={to}
                 className={cn(
-                  'ripple flex min-w-[4rem] flex-col items-center gap-1 rounded-xl px-3 py-2 transition-all',
+                  'ripple flex w-24 flex-col items-center gap-1 rounded-xl px-3 py-2 transition-all',
                   isActive ? 'text-accent' : 'text-text-secondary',
                 )}
               >
                 {/* Pill indicator for active tab */}
                 <div
                   className={cn(
-                    'flex h-8 items-center justify-center rounded-full transition-all',
-                    isActive ? 'min-w-[4rem] bg-accent-subtle px-4' : 'w-8',
+                    'flex h-8 min-w-[4rem] items-center justify-center rounded-full transition-all',
+                    isActive ? 'bg-accent-subtle px-4' : 'w-8',
                   )}
                 >
                   <Icon name={icon} size={20} />

@@ -36,6 +36,7 @@
     --motion-duration-medium: 300ms;
     --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
     --motion-easing-decelerate: cubic-bezier(0, 0, 0, 1);
+    scrollbar-gutter: stable;
   }
 
   body {
