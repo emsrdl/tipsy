@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useProfiles } from '@/hooks/useProfiles';
 import { Badge } from '@/components/atoms/Badge/Badge';
+import { Icon } from '@/components/atoms/Icon/Icon';
 import { cn } from '@/lib/utils';
 
 /** Derives initials from a display name (e.g. "Elias Meyer" → "EM", "Anna" → "A"). */
@@ -34,7 +35,7 @@ function getInitials(name: string): string {
 export function ProfileAvatar() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
-  const { activeProfile, isGuestMode, enterGuestMode } = useProfiles();
+  const { profiles, activeProfile, isGuestMode, enterGuestMode, switchProfile } = useProfiles();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -110,54 +111,60 @@ export function ProfileAvatar() {
             </div>
           </div>
 
-          {/* Menu items */}
+          {/* Profile quick-switch list */}
           <div className="py-1">
+            {profiles.slice(0, 3).map((profile) => {
+              const isActive = !isGuestMode && activeProfile?.id === profile.id;
+              return (
+                <button
+                  key={profile.id}
+                  type="button"
+                  onClick={() => {
+                    switchProfile(profile.id);
+                    setIsOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
+                >
+                  <span className="flex-1 truncate">{profile.name}</span>
+                  {isActive && <Icon name="check" size={14} className="text-accent flex-shrink-0" />}
+                </button>
+              );
+            })}
+
+            {/* Guest Mode / Sign out */}
+            <button
+              type="button"
+              onClick={() => {
+                enterGuestMode();
+                setIsOpen(false);
+              }}
+              className={cn(
+                'flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-colors',
+                isGuestMode
+                  ? 'text-text-primary hover:bg-surface-overlay'
+                  : 'hover:bg-status-error/5 text-status-error',
+              )}
+            >
+              <span className="flex-1">
+                {isGuestMode ? t('profile.headerMenu.guestMode') : t('actions.signOut')}
+              </span>
+              {isGuestMode && <Icon name="check" size={14} className="text-accent flex-shrink-0" />}
+            </button>
+          </div>
+
+          {/* Create profile */}
+          <div className="border-t border-border">
             <button
               type="button"
               onClick={() => {
                 setIsOpen(false);
                 void navigate('/settings');
               }}
-              className="w-full px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
+              className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:bg-surface-overlay"
             >
-              {t('profile.headerMenu.editProfile')}
+              <Icon name="user-plus" size={14} className="flex-shrink-0" />
+              {t('profile.headerMenu.createProfile')}
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                void navigate('/settings');
-              }}
-              className="w-full px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
-            >
-              {t('profile.headerMenu.switchProfile')}
-            </button>
-
-            {!isGuestMode && (
-              <button
-                type="button"
-                onClick={() => {
-                  enterGuestMode();
-                  setIsOpen(false);
-                }}
-                className="hover:bg-status-error/5 w-full px-4 py-3 text-left text-sm text-status-error transition-colors"
-              >
-                {t('actions.signOut')}
-              </button>
-            )}
-
-            <div className="mt-1 border-t border-border pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  void navigate('/settings');
-                }}
-                className="w-full px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:bg-surface-overlay"
-              >
-                {t('profile.headerMenu.settings')}
-              </button>
-            </div>
           </div>
         </div>
       )}

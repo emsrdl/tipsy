@@ -10,6 +10,7 @@
     "calculate": "Calculate",
     "history": "History",
     "settings": "Settings",
+    "createProfile": "Profiles",
     "main": "Main navigation"
   },
   "actions": {
@@ -55,7 +56,9 @@
       "editProfile": "Edit profile",
       "switchProfile": "Switch profile",
       "signOut": "Sign out",
-      "settings": "Settings"
+      "settings": "Settings",
+      "createProfile": "Create profile",
+      "guestMode": "Guest Mode"
     },
     "noShiftsGuest": "No shifts (Guest Mode)",
     "noShiftsGuestSub": "Switch to a profile to save shifts.",

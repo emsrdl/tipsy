@@ -10,6 +10,7 @@
     "calculate": "Berechnen",
     "history": "Verlauf",
     "settings": "Einstellungen",
+    "createProfile": "Profile",
     "main": "Hauptnavigation"
   },
   "actions": {
@@ -55,7 +56,9 @@
       "editProfile": "Profil bearbeiten",
       "switchProfile": "Profil wechseln",
       "signOut": "Abmelden",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "createProfile": "Profil erstellen",
+      "guestMode": "Gast Modus"
     },
     "noShiftsGuest": "Keine Schichten (Gast Modus)",
     "noShiftsGuestSub": "Wechsle zu einem Profil, um Schichten zu speichern.",
