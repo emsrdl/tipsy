@@ -19,3 +19,11 @@ Layout
 Docker
 
 - `docker compose up --build` — preview production image
+
+Automated releases
+
+- `semantic-release` is configured to run on pushes to `main` via `.github/workflows/release.yml`
+  and `.releaserc.json`. It will analyze Conventional Commits and create tags + GitHub Releases
+  automatically.
+- The `version-build.yml` workflow builds artifacts on tag pushes (and PRs) and injects
+  `VITE_APP_VERSION`.
