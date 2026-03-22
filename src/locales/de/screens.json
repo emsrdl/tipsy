@@ -24,6 +24,7 @@
     "quantityLabel": "Anzahl",
     "totalLabel": "Gesamtbetrag",
     "denominationSection": "Scheine",
+    "resetCash": "Bargeld zurücksetzen",
     "coinSection": "Münzen"
   },
   "results": {

@@ -24,6 +24,7 @@
     "quantityLabel": "Quantity",
     "totalLabel": "Total amount",
     "denominationSection": "Banknotes",
+    "resetCash": "Reset cash",
     "coinSection": "Coins"
   },
   "results": {
