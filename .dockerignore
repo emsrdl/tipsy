@@ -1,0 +1,19 @@
+node_modules
+dist
+.git
+.env
+.env.*
+coverage
+.vscode
+.DS_Store
+npm-debug.log
+yarn-error.log
+.turbo
+build
+
+# local config
+*.local
+
+# editor/temp
+*.swp
+*~

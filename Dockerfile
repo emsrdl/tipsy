@@ -37,8 +37,15 @@ FROM nginx:1.27-alpine AS serve
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built assets from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy built assets from builder stage and set ownership to nginx user (UID 101)
+# using --chown so files are not root-owned inside the image.
+COPY --from=builder --chown=101:101 /app/dist /usr/share/nginx/html
+
+# Ensure static files are readable by the nginx worker processes (fallback)
+RUN chmod -R 755 /usr/share/nginx/html
+
+# Simple HTTP healthcheck for orchestration
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD curl -f http://localhost/ || exit 1
 
 EXPOSE 80
 
