@@ -1,3 +1,10 @@
+## [0.1.1](https://github.com/emsrdl/tipsy/compare/v0.1.0...v0.1.1) (2026-03-22)
+
+
+### Bug Fixes
+
+* release version ([d395c45](https://github.com/emsrdl/tipsy/commit/d395c45ef80a8d5fe4564e7bf2182b547bcffd70))
+
 ## 1.0.0 (2026-03-22)
 
 
