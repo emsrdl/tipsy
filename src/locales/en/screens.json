@@ -16,6 +16,7 @@
     "employeeCount_one": "{{count}} employee",
     "employeeCount_other": "{{count}} employees",
     "resetEmployees": "Reset employees",
+    "resetPage": "Reset page",
     "defaultEmployeeName": "Employee {{n}}"
   },
   "cashInput": {
@@ -25,6 +26,7 @@
     "totalLabel": "Total amount",
     "denominationSection": "Banknotes",
     "resetCash": "Reset cash",
+    "resetPage": "Reset page",
     "coinSection": "Coins"
   },
   "results": {

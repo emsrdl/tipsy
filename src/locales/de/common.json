@@ -107,6 +107,7 @@
     "sessionRestored": "Schicht wiederhergestellt",
     "cashReset": "Bargeld zurückgesetzt",
     "employeesReset": "Mitarbeiter zurückgesetzt",
+    "pageReset": "Seite zurückgesetzt",
     "thresholdUpdated": "Schwellwert: {{amount}}",
     "calculationUpdated": "Berechnung aktualisiert",
     "backupDownloaded": "Backup heruntergeladen",

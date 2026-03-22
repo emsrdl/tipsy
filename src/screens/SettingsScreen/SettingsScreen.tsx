@@ -22,7 +22,7 @@ import { Icon } from '@/components/atoms/Icon/Icon';
 import { Button } from '@/components/atoms/Button/Button';
 import { Badge } from '@/components/atoms/Badge/Badge';
 import { THEMES, THEME_IDS } from '@/config/themes';
-import { SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit';
+import { SMART_SPLIT_DEFAULT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit';
 import { formatEurFromCents } from '@/config/currency';
 import { cn } from '@/lib/utils';
 import type { ProfileRole } from '@/types/profile';
@@ -56,7 +56,7 @@ export function SettingsScreen() {
   const { showToast } = useToast();
 
   const [threshold, setThreshold] = useLocalStorage<number>(
-    SMART_SPLIT_THRESHOLD_KEY,
+    SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
     DEFAULT_FAIRNESS_THRESHOLD,
   );
   const [thresholdInput, setThresholdInput] = useState((threshold / 100).toFixed(2));

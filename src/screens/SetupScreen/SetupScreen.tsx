@@ -24,6 +24,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
   SMART_SPLIT_ENABLED,
   SMART_SPLIT_THRESHOLD_KEY,
+  SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
   DEFAULT_FAIRNESS_THRESHOLD,
 } from '@/config/smartSplit';
 import { cn } from '@/lib/utils';
@@ -37,7 +38,8 @@ const PROFILE_EMP_PREFIX = 'profile-emp-';
 export function SetupScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
-  const { session, addEmployee, removeEmployee, updateEmployee, wasRestored } = useTipCalculator();
+  const { session, addEmployee, removeEmployee, updateEmployee, setSplit, wasRestored } =
+    useTipCalculator();
   const { activeProfile, isGuestMode } = useProfiles();
   const { showToast } = useToast();
   const [showSmartHelp, setShowSmartHelp] = useState(false);
@@ -45,6 +47,10 @@ export function SetupScreen() {
   const [isSmartMode, setIsSmartMode] = useLocalStorage('tipsy_smart_mode', SMART_SPLIT_ENABLED);
   const [threshold, setThreshold] = useLocalStorage<number>(
     SMART_SPLIT_THRESHOLD_KEY,
+    DEFAULT_FAIRNESS_THRESHOLD,
+  );
+  const [defaultThreshold] = useLocalStorage<number>(
+    SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
     DEFAULT_FAIRNESS_THRESHOLD,
   );
 
@@ -127,7 +133,7 @@ export function SetupScreen() {
     }
   }
 
-  function handleResetEmployees() {
+  function handleResetPage() {
     session.employees.forEach((e) => {
       if (!e.isProfileOwner) removeEmployee(e.id);
     });
@@ -135,7 +141,11 @@ export function SetupScreen() {
       const profileEmpId = `${PROFILE_EMP_PREFIX}${activeProfile.id}`;
       updateEmployee(profileEmpId, { hours: 8, group: activeProfile.role });
     }
-    showToast(t('common:toast.employeesReset'), 'info');
+    setSplit({ kitchenPercent: 40, servicePercent: 60 });
+    setIsSmartMode(SMART_SPLIT_ENABLED);
+    setThreshold(defaultThreshold);
+    setThresholdInputValue((defaultThreshold / 100).toFixed(2));
+    showToast(t('common:toast.pageReset'), 'info');
   }
 
   function handleNext() {
@@ -153,20 +163,18 @@ export function SetupScreen() {
       step={1}
       totalSteps={3}
     >
-      {/* Reset employees — upper right, mirrors CashInputScreen */}
-      {hasEmployees && (
-        <div className="mb-2 flex justify-end">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleResetEmployees}
-            className="min-h-10 gap-1.5 text-sm text-text-secondary"
-          >
-            <Icon name="refresh-cw" size={14} />
-            {t('screens:setup.resetEmployees')}
-          </Button>
-        </div>
-      )}
+      {/* Reset page — upper right */}
+      <div className="mb-2 flex justify-end">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={handleResetPage}
+          className="min-h-10 gap-1.5 text-sm text-text-secondary"
+        >
+          <Icon name="refresh-cw" size={14} />
+          {t('screens:setup.resetPage')}
+        </Button>
+      </div>
 
       <EmployeeForm />
 

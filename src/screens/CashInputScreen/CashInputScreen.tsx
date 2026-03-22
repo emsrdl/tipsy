@@ -47,7 +47,7 @@ export function CashInputScreen() {
       step={2}
       totalSteps={3}
     >
-      {/* Reset button — top right */}
+      {/* Reset page — upper right */}
       <div className="mb-2 flex justify-end">
         <Button
           type="button"
@@ -56,7 +56,7 @@ export function CashInputScreen() {
           className="min-h-10 gap-1.5 text-sm text-text-secondary"
         >
           <Icon name="refresh-cw" size={14} />
-          {t('screens:cashInput.resetCash')}
+          {t('screens:cashInput.resetPage')}
         </Button>
       </div>
 

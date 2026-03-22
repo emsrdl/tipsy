@@ -24,9 +24,10 @@ import { useProfiles } from '@/hooks/useProfiles';
 import { useSmartSplitter } from '@/hooks/useSmartSplitter';
 import { useToast } from '@/context/ToastContext';
 import { useLocale } from '@/hooks/useLocale';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
 import { formatEurFromCents } from '@/config/currency';
-import { DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit';
+import { DEFAULT_FAIRNESS_THRESHOLD, SMART_SPLIT_DEFAULT_THRESHOLD_KEY } from '@/config/smartSplit';
 import { resolveEmployeeName } from '@/lib/employeeUtils';
 import { cn } from '@/lib/utils';
 import type { Shift, DifferenceLine } from '@/types/shift';
@@ -49,6 +50,10 @@ export function ResultsScreen() {
   const { locale } = useLocale();
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
 
+  const [defaultThreshold] = useLocalStorage<number>(
+    SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
+    DEFAULT_FAIRNESS_THRESHOLD,
+  );
   const [exportOpen, setExportOpen] = useState(false);
   const [showThresholdHelp, setShowThresholdHelp] = useState(false);
 
@@ -153,11 +158,13 @@ export function ResultsScreen() {
 
     addShift(shift);
     showToast(t('common:toast.shiftSaved'), 'success');
+    setThreshold(defaultThreshold);
     reset();
     void navigate('/history');
   }
 
   function handleReset() {
+    setThreshold(defaultThreshold);
     reset();
     void navigate('/calculate');
   }

@@ -37,6 +37,19 @@ npm run test:coverage # Coverage report to coverage/
 - `src/layouts/` — AppLayout, ScreenContainer
 - `src/screens/` — SetupScreen, CashInputScreen, ResultsScreen
 
+### Styling — Material Design
+
+UI follows **Google Material Design 3** principles:
+
+- **Elevation**: surfaces use `shadow-elevation-1/2/3` (defined as CSS variables); higher elevation = more prominent
+- **Typography scale**: `text-xs/sm/base` for body, `font-semibold/bold` for emphasis — no decorative fonts
+- **Spacing**: 4px base grid; prefer `gap-2/3/4`, `p-3/4`, `px-4 py-3` for list items
+- **States**: interactive elements must have hover/active/focus styles; use `transition-colors`
+- **Icons**: always from the existing `Icon` component (Lucide set); pair with text labels
+- **Feedback**: use toasts for confirmations, never silent mutations
+- **Touch targets**: minimum `min-h-10` (40px) for interactive elements, `min-h-12` for primary actions
+- **Cards/surfaces**: `rounded-xl bg-surface-raised shadow-elevation-1` for grouped content
+
 ### Key Conventions
 
 - **No hardcoded values**: colors via CSS variables, strings via i18n, domain via `env.ts`
