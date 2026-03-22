@@ -14,7 +14,9 @@
     "servicePercent": "Service (%)",
     "noEmployees": "Noch keine Mitarbeiter hinzugefügt.",
     "employeeCount_one": "{{count}} Mitarbeiter",
-    "employeeCount_other": "{{count}} Mitarbeiter"
+    "employeeCount_other": "{{count}} Mitarbeiter",
+    "resetEmployees": "Mitarbeiter zurücksetzen",
+    "defaultEmployeeName": "Mitarbeiter {{n}}"
   },
   "cashInput": {
     "title": "Bargeld eingeben",
@@ -44,7 +46,9 @@
     "transfersTitle": "Ausgleichszahlungen",
     "noTransfersNeeded": "Keine Ausgleichszahlungen nötig.",
     "saveAndFinish": "Beenden & Speichern",
-    "finishNoSave": "Beenden (nicht gespeichert)"
+    "finishNoSave": "Beenden (nicht gespeichert)",
+    "denominationsTitle": "Scheine & Münzen",
+    "denominationsPlaceholder": "Wird berechnet..."
   },
   "settings": {
     "sectionProfiles": "Profile",

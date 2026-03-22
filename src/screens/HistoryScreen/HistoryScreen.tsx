@@ -8,10 +8,11 @@
  * // Rendered via React Router at route "/history"
  */
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog'
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog'
+import { ImportDialog } from '@/components/molecules/ImportDialog/ImportDialog'
 import {
   BarChart,
   Bar,
@@ -37,8 +38,17 @@ import type { Shift } from '@/types/shift'
 
 type GraphMode = 'week' | 'day' | 'hourly'
 
+/** Returns the active profile's personal tip amount for a shift, or total if not found. */
+function getProfileAmount(shift: Shift, profileId: string | undefined): number {
+  if (!profileId) return shift.totalTipsInCents
+  const myShare = shift.distribution.personShares.find(
+    (s) => s.id === `profile-emp-${profileId}`
+  )
+  return myShare?.actualShareInCents ?? shift.totalTipsInCents
+}
+
 /** Groups shifts by ISO week key (KWxx). */
-function groupByWeek(shifts: Shift[]): { label: string; totalCents: number }[] {
+function groupByWeek(shifts: Shift[], getValue: (s: Shift) => number): { label: string; totalCents: number }[] {
   const map = new Map<string, number>()
   for (const shift of shifts) {
     const d = new Date(shift.date)
@@ -46,7 +56,7 @@ function groupByWeek(shifts: Shift[]): { label: string; totalCents: number }[] {
     const jan1 = new Date(year, 0, 1)
     const week = Math.ceil(((d.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7)
     const key = `KW${week.toString().padStart(2, '0')}`
-    map.set(key, (map.get(key) ?? 0) + shift.totalTipsInCents)
+    map.set(key, (map.get(key) ?? 0) + getValue(shift))
   }
   return Array.from(map.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
@@ -54,11 +64,11 @@ function groupByWeek(shifts: Shift[]): { label: string; totalCents: number }[] {
 }
 
 /** Groups shifts by date (MM-DD). */
-function groupByDay(shifts: Shift[]): { label: string; totalCents: number }[] {
+function groupByDay(shifts: Shift[], getValue: (s: Shift) => number): { label: string; totalCents: number }[] {
   const map = new Map<string, number>()
   for (const shift of shifts) {
     const label = shift.date.split('T')[0] ?? shift.date
-    map.set(label, (map.get(label) ?? 0) + shift.totalTipsInCents)
+    map.set(label, (map.get(label) ?? 0) + getValue(shift))
   }
   return Array.from(map.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
@@ -67,10 +77,10 @@ function groupByDay(shifts: Shift[]): { label: string; totalCents: number }[] {
 }
 
 /** Average hourly rate per shift (last 10). */
-function groupByHourly(shifts: Shift[]): { label: string; totalCents: number }[] {
+function groupByHourly(shifts: Shift[], getValue: (s: Shift) => number): { label: string; totalCents: number }[] {
   return shifts.slice(-10).map((shift) => {
     const totalHours = shift.employees.reduce((s, e) => s + e.hours, 0)
-    const ratePerHour = totalHours > 0 ? Math.round(shift.totalTipsInCents / totalHours) : 0
+    const ratePerHour = totalHours > 0 ? Math.round(getValue(shift) / totalHours) : 0
     return {
       label: (shift.date.split('T')[0] ?? '').slice(5),
       totalCents: ratePerHour,
@@ -93,13 +103,13 @@ export function HistoryScreen() {
   const { activeProfile, isGuestMode } = useProfiles()
   const { showToast } = useToast()
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [graphMode, setGraphMode] = useState<GraphMode>('week')
   const [expandedShiftId, setExpandedShiftId] = useState<string | null>(null)
   const [confirmClear, setConfirmClear] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [exportOpen, setExportOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
 
   // Filter shifts by active profile
   const shifts = isGuestMode
@@ -108,17 +118,17 @@ export function HistoryScreen() {
     ? allShifts.filter((s) => s.profileId === activeProfile.id)
     : allShifts
 
+  const myAmount = useCallback((shift: Shift) => getProfileAmount(shift, activeProfile?.id), [activeProfile?.id])
+
   const graphData = graphMode === 'week'
-    ? groupByWeek(shifts)
+    ? groupByWeek(shifts, myAmount)
     : graphMode === 'day'
-    ? groupByDay(shifts)
-    : groupByHourly(shifts)
+    ? groupByDay(shifts, myAmount)
+    : groupByHourly(shifts, myAmount)
 
-  const totalAllTime = shifts.reduce((s, sh) => s + sh.totalTipsInCents, 0)
+  const totalAllTime = shifts.reduce((s, sh) => s + myAmount(sh), 0)
 
-  const handleFileImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleFileImport = useCallback((file: File) => {
     const reader = new FileReader()
     reader.onload = (ev) => {
       const json = ev.target?.result as string
@@ -132,7 +142,6 @@ export function HistoryScreen() {
       }
     }
     reader.readAsText(file)
-    e.target.value = ''
   }, [importJson, showToast, t])
 
   function handleClearHistory() {
@@ -183,7 +192,7 @@ export function HistoryScreen() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => setImportOpen(true)}
             className="gap-2"
           >
             <Icon name="upload" size={16} />
@@ -302,7 +311,7 @@ export function HistoryScreen() {
                     </div>
                     <div className="flex items-center gap-3">
                       <p className="font-mono text-base font-bold text-text-primary">
-                        {formatEurFromCents(shift.totalTipsInCents, fmtLocale)}
+                        {formatEurFromCents(myAmount(shift), fmtLocale)}
                       </p>
                       <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} className="text-text-secondary" />
                     </div>
@@ -386,23 +395,13 @@ export function HistoryScreen() {
         <Button
           type="button"
           variant="outline"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => setImportOpen(true)}
           className="flex-1 min-h-12 text-sm gap-2"
         >
           <Icon name="upload" size={14} />
           {t('common:actions.import')}
         </Button>
       </div>
-
-      {/* Hidden file input for import */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".json"
-        onChange={handleFileImport}
-        className="hidden"
-        aria-hidden="true"
-      />
 
       {/* Confirm: delete single shift */}
       <ConfirmDialog
@@ -433,7 +432,14 @@ export function HistoryScreen() {
         onExportCsv={() => { exportCsv(); showToast(t('common:toast.csvDownloaded'), 'success') }}
         onExportPdf={() => { exportPdf(); showToast(t('common:toast.pdfOpened'), 'success') }}
         onExportJson={() => { exportJson(); showToast(t('common:toast.backupDownloaded'), 'success') }}
-        onImport={() => fileInputRef.current?.click()}
+        isProcessing={isProcessing}
+      />
+
+      {/* Import dialog */}
+      <ImportDialog
+        isOpen={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImport={handleFileImport}
         isProcessing={isProcessing}
       />
     </ScreenContainer>

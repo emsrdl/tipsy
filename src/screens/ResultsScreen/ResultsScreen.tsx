@@ -8,7 +8,7 @@
  * // Rendered via React Router at route "/calculate/results"
  */
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer'
@@ -25,9 +25,8 @@ import { useSmartSplitter } from '@/hooks/useSmartSplitter'
 import { useToast } from '@/context/ToastContext'
 import { useLocale } from '@/hooks/useLocale'
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { formatEurFromCents } from '@/config/currency'
-import { SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit'
+import { DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit'
 import { cn } from '@/lib/utils'
 import type { Shift, DifferenceLine } from '@/types/shift'
 
@@ -50,7 +49,6 @@ export function ResultsScreen() {
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE'
 
   const [exportOpen, setExportOpen] = useState(false)
-  const [threshold] = useLocalStorage<number>(SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD)
 
   const smartOutput = useSmartSplitter(
     session.employees,
@@ -59,7 +57,30 @@ export function ResultsScreen() {
     session.denominations
   )
 
-  const { isSmartMode, toggleSmartMode } = smartOutput
+  const { isSmartMode, toggleSmartMode, thresholdInCents, setThreshold } = smartOutput
+  const [thresholdInput, setThresholdInput] = useState((thresholdInCents / 100).toFixed(2))
+  const thresholdInputRef = useRef<HTMLInputElement>(null)
+
+  function handleThresholdChange(value: string) {
+    setThresholdInput(value)
+    const parsed = parseFloat(value.replace(',', '.'))
+    if (!isNaN(parsed) && parsed >= 0.5 && parsed <= 50) {
+      setThreshold(Math.round(parsed * 100))
+    }
+  }
+
+  function handleThresholdBlur() {
+    const parsed = parseFloat(thresholdInput.replace(',', '.'))
+    if (isNaN(parsed) || parsed < 0.5) {
+      setThresholdInput((DEFAULT_FAIRNESS_THRESHOLD / 100).toFixed(2))
+      setThreshold(DEFAULT_FAIRNESS_THRESHOLD)
+    } else {
+      const clamped = Math.min(Math.max(parsed, 0.5), 50)
+      setThresholdInput(clamped.toFixed(2))
+      setThreshold(Math.round(clamped * 100))
+    }
+    showToast(t('common:toast.thresholdUpdated', { amount: formatEurFromCents(thresholdInCents, fmtLocale) }), 'info')
+  }
 
   const results = session.results ?? []
   const hasResults = results.length > 0
@@ -176,6 +197,28 @@ export function ResultsScreen() {
             />
           </button>
 
+          {/* Threshold input (smart mode) */}
+          {isSmartMode && (
+            <div className="rounded-xl bg-surface-raised shadow-elevation-1 px-4 py-3 flex items-center gap-3">
+              <span className="text-xs text-text-secondary whitespace-nowrap">
+                {t('common:smartSplit.thresholdLabel')}:
+              </span>
+              <input
+                ref={thresholdInputRef}
+                type="number"
+                inputMode="decimal"
+                min="0.50"
+                max="50"
+                step="0.50"
+                value={thresholdInput}
+                onChange={(e) => handleThresholdChange(e.target.value)}
+                onBlur={handleThresholdBlur}
+                className="w-20 h-9 px-2 rounded-lg bg-surface-overlay text-sm font-mono text-text-primary border border-border focus:outline-none focus:border-accent text-center"
+              />
+              <span className="text-sm text-text-secondary">€</span>
+            </div>
+          )}
+
           {/* Fairness score (smart mode) */}
           {isSmartMode && fairnessScore !== undefined && (
             <div className={cn(
@@ -218,7 +261,7 @@ export function ResultsScreen() {
                   {t('common:smartSplit.transfers')}
                 </span>
                 <Badge variant="default" className="ml-auto text-xs bg-status-warning/20 text-status-warning border-0">
-                  {t('common:smartSplit.aboveThreshold', { amount: formatEurFromCents(threshold, fmtLocale) })}
+                  {t('common:smartSplit.aboveThreshold', { amount: formatEurFromCents(thresholdInCents, fmtLocale) })}
                 </Badge>
               </div>
               <div className="divide-y divide-status-warning/10">

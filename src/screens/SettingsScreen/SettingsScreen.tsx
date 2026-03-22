@@ -6,10 +6,11 @@
  * // Rendered via React Router at route "/settings"
  */
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog'
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog'
+import { ImportDialog } from '@/components/molecules/ImportDialog/ImportDialog'
 import { useProfiles } from '@/hooks/useProfiles'
 import { useTheme } from '@/hooks/useTheme'
 import { useLocale } from '@/hooks/useLocale'
@@ -66,8 +67,7 @@ export function SettingsScreen() {
   // Clear history confirmation
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const [exportOpen, setExportOpen] = useState(false)
-
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [importOpen, setImportOpen] = useState(false)
 
   function handleStartEdit(id: string) {
     const profile = profiles.find((p) => p.id === id)
@@ -135,13 +135,7 @@ export function SettingsScreen() {
     }
   }
 
-  function handleImportClick() {
-    fileInputRef.current?.click()
-  }
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+  function handleFileImport(file: File) {
     const reader = new FileReader()
     reader.onload = (ev) => {
       const text = ev.target?.result
@@ -156,7 +150,6 @@ export function SettingsScreen() {
       }
     }
     reader.readAsText(file)
-    e.target.value = ''
   }
 
   function handleClearHistory() {
@@ -570,7 +563,7 @@ export function SettingsScreen() {
                 type="button"
                 variant="outline"
                 className="flex-1 min-h-11 text-xs gap-1.5"
-                onClick={handleImportClick}
+                onClick={() => setImportOpen(true)}
               >
                 <Icon name="upload" size={14} />
                 {t('common:actions.import')}
@@ -610,15 +603,6 @@ export function SettingsScreen() {
 
       </div>
 
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".json"
-        className="hidden"
-        onChange={handleFileChange}
-      />
-
       {/* Confirm: delete profile */}
       {deletingId && (
         <ConfirmDialog
@@ -657,7 +641,14 @@ export function SettingsScreen() {
         onExportCsv={() => { exportCsv(); showToast(t('common:toast.csvDownloaded'), 'success') }}
         onExportPdf={() => { exportPdf(); showToast(t('common:toast.pdfOpened'), 'success') }}
         onExportJson={() => { exportJson(); showToast(t('common:toast.backupDownloaded'), 'success') }}
-        onImport={handleImportClick}
+        isProcessing={isExporting}
+      />
+
+      {/* Import dialog */}
+      <ImportDialog
+        isOpen={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImport={handleFileImport}
         isProcessing={isExporting}
       />
     </div>

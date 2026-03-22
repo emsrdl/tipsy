@@ -13,7 +13,6 @@
  *   onExportCsv={handleCsv}
  *   onExportPdf={handlePdf}
  *   onExportJson={handleJson}
- *   onImport={() => fileInputRef.current?.click()}
  * />
  */
 
@@ -39,7 +38,6 @@ export interface ExportDialogProps {
   onExportCsv: () => void
   onExportPdf: () => void
   onExportJson?: () => void
-  onImport?: () => void
   isProcessing?: boolean
 }
 
@@ -53,7 +51,6 @@ export function ExportDialog({
   onExportCsv,
   onExportPdf,
   onExportJson,
-  onImport,
   isProcessing = false,
 }: ExportDialogProps) {
   const { t } = useTranslation(['common', 'screens'])
@@ -109,17 +106,6 @@ export function ExportDialog({
         </div>
 
         <div className="flex gap-2 pt-1">
-          {onImport && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => { onImport(); onClose() }}
-              className="min-h-11 gap-2"
-            >
-              <Icon name="upload" size={14} />
-              {t('common:actions.import')}
-            </Button>
-          )}
           <Button
             type="button"
             variant="ghost"

@@ -55,11 +55,12 @@ export function SetupScreen() {
   const splitValid = session.split.kitchenPercent + session.split.servicePercent === 100
   const canContinue = hasEmployees && splitValid
 
-  // Show session restore toast once on mount
-  const hasShownRestoreToast = useRef(false)
+  // Show session restore toast once per page session
   useEffect(() => {
-    if (wasRestored && !hasShownRestoreToast.current) {
-      hasShownRestoreToast.current = true
+    if (!wasRestored) return
+    const alreadyShown = sessionStorage.getItem('tipsy_restore_toast_shown')
+    if (!alreadyShown) {
+      sessionStorage.setItem('tipsy_restore_toast_shown', '1')
       showToast(t('common:toast.sessionRestored'), 'info')
     }
   }, [wasRestored, showToast, t])
@@ -125,6 +126,17 @@ export function SetupScreen() {
     }
   }
 
+  function handleResetEmployees() {
+    session.employees.forEach((e) => {
+      if (!e.isProfileOwner) removeEmployee(e.id)
+    })
+    if (activeProfile) {
+      const profileEmpId = `${PROFILE_EMP_PREFIX}${activeProfile.id}`
+      updateEmployee(profileEmpId, { hours: 8 })
+    }
+    showToast(t('common:toast.employeesReset'), 'info')
+  }
+
   function handleNext() {
     if (!canContinue) {
       if (!hasEmployees) showToast(t('errors:validation.noEmployees'), 'error')
@@ -146,6 +158,19 @@ export function SetupScreen() {
       </div>
 
       {/* Employee form */}
+      {hasEmployees && (
+        <div className="flex justify-end mb-2">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={handleResetEmployees}
+            className="min-h-10 text-sm gap-1.5 text-text-secondary"
+          >
+            <Icon name="refresh-cw" size={14} />
+            {t('screens:setup.resetEmployees')}
+          </Button>
+        </div>
+      )}
       <EmployeeForm />
 
       {/* Smart Split toggle */}

@@ -81,7 +81,8 @@
     "helpClose": "Schließen",
     "helpWhat": "Was ist das?",
     "helpText": "Ausgleichszahlungen werden vorgeschlagen, wenn die Abweichung diesen Betrag überschreitet.",
-    "aboveThreshold": "über {{amount}} Schwellwert"
+    "aboveThreshold": "über {{amount}} Schwellwert",
+    "thresholdLabel": "Fairness-Schwellwert"
   },
   "toast": {
     "shiftSaved": "Schicht gespeichert",
@@ -101,6 +102,8 @@
     "importFailed": "Import fehlgeschlagen",
     "sessionRestored": "Schicht wiederhergestellt",
     "cashReset": "Bargeld zurückgesetzt",
+    "employeesReset": "Mitarbeiter zurückgesetzt",
+    "thresholdUpdated": "Schwellwert: {{amount}}",
     "calculationUpdated": "Berechnung aktualisiert",
     "backupDownloaded": "Backup heruntergeladen",
     "csvDownloaded": "CSV heruntergeladen",

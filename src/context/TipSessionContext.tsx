@@ -104,7 +104,10 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
   }, [session, initialSession])
 
   const addEmployee = useCallback((employee: Employee) => {
-    setSession((s) => ({ ...s, results: null, employees: [...s.employees, employee] }))
+    setSession((s) => {
+      if (s.employees.some((e) => e.id === employee.id)) return s
+      return { ...s, results: null, employees: [...s.employees, employee] }
+    })
   }, [])
 
   const removeEmployee = useCallback((id: string) => {
@@ -150,6 +153,7 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
   const reset = useCallback(() => {
     try {
       sessionStorage.removeItem(SESSION_STORAGE_KEY)
+      sessionStorage.removeItem('tipsy_restore_toast_shown')
     } catch {
       // ignore
     }

@@ -40,9 +40,10 @@ export function EmployeeForm() {
   const splitError = session.split.kitchenPercent + session.split.servicePercent !== 100
 
   function handleAddEmployee() {
+    const n = session.employees.length + 1
     const employee: Employee = {
       id: generateId(),
-      name: '',
+      name: t('screens:setup.defaultEmployeeName', { n }),
       hours: 8,
       group: 'service',
     }

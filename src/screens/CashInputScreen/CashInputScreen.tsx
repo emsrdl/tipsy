@@ -56,7 +56,7 @@ export function CashInputScreen() {
           className="min-h-10 text-sm gap-1.5 text-text-secondary"
         >
           <Icon name="refresh-cw" size={14} />
-          Reset
+          {t('common:actions.reset')}
         </Button>
       </div>
 

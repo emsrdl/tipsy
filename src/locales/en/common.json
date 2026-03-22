@@ -81,7 +81,8 @@
     "helpClose": "Close",
     "helpWhat": "What is this?",
     "helpText": "Balance transfers are suggested when the deviation exceeds this amount.",
-    "aboveThreshold": "above {{amount}} threshold"
+    "aboveThreshold": "above {{amount}} threshold",
+    "thresholdLabel": "Fairness threshold"
   },
   "toast": {
     "shiftSaved": "Shift saved",
@@ -101,6 +102,8 @@
     "importFailed": "Import failed",
     "sessionRestored": "Shift restored",
     "cashReset": "Cash reset",
+    "employeesReset": "Employees reset",
+    "thresholdUpdated": "Threshold: {{amount}}",
     "calculationUpdated": "Calculation updated",
     "backupDownloaded": "Backup downloaded",
     "csvDownloaded": "CSV downloaded",

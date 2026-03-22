@@ -14,7 +14,9 @@
     "servicePercent": "Service (%)",
     "noEmployees": "No employees added yet.",
     "employeeCount_one": "{{count}} employee",
-    "employeeCount_other": "{{count}} employees"
+    "employeeCount_other": "{{count}} employees",
+    "resetEmployees": "Reset employees",
+    "defaultEmployeeName": "Employee {{n}}"
   },
   "cashInput": {
     "title": "Enter cash",
@@ -44,7 +46,9 @@
     "transfersTitle": "Balance transfers",
     "noTransfersNeeded": "No balance transfers needed.",
     "saveAndFinish": "Finish & Save",
-    "finishNoSave": "Finish (not saved)"
+    "finishNoSave": "Finish (not saved)",
+    "denominationsTitle": "Notes & Coins",
+    "denominationsPlaceholder": "Calculating..."
   },
   "settings": {
     "sectionProfiles": "Profiles",

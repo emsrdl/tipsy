@@ -168,6 +168,10 @@ export function DistributionTable({ results, totalInCents, personShares }: Distr
                       </span>
                     </div>
                   )}
+                  <div className="border-t border-border/50 mt-2 pt-2">
+                    <p className="text-xs text-text-secondary mb-1">{t('screens:results.denominationsTitle')}</p>
+                    <p className="text-xs text-text-secondary italic">{t('screens:results.denominationsPlaceholder')}</p>
+                  </div>
                 </div>
               )}
             </div>
