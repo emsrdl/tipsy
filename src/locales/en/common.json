@@ -114,6 +114,7 @@
     "cashReset": "Cash reset",
     "employeesReset": "Employees reset",
     "pageReset": "Page reset",
+    "allReset": "Everything reset",
     "thresholdUpdated": "Threshold: {{amount}}",
     "calculationUpdated": "Calculation updated",
     "backupDownloaded": "Backup downloaded",

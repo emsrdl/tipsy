@@ -8,6 +8,7 @@
  * // Rendered via React Router at route "/calculate/cash"
  */
 
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
@@ -15,6 +16,7 @@ import { DenominationGrid } from '@/components/organisms/DenominationGrid/Denomi
 import { Button } from '@/components/atoms/Button/Button';
 import { Alert } from '@/components/molecules/Alert/Alert';
 import { Icon } from '@/components/atoms/Icon/Icon';
+import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
 import { useToast } from '@/context/ToastContext';
 import { DENOMINATIONS } from '@/config/currency';
@@ -31,8 +33,9 @@ const STEP_ROUTES: Record<number, string> = {
 export function CashInputScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
-  const { totalInCents, calculate, setDenominationQuantity } = useTipCalculator();
+  const { totalInCents, calculate, setDenominationQuantity, reset } = useTipCalculator();
   const { showToast } = useToast();
+  const [confirmResetAllOpen, setConfirmResetAllOpen] = useState(false);
 
   const hasTotal = totalInCents > 0;
 
@@ -46,6 +49,13 @@ export function CashInputScreen() {
     showToast(t('common:toast.cashReset'), 'info');
   }
 
+  function handleResetAll() {
+    reset();
+    setConfirmResetAllOpen(false);
+    showToast(t('common:toast.allReset'), 'info');
+    void navigate('/calculate');
+  }
+
   return (
     <ScreenContainer
       title={t('screens:cashInput.title')}
@@ -54,6 +64,7 @@ export function CashInputScreen() {
       totalSteps={3}
       maxReachableStep={hasTotal ? 3 : 2}
       onStepClick={handleStepClick}
+      onReset={() => setConfirmResetAllOpen(true)}
     >
       {/* Reset page — upper right */}
       <div className="mb-2 flex justify-end">
@@ -95,6 +106,15 @@ export function CashInputScreen() {
           {t('common:actions.back')}
         </Button>
       </div>
+      <ConfirmDialog
+        isOpen={confirmResetAllOpen}
+        title={t('screens:setup.resetAllConfirmTitle')}
+        message={t('screens:setup.resetAllConfirmMessage')}
+        confirmLabel={t('screens:setup.resetAll')}
+        onConfirm={handleResetAll}
+        onCancel={() => setConfirmResetAllOpen(false)}
+        variant="danger"
+      />
     </ScreenContainer>
   );
 }

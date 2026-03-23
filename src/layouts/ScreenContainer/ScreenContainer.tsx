@@ -5,13 +5,15 @@
  * Adds:
  * - Optional step indicator (1/3 → 2/3 → 3/3) as Material pill progress
  * - Clickable step pills when `onStepClick` + `maxReachableStep` are provided
+ * - Optional reset-all icon button at the right end of the stepper row (via `onReset`)
  * - Material headline typography for title
  * - Consistent 16px horizontal, 24px vertical padding
  * - Bottom padding accounts for bottom nav + safe area
  *
  * @example
  * <ScreenContainer title="Mitarbeiter" step={1} totalSteps={3}
- *   maxReachableStep={2} onStepClick={(s) => navigate(stepRoutes[s])}>
+ *   maxReachableStep={2} onStepClick={(s) => navigate(stepRoutes[s])}
+ *   onReset={() => setConfirmOpen(true)}>
  *   <EmployeeForm />
  * </ScreenContainer>
  */
@@ -19,6 +21,7 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { Icon } from '@/components/atoms/Icon/Icon';
 
 export interface ScreenContainerProps {
   title: string;
@@ -34,6 +37,8 @@ export interface ScreenContainerProps {
   maxReachableStep?: number;
   /** Called with the 1-based step number when a clickable step pill is tapped. */
   onStepClick?: (step: number) => void;
+  /** When provided, renders a minimal icon button at the right end of the stepper row. */
+  onReset?: () => void;
   children: ReactNode;
 }
 
@@ -42,6 +47,7 @@ export interface ScreenContainerProps {
  *
  * When `onStepClick` and `maxReachableStep` are supplied, step pills up to
  * `maxReachableStep` become interactive buttons with enlarged touch targets.
+ * When `onReset` is supplied, a minimal icon button appears at the right of the stepper.
  *
  * @param props - ScreenContainerProps
  * @returns main element with title, optional step indicator, and content
@@ -59,6 +65,7 @@ export function ScreenContainer({
   totalSteps,
   maxReachableStep,
   onStepClick,
+  onReset,
   children,
 }: ScreenContainerProps) {
   const { t } = useTranslation('common');
@@ -110,6 +117,17 @@ export function ScreenContainer({
               </div>
             );
           })}
+
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="-my-3 -mr-1 flex flex-shrink-0 items-center justify-center p-3 text-text-secondary opacity-50 transition-opacity hover:opacity-100"
+              aria-label={t('actions.reset')}
+            >
+              <Icon name="refresh-cw" size={14} />
+            </button>
+          )}
         </nav>
       )}
 

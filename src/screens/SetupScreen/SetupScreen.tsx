@@ -17,6 +17,7 @@ import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { EmployeeForm } from '@/components/organisms/EmployeeForm/EmployeeForm';
 import { Button } from '@/components/atoms/Button/Button';
 import { Icon } from '@/components/atoms/Icon/Icon';
+import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useToast } from '@/context/ToastContext';
@@ -45,11 +46,12 @@ const STEP_ROUTES: Record<number, string> = {
 export function SetupScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
-  const { session, totalInCents, addEmployee, removeEmployee, updateEmployee, setSplit, calculate, wasRestored } =
+  const { session, totalInCents, addEmployee, removeEmployee, updateEmployee, setSplit, calculate, reset, wasRestored } =
     useTipCalculator();
   const { activeProfile, isGuestMode } = useProfiles();
   const { showToast } = useToast();
   const [showSmartHelp, setShowSmartHelp] = useState(false);
+  const [confirmResetAllOpen, setConfirmResetAllOpen] = useState(false);
 
   const [isSmartMode, setIsSmartMode] = useLocalStorage('tipsy_smart_mode', SMART_SPLIT_ENABLED);
   const [threshold, setThreshold] = useLocalStorage<number>(
@@ -157,6 +159,15 @@ export function SetupScreen() {
     showToast(t('common:toast.pageReset'), 'info');
   }
 
+  function handleResetAll() {
+    reset();
+    setIsSmartMode(SMART_SPLIT_ENABLED);
+    setThreshold(defaultThreshold);
+    setThresholdInputValue((defaultThreshold / 100).toFixed(2));
+    setConfirmResetAllOpen(false);
+    showToast(t('common:toast.allReset'), 'info');
+  }
+
   function handleNext() {
     if (!canContinue) {
       if (!hasEmployees) showToast(t('errors:validation.noEmployees'), 'error');
@@ -180,6 +191,7 @@ export function SetupScreen() {
       totalSteps={3}
       maxReachableStep={maxReachableStep}
       onStepClick={handleStepClick}
+      onReset={() => setConfirmResetAllOpen(true)}
     >
       {/* Reset page — upper right */}
       <div className="mb-2 flex justify-end">
@@ -295,6 +307,15 @@ export function SetupScreen() {
           <Icon name="chevron-right" size={18} />
         </Button>
       </div>
+      <ConfirmDialog
+        isOpen={confirmResetAllOpen}
+        title={t('screens:setup.resetAllConfirmTitle')}
+        message={t('screens:setup.resetAllConfirmMessage')}
+        confirmLabel={t('screens:setup.resetAll')}
+        onConfirm={handleResetAll}
+        onCancel={() => setConfirmResetAllOpen(false)}
+        variant="danger"
+      />
     </ScreenContainer>
   );
 }

@@ -114,6 +114,7 @@
     "cashReset": "Bargeld zurückgesetzt",
     "employeesReset": "Mitarbeiter zurückgesetzt",
     "pageReset": "Seite zurückgesetzt",
+    "allReset": "Alles zurückgesetzt",
     "thresholdUpdated": "Schwellwert: {{amount}}",
     "calculationUpdated": "Berechnung aktualisiert",
     "backupDownloaded": "Backup heruntergeladen",
