@@ -77,10 +77,7 @@ export function ScreenContainer({
     <main className="mx-auto max-w-2xl px-4 py-6 pb-8">
       {/* Step indicator */}
       {showSteps && (
-        <nav
-          className="mb-5 flex items-center gap-2"
-          aria-label={t('navigation.steps')}
-        >
+        <nav className="mb-5 flex items-center gap-2" aria-label={t('navigation.steps')}>
           {Array.from({ length: totalSteps }, (_, i) => {
             const stepNum = i + 1;
             const isActive = stepNum <= step;
@@ -90,13 +87,11 @@ export function ScreenContainer({
               stepNum <= maxReachableStep &&
               stepNum !== step;
 
-            const pill = (
-              <div
-                className={cn(
-                  'h-2 w-full rounded-full transition-all duration-300',
-                  isActive ? 'bg-accent' : 'bg-surface-overlay',
-                )}
-              />
+            const pillClass = cn(
+              'h-2.5 w-full rounded-full transition-all duration-300',
+              isActive ? 'bg-accent' : 'bg-surface-overlay',
+              isClickable &&
+                'ring-1 ring-inset ring-accent/80 group-hover:h-3.5 group-active:h-3.5',
             );
 
             if (isClickable) {
@@ -105,17 +100,17 @@ export function ScreenContainer({
                   key={i}
                   type="button"
                   onClick={() => onStepClick(stepNum)}
-                  className="flex flex-1 items-center py-3 -my-3 cursor-pointer"
+                  className="group -my-3 flex flex-1 cursor-pointer items-center py-3"
                   aria-label={t('navigation.goToStep', { step: stepNum, total: totalSteps })}
                 >
-                  {pill}
+                  <div className={pillClass} />
                 </button>
               );
             }
 
             return (
               <div key={i} className="flex-1">
-                {pill}
+                <div className={pillClass} />
               </div>
             );
           })}
@@ -156,7 +151,10 @@ export function ScreenContainer({
           title={t('resetAllDialog.title')}
           message={t('resetAllDialog.message')}
           confirmLabel={t('resetAllDialog.trigger')}
-          onConfirm={() => { setConfirmOpen(false); onReset(); }}
+          onConfirm={() => {
+            setConfirmOpen(false);
+            onReset();
+          }}
           onCancel={() => setConfirmOpen(false)}
           variant="danger"
         />
