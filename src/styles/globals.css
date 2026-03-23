@@ -208,14 +208,14 @@
    Katzentempel theme — Light mode
    ============================================================ */
 [data-theme='katzentempel'] {
-  --color-surface: #f5f9f1;
-  --color-surface-raised: #edf4e7;
-  --color-surface-overlay: #dcebd3;
+  --color-surface: #f9fafb;
+  --color-surface-raised: #f3f4f6;
+  --color-surface-overlay: #e5e7eb;
   --color-text-primary: #1b2415;
   --color-text-secondary: #4a6340;
   --color-text-inverse: #ffffff;
-  --color-border: #c3d9b8;
-  --color-border-strong: #a0c490;
+  --color-border: #d1d5db;
+  --color-border-strong: #9ca3af;
   --color-status-error: #dc2626;
   --color-status-success: #16a34a;
   --color-status-warning: #d97706;
@@ -229,14 +229,14 @@
    Katzentempel theme — Dark mode
    ============================================================ */
 [data-theme='katzentempel'][data-mode='dark'] {
-  --color-surface: #1b2415;
-  --color-surface-raised: #243018;
-  --color-surface-overlay: #2e3d1e;
-  --color-text-primary: #edf4e7;
-  --color-text-secondary: #9abf8a;
-  --color-text-inverse: #1b2415;
-  --color-border: #3a4f2e;
-  --color-border-strong: #4e6b3e;
+  --color-surface: #111827;
+  --color-surface-raised: #1f2937;
+  --color-surface-overlay: #374151;
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #d1d5db;
+  --color-text-inverse: #111827;
+  --color-border: #4b5563;
+  --color-border-strong: #6b7280;
   --color-status-error: #f87171;
   --color-status-success: #4ade80;
   --color-status-warning: #fbbf24;

@@ -90,8 +90,7 @@ export function ScreenContainer({
             const pillClass = cn(
               'h-2.5 w-full rounded-full transition-all duration-300',
               isActive ? 'bg-accent' : 'bg-surface-overlay',
-              isClickable &&
-                'ring-1 ring-inset ring-accent/80 group-hover:h-3.5 group-active:h-3.5',
+              isClickable && 'border border-accent group-hover:h-3.5 group-active:h-3.5',
             );
 
             if (isClickable) {
