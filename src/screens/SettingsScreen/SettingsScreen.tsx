@@ -657,7 +657,10 @@ export function SettingsScreen() {
           <div className="divide-y divide-border overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-text-secondary">Version</span>
-              <span className="font-mono text-sm text-text-primary">{import.meta.env.VITE_APP_VERSION}</span>
+              <span className="font-mono text-sm text-text-primary">
+                {import.meta.env.VITE_APP_VERSION}
+                {import.meta.env.DEV && ' development'}
+              </span>
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-text-secondary">{t('common:app.name')}</span>
