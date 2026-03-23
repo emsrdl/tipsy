@@ -58,7 +58,7 @@ export function ProfileAvatar() {
       ? (t('profile.guest')[0]?.toUpperCase() ?? 'G')
       : getInitials(activeProfile.name) || '?';
 
-  const displayName = isGuestMode || !activeProfile ? t('profile.guestBadge') : activeProfile.name;
+  const displayName = isGuestMode || !activeProfile ? t('profile.guest') : activeProfile.name;
 
   const displayRole = !isGuestMode && activeProfile?.role;
 
@@ -91,10 +91,7 @@ export function ProfileAvatar() {
                 {displayName}
               </p>
               {isGuestMode && (
-                <Badge
-                  variant="default"
-                  className="bg-status-warning/20 flex-shrink-0 border-0 text-xs text-status-warning"
-                >
+                <Badge variant="guest" className="flex-shrink-0">
                   {t('profile.guestBadge')}
                 </Badge>
               )}
@@ -111,25 +108,30 @@ export function ProfileAvatar() {
             </div>
           </div>
 
-          {/* Profile quick-switch list */}
+          {/* Profile quick-switch list — up to 3 most recent by creation date */}
           <div className="py-1">
-            {profiles.slice(0, 3).map((profile) => {
-              const isActive = !isGuestMode && activeProfile?.id === profile.id;
-              return (
-                <button
-                  key={profile.id}
-                  type="button"
-                  onClick={() => {
-                    switchProfile(profile.id);
-                    setIsOpen(false);
-                  }}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
-                >
-                  <span className="flex-1 truncate">{profile.name}</span>
-                  {isActive && <Icon name="check" size={14} className="text-accent flex-shrink-0" />}
-                </button>
-              );
-            })}
+            {[...profiles]
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, 3)
+              .map((profile) => {
+                const isActive = !isGuestMode && activeProfile?.id === profile.id;
+                return (
+                  <button
+                    key={profile.id}
+                    type="button"
+                    onClick={() => {
+                      switchProfile(profile.id);
+                      setIsOpen(false);
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
+                  >
+                    <span className="flex-1 truncate">{profile.name}</span>
+                    {isActive && (
+                      <Icon name="check" size={14} className="text-accent flex-shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
 
             {/* Guest Mode / Sign out */}
             <button
@@ -141,18 +143,18 @@ export function ProfileAvatar() {
               className={cn(
                 'flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-colors',
                 isGuestMode
-                  ? 'text-text-primary hover:bg-surface-overlay'
-                  : 'hover:bg-status-error/5 text-status-error',
+                  ? 'bg-status-warning/5 text-status-warning hover:bg-status-warning/10'
+                  : 'text-status-error hover:bg-status-error/5',
               )}
             >
               <span className="flex-1">
-                {isGuestMode ? t('profile.headerMenu.guestMode') : t('actions.signOut')}
+                {isGuestMode ? t('profile.guest') : t('actions.signOut')}
               </span>
-              {isGuestMode && <Icon name="check" size={14} className="text-accent flex-shrink-0" />}
+              {isGuestMode && <Icon name="check" size={14} className="text-status-warning flex-shrink-0" />}
             </button>
           </div>
 
-          {/* Create profile */}
+          {/* More profiles → Settings */}
           <div className="border-t border-border">
             <button
               type="button"
@@ -162,8 +164,9 @@ export function ProfileAvatar() {
               }}
               className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:bg-surface-overlay"
             >
-              <Icon name="user-plus" size={14} className="flex-shrink-0" />
-              {t('profile.headerMenu.createProfile')}
+              <Icon name="users" size={14} className="flex-shrink-0" />
+              <span className="flex-1">{t('profile.headerMenu.moreProfiles')}</span>
+              <Icon name="chevron-right" size={14} className="flex-shrink-0" />
             </button>
           </div>
         </div>

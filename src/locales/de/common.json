@@ -58,7 +58,9 @@
       "signOut": "Abmelden",
       "settings": "Einstellungen",
       "createProfile": "Profil erstellen",
-      "guestMode": "Gast Modus"
+      "guestMode": "Gast Modus",
+      "moreProfiles": "Weitere Profile",
+      "signedOut": "Abgemeldet"
     },
     "noShiftsGuest": "Keine Schichten (Gast Modus)",
     "noShiftsGuestSub": "Wechsle zu einem Profil, um Schichten zu speichern.",

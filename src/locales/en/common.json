@@ -58,7 +58,9 @@
       "signOut": "Sign out",
       "settings": "Settings",
       "createProfile": "Create profile",
-      "guestMode": "Guest Mode"
+      "guestMode": "Guest Mode",
+      "moreProfiles": "More profiles",
+      "signedOut": "Signed out"
     },
     "noShiftsGuest": "No shifts (Guest Mode)",
     "noShiftsGuestSub": "Switch to a profile to save shifts.",

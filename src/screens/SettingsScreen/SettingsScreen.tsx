@@ -346,9 +346,12 @@ export function SettingsScreen() {
               <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-surface-overlay">
                 <Icon name="user" size={16} className="text-text-secondary" />
               </div>
-              <span className="flex-1 text-left text-sm font-medium text-text-primary">
-                {t('common:actions.guestMode')}
-              </span>
+              <div className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                <span className="truncate text-sm font-medium text-text-primary">
+                  {t('common:profile.guest')}
+                </span>
+                <Badge variant="guest">{t('common:profile.guestBadge')}</Badge>
+              </div>
               {isGuestMode && <Icon name="check" size={14} className="text-accent" />}
             </button>
 
