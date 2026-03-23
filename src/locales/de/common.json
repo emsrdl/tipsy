@@ -17,6 +17,11 @@
     "steps": "Schritte",
     "goToStep": "Zu Schritt {{step}} von {{total}}"
   },
+  "resetAllDialog": {
+    "trigger": "Alles zurücksetzen",
+    "title": "Alles zurücksetzen?",
+    "message": "Alle Mitarbeiter, Bargeld und Einstellungen dieser Schicht werden zurückgesetzt."
+  },
   "actions": {
     "next": "Weiter",
     "back": "Zurück",

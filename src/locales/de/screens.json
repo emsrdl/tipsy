@@ -17,9 +17,6 @@
     "employeeCount_other": "{{count}} Mitarbeiter",
     "resetEmployees": "Mitarbeiter zurücksetzen",
     "resetPage": "Seite zurücksetzen",
-    "resetAll": "Alles zurücksetzen",
-    "resetAllConfirmTitle": "Alles zurücksetzen?",
-    "resetAllConfirmMessage": "Alle Mitarbeiter, Bargeld und Einstellungen dieser Schicht werden zurückgesetzt.",
     "defaultEmployeeName": "Mitarbeiter {{n}}"
   },
   "cashInput": {

@@ -26,7 +26,6 @@ import { useToast } from '@/context/ToastContext';
 import { useLocale } from '@/hooks/useLocale';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
-import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
 import { formatEurFromCents } from '@/config/currency';
 import { DEFAULT_FAIRNESS_THRESHOLD, SMART_SPLIT_DEFAULT_THRESHOLD_KEY } from '@/config/smartSplit';
 import { resolveEmployeeName } from '@/lib/employeeUtils';
@@ -63,7 +62,6 @@ export function ResultsScreen() {
   );
   const [exportOpen, setExportOpen] = useState(false);
   const [showThresholdHelp, setShowThresholdHelp] = useState(false);
-  const [confirmResetAllOpen, setConfirmResetAllOpen] = useState(false);
 
   const results = session.results ?? [];
 
@@ -174,7 +172,6 @@ export function ResultsScreen() {
   function handleResetAll() {
     setThreshold(defaultThreshold);
     reset();
-    setConfirmResetAllOpen(false);
     showToast(t('common:toast.allReset'), 'info');
     void navigate('/calculate');
   }
@@ -194,7 +191,7 @@ export function ResultsScreen() {
       totalSteps={3}
       maxReachableStep={3}
       onStepClick={handleStepClick}
-      onReset={() => setConfirmResetAllOpen(true)}
+      onReset={handleResetAll}
     >
       {results.length === 0 ? (
         <Alert status="info" message={t('errors:validation.noEmployees')} />
@@ -436,15 +433,6 @@ export function ResultsScreen() {
           showToast(t('common:toast.pdfOpened'), 'success');
         }}
         isProcessing={isExporting}
-      />
-      <ConfirmDialog
-        isOpen={confirmResetAllOpen}
-        title={t('screens:setup.resetAllConfirmTitle')}
-        message={t('screens:setup.resetAllConfirmMessage')}
-        confirmLabel={t('screens:setup.resetAll')}
-        onConfirm={handleResetAll}
-        onCancel={() => setConfirmResetAllOpen(false)}
-        variant="danger"
       />
     </ScreenContainer>
   );

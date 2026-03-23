@@ -18,10 +18,11 @@
  * </ScreenContainer>
  */
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/atoms/Icon/Icon';
+import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
 
 export interface ScreenContainerProps {
   title: string;
@@ -69,6 +70,7 @@ export function ScreenContainer({
   children,
 }: ScreenContainerProps) {
   const { t } = useTranslation('common');
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const showSteps = step !== undefined && totalSteps !== undefined;
 
   return (
@@ -121,9 +123,9 @@ export function ScreenContainer({
           {onReset && (
             <button
               type="button"
-              onClick={onReset}
+              onClick={() => setConfirmOpen(true)}
               className="-my-3 -mr-1 flex flex-shrink-0 items-center justify-center p-3 text-text-secondary opacity-50 transition-opacity hover:opacity-100"
-              aria-label={t('actions.reset')}
+              aria-label={t('resetAllDialog.trigger')}
             >
               <Icon name="refresh-cw" size={14} />
             </button>
@@ -147,6 +149,18 @@ export function ScreenContainer({
       </div>
 
       {children}
+
+      {onReset && (
+        <ConfirmDialog
+          isOpen={confirmOpen}
+          title={t('resetAllDialog.title')}
+          message={t('resetAllDialog.message')}
+          confirmLabel={t('resetAllDialog.trigger')}
+          onConfirm={() => { setConfirmOpen(false); onReset(); }}
+          onCancel={() => setConfirmOpen(false)}
+          variant="danger"
+        />
+      )}
     </main>
   );
 }

@@ -17,7 +17,6 @@ import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { EmployeeForm } from '@/components/organisms/EmployeeForm/EmployeeForm';
 import { Button } from '@/components/atoms/Button/Button';
 import { Icon } from '@/components/atoms/Icon/Icon';
-import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useToast } from '@/context/ToastContext';
@@ -51,7 +50,6 @@ export function SetupScreen() {
   const { activeProfile, isGuestMode } = useProfiles();
   const { showToast } = useToast();
   const [showSmartHelp, setShowSmartHelp] = useState(false);
-  const [confirmResetAllOpen, setConfirmResetAllOpen] = useState(false);
 
   const [isSmartMode, setIsSmartMode] = useLocalStorage('tipsy_smart_mode', SMART_SPLIT_ENABLED);
   const [threshold, setThreshold] = useLocalStorage<number>(
@@ -161,10 +159,18 @@ export function SetupScreen() {
 
   function handleResetAll() {
     reset();
+    if (activeProfile) {
+      addEmployee({
+        id: `${PROFILE_EMP_PREFIX}${activeProfile.id}`,
+        name: activeProfile.name,
+        hours: 8,
+        group: activeProfile.role,
+        isProfileOwner: true,
+      });
+    }
     setIsSmartMode(SMART_SPLIT_ENABLED);
     setThreshold(defaultThreshold);
     setThresholdInputValue((defaultThreshold / 100).toFixed(2));
-    setConfirmResetAllOpen(false);
     showToast(t('common:toast.allReset'), 'info');
   }
 
@@ -191,7 +197,7 @@ export function SetupScreen() {
       totalSteps={3}
       maxReachableStep={maxReachableStep}
       onStepClick={handleStepClick}
-      onReset={() => setConfirmResetAllOpen(true)}
+      onReset={handleResetAll}
     >
       {/* Reset page — upper right */}
       <div className="mb-2 flex justify-end">
@@ -307,15 +313,6 @@ export function SetupScreen() {
           <Icon name="chevron-right" size={18} />
         </Button>
       </div>
-      <ConfirmDialog
-        isOpen={confirmResetAllOpen}
-        title={t('screens:setup.resetAllConfirmTitle')}
-        message={t('screens:setup.resetAllConfirmMessage')}
-        confirmLabel={t('screens:setup.resetAll')}
-        onConfirm={handleResetAll}
-        onCancel={() => setConfirmResetAllOpen(false)}
-        variant="danger"
-      />
     </ScreenContainer>
   );
 }

@@ -17,6 +17,11 @@
     "steps": "Steps",
     "goToStep": "Go to step {{step}} of {{total}}"
   },
+  "resetAllDialog": {
+    "trigger": "Reset all",
+    "title": "Reset everything?",
+    "message": "All employees, cash, and settings for this shift will be cleared."
+  },
   "actions": {
     "next": "Next",
     "back": "Back",

@@ -17,9 +17,6 @@
     "employeeCount_other": "{{count}} employees",
     "resetEmployees": "Reset employees",
     "resetPage": "Reset page",
-    "resetAll": "Reset all",
-    "resetAllConfirmTitle": "Reset everything?",
-    "resetAllConfirmMessage": "All employees, cash, and settings for this shift will be cleared.",
     "defaultEmployeeName": "Employee {{n}}"
   },
   "cashInput": {
