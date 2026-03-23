@@ -18,7 +18,7 @@ export interface BadgeProps {
   /** Visual style variant. @default "default" */
   variant?: 'default' | 'kitchen' | 'service' | 'accent' | 'guest' | 'signed-out';
   children: ReactNode;
-  className?: string;
+  className?: string | undefined;
 }
 
 const VARIANT_CLASSES: Record<NonNullable<BadgeProps['variant']>, string> = {

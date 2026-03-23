@@ -39,6 +39,13 @@ export function EmployeeForm() {
 
   const splitError = session.split.kitchenPercent + session.split.servicePercent !== 100;
 
+  const sortedEmployees = [...session.employees].sort((a, b) => {
+    const aIsProfile = a.id.startsWith('profile-emp-');
+    const bIsProfile = b.id.startsWith('profile-emp-');
+    if (aIsProfile === bIsProfile) return 0;
+    return aIsProfile ? -1 : 1;
+  });
+
   function handleAddEmployee() {
     const employee: Employee = {
       id: generateId(),
@@ -64,7 +71,7 @@ export function EmployeeForm() {
         </div>
       ) : (
         <div className="space-y-3">
-          {session.employees.map((emp, index) => (
+          {sortedEmployees.map((emp, index) => (
             <EmployeeRow
               key={emp.id}
               employee={emp}
