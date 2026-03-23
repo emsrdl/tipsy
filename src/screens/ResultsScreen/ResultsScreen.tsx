@@ -36,6 +36,12 @@ function generateShiftId(): string {
   return `shift-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+const STEP_ROUTES: Record<number, string> = {
+  1: '/calculate',
+  2: '/calculate/cash',
+  3: '/calculate/results',
+};
+
 /**
  * Results screen — step 3 of 3.
  */
@@ -172,12 +178,18 @@ export function ResultsScreen() {
   const fairnessScore = smartOutput.output?.distribution.fairnessScore;
   const transfers: DifferenceLine[] = smartOutput.output?.differences ?? [];
 
+  function handleStepClick(s: number) {
+    void navigate(STEP_ROUTES[s]);
+  }
+
   return (
     <ScreenContainer
       title={t('screens:results.title')}
       subtitle={t('screens:results.subtitle')}
       step={3}
       totalSteps={3}
+      maxReachableStep={3}
+      onStepClick={handleStepClick}
     >
       {results.length === 0 ? (
         <Alert status="info" message={t('errors:validation.noEmployees')} />

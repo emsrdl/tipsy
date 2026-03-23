@@ -19,6 +19,12 @@ import { useTipCalculator } from '@/hooks/useTipCalculator';
 import { useToast } from '@/context/ToastContext';
 import { DENOMINATIONS } from '@/config/currency';
 
+const STEP_ROUTES: Record<number, string> = {
+  1: '/calculate',
+  2: '/calculate/cash',
+  3: '/calculate/results',
+};
+
 /**
  * Cash input screen — step 2 of 3.
  */
@@ -30,9 +36,9 @@ export function CashInputScreen() {
 
   const hasTotal = totalInCents > 0;
 
-  function handleCalculate() {
-    calculate();
-    void navigate('/calculate/results');
+  function handleStepClick(s: number) {
+    if (s === 3) calculate();
+    void navigate(STEP_ROUTES[s]);
   }
 
   function handleReset() {
@@ -46,6 +52,8 @@ export function CashInputScreen() {
       subtitle={t('screens:cashInput.subtitle')}
       step={2}
       totalSteps={3}
+      maxReachableStep={hasTotal ? 3 : 2}
+      onStepClick={handleStepClick}
     >
       {/* Reset page — upper right */}
       <div className="mb-2 flex justify-end">
@@ -71,7 +79,7 @@ export function CashInputScreen() {
         <Button
           type="button"
           disabled={!hasTotal}
-          onClick={handleCalculate}
+          onClick={() => handleStepClick(3)}
           className="min-h-14 w-full text-base font-semibold"
         >
           {t('common:actions.calculate')}
@@ -80,7 +88,7 @@ export function CashInputScreen() {
         <Button
           type="button"
           variant="ghost"
-          onClick={() => void navigate('/calculate')}
+          onClick={() => handleStepClick(1)}
           className="min-h-12 w-full"
         >
           <Icon name="chevron-left" size={16} />

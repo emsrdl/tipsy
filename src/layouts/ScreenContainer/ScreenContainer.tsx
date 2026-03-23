@@ -4,17 +4,20 @@
  *
  * Adds:
  * - Optional step indicator (1/3 → 2/3 → 3/3) as Material pill progress
+ * - Clickable step pills when `onStepClick` + `maxReachableStep` are provided
  * - Material headline typography for title
  * - Consistent 16px horizontal, 24px vertical padding
  * - Bottom padding accounts for bottom nav + safe area
  *
  * @example
- * <ScreenContainer title="Mitarbeiter" step={1} totalSteps={3}>
+ * <ScreenContainer title="Mitarbeiter" step={1} totalSteps={3}
+ *   maxReachableStep={2} onStepClick={(s) => navigate(stepRoutes[s])}>
  *   <EmployeeForm />
  * </ScreenContainer>
  */
 
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export interface ScreenContainerProps {
@@ -24,17 +27,28 @@ export interface ScreenContainerProps {
   step?: number;
   /** Total number of steps. */
   totalSteps?: number;
+  /**
+   * Highest step number the user may navigate to (inclusive).
+   * Steps 1..maxReachableStep render as clickable buttons.
+   */
+  maxReachableStep?: number;
+  /** Called with the 1-based step number when a clickable step pill is tapped. */
+  onStepClick?: (step: number) => void;
   children: ReactNode;
 }
 
 /**
  * Consistent screen wrapper with Material typography and step progress.
  *
+ * When `onStepClick` and `maxReachableStep` are supplied, step pills up to
+ * `maxReachableStep` become interactive buttons with enlarged touch targets.
+ *
  * @param props - ScreenContainerProps
  * @returns main element with title, optional step indicator, and content
  *
  * @example
- * <ScreenContainer title="Bargeld" step={2} totalSteps={3}>
+ * <ScreenContainer title="Bargeld" step={2} totalSteps={3}
+ *   maxReachableStep={3} onStepClick={handleStepClick}>
  *   <DenominationGrid />
  * </ScreenContainer>
  */
@@ -43,31 +57,60 @@ export function ScreenContainer({
   subtitle,
   step,
   totalSteps,
+  maxReachableStep,
+  onStepClick,
   children,
 }: ScreenContainerProps) {
+  const { t } = useTranslation('common');
   const showSteps = step !== undefined && totalSteps !== undefined;
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 pb-8">
       {/* Step indicator */}
       {showSteps && (
-        <div
+        <nav
           className="mb-5 flex items-center gap-2"
-          role="progressbar"
-          aria-valuenow={step}
-          aria-valuemin={1}
-          aria-valuemax={totalSteps}
+          aria-label={t('navigation.steps')}
         >
-          {Array.from({ length: totalSteps }, (_, i) => (
-            <div
-              key={i}
-              className={cn(
-                'h-1.5 flex-1 rounded-full transition-all duration-300',
-                i < step ? 'bg-accent' : 'bg-surface-overlay',
-              )}
-            />
-          ))}
-        </div>
+          {Array.from({ length: totalSteps }, (_, i) => {
+            const stepNum = i + 1;
+            const isActive = stepNum <= step;
+            const isClickable =
+              onStepClick !== undefined &&
+              maxReachableStep !== undefined &&
+              stepNum <= maxReachableStep &&
+              stepNum !== step;
+
+            const pill = (
+              <div
+                className={cn(
+                  'h-2 w-full rounded-full transition-all duration-300',
+                  isActive ? 'bg-accent' : 'bg-surface-overlay',
+                )}
+              />
+            );
+
+            if (isClickable) {
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => onStepClick(stepNum)}
+                  className="flex flex-1 items-center py-3 -my-3 cursor-pointer"
+                  aria-label={t('navigation.goToStep', { step: stepNum, total: totalSteps })}
+                >
+                  {pill}
+                </button>
+              );
+            }
+
+            return (
+              <div key={i} className="flex-1">
+                {pill}
+              </div>
+            );
+          })}
+        </nav>
       )}
 
       {/* Title area */}

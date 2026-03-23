@@ -13,6 +13,10 @@
     "createProfile": "Profile",
     "main": "Hauptnavigation"
   },
+  "navigation": {
+    "steps": "Schritte",
+    "goToStep": "Zu Schritt {{step}} von {{total}}"
+  },
   "actions": {
     "next": "Weiter",
     "back": "Zurück",

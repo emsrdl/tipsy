@@ -33,13 +33,19 @@ import { cn } from '@/lib/utils';
 /** Prefix used to identify profile-owned employees. */
 const PROFILE_EMP_PREFIX = 'profile-emp-';
 
+const STEP_ROUTES: Record<number, string> = {
+  1: '/calculate',
+  2: '/calculate/cash',
+  3: '/calculate/results',
+};
+
 /**
  * Setup screen — step 1 of 3.
  */
 export function SetupScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
-  const { session, addEmployee, removeEmployee, updateEmployee, setSplit, wasRestored } =
+  const { session, totalInCents, addEmployee, removeEmployee, updateEmployee, setSplit, calculate, wasRestored } =
     useTipCalculator();
   const { activeProfile, isGuestMode } = useProfiles();
   const { showToast } = useToast();
@@ -62,6 +68,7 @@ export function SetupScreen() {
   const hasEmployees = session.employees.length > 0;
   const splitValid = session.split.kitchenPercent + session.split.servicePercent === 100;
   const canContinue = hasEmployees && splitValid;
+  const step2Valid = totalInCents > 0;
 
   // Show session restore toast once per page session
   useEffect(() => {
@@ -158,12 +165,21 @@ export function SetupScreen() {
     void navigate('/calculate/cash');
   }
 
+  const maxReachableStep = canContinue && step2Valid ? 3 : canContinue ? 2 : 1;
+
+  function handleStepClick(s: number) {
+    if (s === 3) calculate();
+    void navigate(STEP_ROUTES[s]);
+  }
+
   return (
     <ScreenContainer
       title={t('screens:setup.title')}
       subtitle={t('screens:setup.subtitle')}
       step={1}
       totalSteps={3}
+      maxReachableStep={maxReachableStep}
+      onStepClick={handleStepClick}
     >
       {/* Reset page — upper right */}
       <div className="mb-2 flex justify-end">
