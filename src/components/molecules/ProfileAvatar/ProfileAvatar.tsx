@@ -125,6 +125,21 @@ export function ProfileAvatar() {
                 );
               })}
 
+            {/* Create profile — only shown in guest mode with no profiles */}
+            {isGuestMode && profiles.length === 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  void navigate('/settings');
+                }}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-accent transition-colors hover:bg-surface-overlay"
+              >
+                <Icon name="user-plus" size={14} className="flex-shrink-0" />
+                <span className="flex-1">{t('actions.createProfile')}</span>
+              </button>
+            )}
+
             {/* Sign out — only shown when a profile is active */}
             {!isGuestMode && (
               <button
