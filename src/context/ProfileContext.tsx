@@ -73,11 +73,13 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
 
   const createProfile = useCallback(
     (name: string, role: ProfileRole, activate = true): Profile => {
+      const now = new Date().toISOString();
       const profile: Profile = {
         id: generateId(),
         name,
         role,
-        createdAt: new Date().toISOString(),
+        createdAt: now,
+        lastUsedAt: now,
         isActive: activate,
         stats: { ...EMPTY_STATS },
       };
@@ -96,7 +98,12 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
 
   const switchProfile = useCallback(
     (profileId: string) => {
-      setProfiles((prev) => prev.map((p) => ({ ...p, isActive: p.id === profileId })));
+      const now = new Date().toISOString();
+      setProfiles((prev) =>
+        prev.map((p) =>
+          p.id === profileId ? { ...p, isActive: true, lastUsedAt: now } : { ...p, isActive: false },
+        ),
+      );
       setActiveProfileId(profileId);
       setIsGuestMode(false);
     },
@@ -122,9 +129,10 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
       setProfiles((prev) => prev.filter((p) => p.id !== profileId));
       if (activeProfileId === profileId) {
         setActiveProfileId(null);
+        setIsGuestMode(true);
       }
     },
-    [setProfiles, activeProfileId, setActiveProfileId],
+    [setProfiles, activeProfileId, setActiveProfileId, setIsGuestMode],
   );
 
   const resetProfileStats = useCallback(

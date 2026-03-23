@@ -136,6 +136,7 @@ export function makeProfile(opts: Partial<Profile> = {}): Profile {
     name: 'Test Profile',
     role: 'service',
     createdAt: '2026-03-21T10:00:00.000Z',
+    lastUsedAt: '2026-03-21T10:00:00.000Z',
     isActive: false,
     stats: makeProfileStats(),
     ...opts,

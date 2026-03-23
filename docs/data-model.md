@@ -61,7 +61,8 @@ interface Profile {
   id: string;
   name: string;
   role: ProfileRole;
-  createdAt: string;  // ISO 8601
+  createdAt: string;   // ISO 8601
+  lastUsedAt: string;  // ISO 8601, updated on each switchProfile()
   isActive: boolean;
   stats: {
     totalShifts: number;

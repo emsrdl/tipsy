@@ -14,7 +14,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useProfiles } from '@/hooks/useProfiles';
-import { Badge } from '@/components/atoms/Badge/Badge';
+import { ProfileRoleBadge } from '@/components/molecules/ProfileRoleBadge/ProfileRoleBadge';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { cn } from '@/lib/utils';
 
@@ -60,8 +60,6 @@ export function ProfileAvatar() {
 
   const displayName = isGuestMode || !activeProfile ? t('profile.guest') : activeProfile.name;
 
-  const displayRole = !isGuestMode && activeProfile?.role;
-
   return (
     <div ref={containerRef} className="relative">
       <button
@@ -90,28 +88,22 @@ export function ProfileAvatar() {
               <p className="flex-1 truncate text-sm font-semibold text-text-primary">
                 {displayName}
               </p>
-              {isGuestMode && (
-                <Badge variant="guest" className="flex-shrink-0">
-                  {t('profile.guestBadge')}
-                </Badge>
-              )}
-              {displayRole && (
-                <Badge
-                  variant={displayRole === 'kitchen' ? 'kitchen' : 'service'}
-                  className="flex-shrink-0"
-                >
-                  {displayRole === 'kitchen'
-                    ? t('profile.role.kitchen')
-                    : t('profile.role.service')}
-                </Badge>
-              )}
+              <ProfileRoleBadge
+                role={isGuestMode ? null : (activeProfile?.role ?? null)}
+                className="flex-shrink-0"
+              />
             </div>
           </div>
 
           {/* Profile quick-switch list — up to 3 most recent by creation date */}
           <div className="py-1">
             {[...profiles]
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .filter((p) => p.id !== activeProfile?.id)
+              .sort(
+                (a, b) =>
+                  new Date(b.lastUsedAt ?? b.createdAt).getTime() -
+                  new Date(a.lastUsedAt ?? a.createdAt).getTime(),
+              )
               .slice(0, 3)
               .map((profile) => {
                 const isActive = !isGuestMode && activeProfile?.id === profile.id;
@@ -133,25 +125,19 @@ export function ProfileAvatar() {
                 );
               })}
 
-            {/* Guest Mode / Sign out */}
-            <button
-              type="button"
-              onClick={() => {
-                enterGuestMode();
-                setIsOpen(false);
-              }}
-              className={cn(
-                'flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-colors',
-                isGuestMode
-                  ? 'bg-status-warning/5 text-status-warning hover:bg-status-warning/10'
-                  : 'text-status-error hover:bg-status-error/5',
-              )}
-            >
-              <span className="flex-1">
-                {isGuestMode ? t('profile.guest') : t('actions.signOut')}
-              </span>
-              {isGuestMode && <Icon name="check" size={14} className="text-status-warning flex-shrink-0" />}
-            </button>
+            {/* Sign out — only shown when a profile is active */}
+            {!isGuestMode && (
+              <button
+                type="button"
+                onClick={() => {
+                  enterGuestMode();
+                  setIsOpen(false);
+                }}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-status-error transition-colors hover:bg-status-error/5"
+              >
+                <span className="flex-1">{t('actions.signOut')}</span>
+              </button>
+            )}
           </div>
 
           {/* More profiles → Settings */}

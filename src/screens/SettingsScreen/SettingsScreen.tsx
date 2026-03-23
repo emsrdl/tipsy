@@ -20,7 +20,7 @@ import { useToast } from '@/context/ToastContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { Button } from '@/components/atoms/Button/Button';
-import { Badge } from '@/components/atoms/Badge/Badge';
+import { ProfileRoleBadge } from '@/components/molecules/ProfileRoleBadge/ProfileRoleBadge';
 import { THEMES, THEME_IDS } from '@/config/themes';
 import {
   SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
@@ -291,11 +291,7 @@ export function SettingsScreen() {
                         <span className="truncate text-sm font-medium text-text-primary">
                           {profile.name}
                         </span>
-                        <Badge variant={profile.role === 'kitchen' ? 'kitchen' : 'service'}>
-                          {profile.role === 'kitchen'
-                            ? t('common:profile.role.kitchen')
-                            : t('common:profile.role.service')}
-                        </Badge>
+                        <ProfileRoleBadge role={profile.role} />
                         {activeProfile?.id === profile.id && !isGuestMode && (
                           <Icon name="check" size={14} className="flex-shrink-0 text-accent" />
                         )}
@@ -350,7 +346,7 @@ export function SettingsScreen() {
                 <span className="truncate text-sm font-medium text-text-primary">
                   {t('common:profile.guest')}
                 </span>
-                <Badge variant="guest">{t('common:profile.guestBadge')}</Badge>
+                <ProfileRoleBadge role={null} />
               </div>
               {isGuestMode && <Icon name="check" size={14} className="text-accent" />}
             </button>
