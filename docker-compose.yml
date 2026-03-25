@@ -3,7 +3,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: deploy/Dockerfile
+      dockerfile: Dockerfile
       args:
         VITE_APP_DOMAIN: ${VITE_APP_DOMAIN}
         VITE_APP_NAME: ${VITE_APP_NAME:-Tipsy}
