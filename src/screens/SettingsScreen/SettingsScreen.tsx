@@ -659,7 +659,10 @@ export function SettingsScreen() {
               <span className="text-sm text-text-secondary">Version</span>
               <span className="font-mono text-sm text-text-primary">
                 {import.meta.env.VITE_APP_VERSION}
-                {import.meta.env.DEV && ' development'}
+                {import.meta.env.DEV && ' (dev)'}
+                {!import.meta.env.DEV &&
+                  window.location.hostname.includes('prvw.') &&
+                  ' (preview)'}
               </span>
             </div>
             <div className="flex items-center justify-between px-4 py-3">

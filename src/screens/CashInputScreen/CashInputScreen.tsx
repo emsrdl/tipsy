@@ -17,7 +17,14 @@ import { Alert } from '@/components/molecules/Alert/Alert';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
 import { useToast } from '@/context/ToastContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { DENOMINATIONS } from '@/config/currency';
+import {
+  DEFAULT_FAIRNESS_THRESHOLD,
+  SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
+  SMART_SPLIT_THRESHOLD_KEY,
+  SMART_SPLIT_ENABLED,
+} from '@/config/smartSplit';
 
 const STEP_ROUTES: Record<number, string> = {
   1: '/calculate',
@@ -33,6 +40,12 @@ export function CashInputScreen() {
   const navigate = useNavigate();
   const { totalInCents, calculate, setDenominationQuantity, reset } = useTipCalculator();
   const { showToast } = useToast();
+  const [defaultThreshold] = useLocalStorage<number>(
+    SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
+    DEFAULT_FAIRNESS_THRESHOLD,
+  );
+  const [, setThreshold] = useLocalStorage<number>(SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD);
+  const [, setSmartMode] = useLocalStorage<boolean>('tipsy_smart_mode', SMART_SPLIT_ENABLED);
 
   const hasTotal = totalInCents > 0;
 
@@ -48,6 +61,8 @@ export function CashInputScreen() {
 
   function handleResetAll() {
     reset();
+    setThreshold(defaultThreshold);
+    setSmartMode(SMART_SPLIT_ENABLED);
     showToast(t('common:toast.allReset'), 'info');
     void navigate('/calculate');
   }

@@ -65,6 +65,15 @@ export function ResultsScreen() {
 
   const results = session.results ?? [];
 
+  const normalizedResults = useMemo(
+    () =>
+      (session.results ?? []).map((r, i) => ({
+        ...r,
+        name: resolveEmployeeName(r.name, t('screens:setup.defaultEmployeeName', { n: i + 1 })),
+      })),
+    [session.results, t],
+  );
+
   const normalizedEmployees = useMemo(
     () =>
       session.employees.map((emp, i) => ({
@@ -123,7 +132,7 @@ export function ResultsScreen() {
           hours: s.hoursWorked,
           amountInCents: s.actualShareInCents,
         }))
-      : results;
+      : normalizedResults;
 
   function handleToggleSmartMode() {
     toggleSmartMode();
@@ -134,7 +143,7 @@ export function ResultsScreen() {
     if (!hasResults) return;
 
     const distribution = smartOutput.output?.distribution ?? {
-      personShares: results.map((r) => ({
+      personShares: normalizedResults.map((r) => ({
         id: r.employeeId,
         name: r.name,
         role: r.group,
@@ -153,7 +162,7 @@ export function ResultsScreen() {
       profileId: activeProfile?.id ?? null,
       date: new Date().toISOString(),
       kitchenPercent: session.split.kitchenPercent,
-      employees: session.employees,
+      employees: normalizedEmployees,
       totalTipsInCents: totalInCents,
       denominationInput: session.denominations.filter((d) => d.quantity > 0),
       distribution,
@@ -425,11 +434,11 @@ export function ResultsScreen() {
         onClose={() => setExportOpen(false)}
         context="single"
         onExportCsv={() => {
-          exportCsv(results);
+          exportCsv(normalizedResults);
           showToast(t('common:toast.csvDownloaded'), 'success');
         }}
         onExportPdf={() => {
-          exportPdf(results);
+          exportPdf(normalizedResults);
           showToast(t('common:toast.pdfOpened'), 'success');
         }}
         isProcessing={isExporting}

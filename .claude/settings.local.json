@@ -1,10 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(npm run:*)",
-      "WebSearch",
-      "Bash(npm install:*)",
-      "Bash(npm info:*)"
-    ]
+    "defaultMode": "allow",
+    "allow": ["Bash(npm run:*)", "WebSearch", "Bash(npm install:*)", "Bash(npm info:*)"]
   }
 }

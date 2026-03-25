@@ -95,7 +95,7 @@ export function ProfileAvatar() {
             </div>
           </div>
 
-          {/* Profile quick-switch list — up to 3 most recent by creation date */}
+          {/* Profile quick-switch list — up to 3 most recently used */}
           <div className="py-1">
             {[...profiles]
               .filter((p) => p.id !== activeProfile?.id)
@@ -141,7 +141,7 @@ export function ProfileAvatar() {
             )}
 
             {/* Sign out — only shown when a profile is active */}
-            {!isGuestMode && (
+            {!isGuestMode && activeProfile !== null && (
               <button
                 type="button"
                 onClick={() => {

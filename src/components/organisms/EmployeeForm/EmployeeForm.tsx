@@ -71,17 +71,24 @@ export function EmployeeForm() {
         </div>
       ) : (
         <div className="space-y-3">
-          {sortedEmployees.map((emp, index) => (
-            <EmployeeRow
-              key={emp.id}
-              employee={emp}
-              fallbackName={t('screens:setup.defaultEmployeeName', { n: index + 1 })}
-              onRemove={removeEmployee}
-              onNameChange={(id, name) => updateEmployee(id, { name })}
-              onHoursChange={(id, hours) => updateEmployee(id, { hours })}
-              onGroupChange={(id, group) => updateEmployee(id, { group })}
-            />
-          ))}
+          {(() => {
+            let nonProfileCount = 0;
+            return sortedEmployees.map((emp) => {
+              const isProfileOwner = emp.id.startsWith('profile-emp-');
+              if (!isProfileOwner) nonProfileCount++;
+              return (
+                <EmployeeRow
+                  key={emp.id}
+                  employee={emp}
+                  fallbackName={t('screens:setup.defaultEmployeeName', { n: nonProfileCount || 1 })}
+                  onRemove={removeEmployee}
+                  onNameChange={(id, name) => updateEmployee(id, { name })}
+                  onHoursChange={(id, hours) => updateEmployee(id, { hours })}
+                  onGroupChange={(id, group) => updateEmployee(id, { group })}
+                />
+              );
+            });
+          })()}
         </div>
       )}
 
