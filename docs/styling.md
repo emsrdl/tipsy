@@ -67,7 +67,7 @@ active/pressed: handled by browser defaults
 
 ## Border Radius
 
-`rounded-md` = 12px, set globally in `tailwind.config.ts`.
+`rounded-md` = 12px, set globally in `src/styles/globals.css` via `@theme`.
 
 - Cards/sections: `rounded-xl`
 - Buttons: `rounded-md` (default via Button atom)
