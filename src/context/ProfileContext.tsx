@@ -15,7 +15,6 @@ import type { Profile, ProfileRole, ProfileStats } from '@/types/profile';
 
 const PROFILES_KEY = 'tipsy_profiles';
 const ACTIVE_PROFILE_KEY = 'tipsy_active_profile_id';
-const GUEST_MODE_KEY = 'tipsy_guest_mode';
 
 const EMPTY_STATS: ProfileStats = {
   totalShifts: 0,
@@ -46,10 +45,8 @@ export interface ProfileContextValue {
   deleteProfile: (profileId: string) => void;
   /** Reset a profile's stats to zero. */
   resetProfileStats: (profileId: string) => void;
-  /** Enter guest mode (no profile, no persistence). */
+  /** Enter guest mode — clears the active profile. */
   enterGuestMode: () => void;
-  /** Exit guest mode. */
-  exitGuestMode: () => void;
 }
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -67,9 +64,11 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
     ACTIVE_PROFILE_KEY,
     null,
   );
-  const [isGuestMode, setIsGuestMode] = useLocalStorage<boolean>(GUEST_MODE_KEY, false);
 
   const activeProfile = profiles.find((p) => p.id === activeProfileId) ?? null;
+
+  /** Guest mode is derived: no active profile = guest. */
+  const isGuestMode = activeProfile === null;
 
   const createProfile = useCallback(
     (name: string, role: ProfileRole, activate = true): Profile => {
@@ -89,11 +88,10 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
       });
       if (activate) {
         setActiveProfileId(profile.id);
-        setIsGuestMode(false);
       }
       return profile;
     },
-    [setProfiles, setActiveProfileId, setIsGuestMode],
+    [setProfiles, setActiveProfileId],
   );
 
   const switchProfile = useCallback(
@@ -105,9 +103,8 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
         ),
       );
       setActiveProfileId(profileId);
-      setIsGuestMode(false);
     },
-    [setProfiles, setActiveProfileId, setIsGuestMode],
+    [setProfiles, setActiveProfileId],
   );
 
   const updateProfile = useCallback(
@@ -129,10 +126,9 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
       setProfiles((prev) => prev.filter((p) => p.id !== profileId));
       if (activeProfileId === profileId) {
         setActiveProfileId(null);
-        setIsGuestMode(true);
       }
     },
-    [setProfiles, activeProfileId, setActiveProfileId, setIsGuestMode],
+    [setProfiles, activeProfileId, setActiveProfileId],
   );
 
   const resetProfileStats = useCallback(
@@ -145,14 +141,9 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
   );
 
   const enterGuestMode = useCallback(() => {
-    setIsGuestMode(true);
     setActiveProfileId(null);
     setProfiles((prev) => prev.map((p) => ({ ...p, isActive: false })));
-  }, [setIsGuestMode, setActiveProfileId, setProfiles]);
-
-  const exitGuestMode = useCallback(() => {
-    setIsGuestMode(false);
-  }, [setIsGuestMode]);
+  }, [setActiveProfileId, setProfiles]);
 
   return (
     <ProfileContext.Provider
@@ -167,7 +158,6 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
         deleteProfile,
         resetProfileStats,
         enterGuestMode,
-        exitGuestMode,
       }}
     >
       {children}

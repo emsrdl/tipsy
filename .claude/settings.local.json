@@ -6,7 +6,9 @@
       "WebSearch",
       "Bash(npm install:*)",
       "Bash(npm info:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(bun run:*)",
+      "Bash(bun test:*)"
     ]
   }
 }

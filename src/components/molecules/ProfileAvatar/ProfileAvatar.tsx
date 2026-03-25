@@ -54,11 +54,11 @@ export function ProfileAvatar() {
   }, [isOpen]);
 
   const initials =
-    isGuestMode || !activeProfile
+    activeProfile === null
       ? (t('profile.guest')[0]?.toUpperCase() ?? 'G')
       : getInitials(activeProfile.name) || '?';
 
-  const displayName = isGuestMode || !activeProfile ? t('profile.guest') : activeProfile.name;
+  const displayName = activeProfile === null ? t('profile.guest') : activeProfile.name;
 
   return (
     <div ref={containerRef} className="relative">
@@ -71,7 +71,7 @@ export function ProfileAvatar() {
           'flex h-10 w-10 items-center justify-center rounded-full',
           'text-xs font-bold transition-all',
           'ring-2 ring-offset-2 ring-offset-surface',
-          isGuestMode || !activeProfile
+          isGuestMode
             ? 'bg-surface-overlay text-text-secondary ring-border'
             : 'ring-accent/40 bg-accent text-accent-foreground',
           isOpen && 'scale-95',
@@ -125,8 +125,8 @@ export function ProfileAvatar() {
                 );
               })}
 
-            {/* Create profile — only shown in guest mode with no profiles */}
-            {isGuestMode && profiles.length === 0 && (
+            {/* Create profile — shown when no profile is active and no profiles exist */}
+            {activeProfile === null && profiles.length === 0 && (
               <button
                 type="button"
                 onClick={() => {

@@ -52,7 +52,7 @@ export function ProfileSelector() {
   }
 
   const displayName =
-    isGuestMode || !activeProfile ? t('common:profile.guestBadge') : activeProfile.name;
+    activeProfile === null ? t('common:profile.guestBadge') : activeProfile.name;
 
   const displayRole = activeProfile?.role ?? null;
 
@@ -73,13 +73,13 @@ export function ProfileSelector() {
         <div
           className={cn(
             'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-            isGuestMode || !activeProfile ? 'bg-surface-overlay' : 'bg-accent/10',
+            isGuestMode ? 'bg-surface-overlay' : 'bg-accent/10',
           )}
         >
           <Icon
-            name={isGuestMode || !activeProfile ? 'user' : 'user'}
+            name={isGuestMode ? 'user' : 'user'}
             size={18}
-            className={isGuestMode || !activeProfile ? 'text-text-secondary' : 'text-accent'}
+            className={isGuestMode ? 'text-text-secondary' : 'text-accent'}
           />
         </div>
 
