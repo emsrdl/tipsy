@@ -1,5 +1,5 @@
 /**
- * @file src/utils/validators.ts
+ * @file src/lib/validators.ts
  * @description Form validation functions for the Tipsy app.
  *
  * Each validator returns a {@link ValidationResult} with a `valid` boolean
@@ -12,7 +12,7 @@
  * @see src/locales/de/errors.json for error message strings
  *
  * @example
- * import { validateEmployees, validateSplit } from '@/utils/validators'
+ * import { validateEmployees, validateSplit } from '@/lib/validators'
  * const result = validateEmployees(session.employees)
  * if (!result.valid) showErrors(result.errors)
  */

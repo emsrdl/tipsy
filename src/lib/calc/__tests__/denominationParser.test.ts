@@ -1,5 +1,5 @@
 /**
- * @file src/lib/__tests__/denominationParser.test.ts
+ * @file src/lib/calc/__tests__/denominationParser.test.ts
  * @description Tests for denomination sum calculation.
  */
 

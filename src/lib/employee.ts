@@ -1,5 +1,5 @@
 /**
- * @file src/lib/employeeUtils.ts
+ * @file src/lib/employee.ts
  * @description Utility helpers for employee display logic.
  */
 

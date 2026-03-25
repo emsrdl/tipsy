@@ -1,20 +1,20 @@
 /**
- * @file src/lib/exportCsv.ts
+ * @file src/lib/io/exportCsv.ts
  * @description CSV export for tip distribution results.
  *
  * Generates a semicolon-separated CSV file (DE convention) from
  * the distribution results and triggers a browser download.
  *
- * @see src/lib/exportPdf.ts for PDF export
+ * @see src/lib/io/exportPdf.ts for PDF export
  * @see src/types/session.ts for DistributionResult type
  *
  * @example
- * import { exportTipsCsv } from '@/lib/exportCsv'
+ * import { exportTipsCsv } from '@/lib/io/exportCsv'
  * exportTipsCsv(results, { locale: 'de', filename: 'trinkgeld.csv', labels: { name: 'Name', group: 'Gruppe', hours: 'Stunden', amount: 'Betrag', kitchen: 'Küche', service: 'Service' } })
  */
 
 import type { DistributionResult } from '@/types/session';
-import { formatEurFromCents } from './formatCurrency';
+import { formatEurFromCents } from '@/lib/format/formatCurrency';
 
 export interface ExportCsvOptions {
   /** BCP 47 locale for number formatting. Defaults to 'de-DE'. */

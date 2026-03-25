@@ -1,5 +1,5 @@
 /**
- * @file src/lib/smartSplitter.ts
+ * @file src/lib/calc/smartSplitter.ts
  * @description Smart splitting algorithm for tip distribution.
  *
  * Two modes:
@@ -20,7 +20,7 @@
  * All monetary values are integer euro cents.
  *
  * @see src/types/shift.ts for SmartSplitInput, SmartSplitOutput, PersonShare, DifferenceLine
- * @see src/lib/tipCalculator.ts for the base proportional algorithm
+ * @see src/lib/calc/tipCalculator.ts for the base proportional algorithm
  * @see src/hooks/useDenominationMatcher.ts for the greedy+swap denomination matching
  * @see src/config/smartSplit.ts for default configuration
  */

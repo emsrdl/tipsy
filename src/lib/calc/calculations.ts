@@ -1,15 +1,15 @@
 /**
- * @file src/utils/calculations.ts
+ * @file src/lib/calc/calculations.ts
  * @description Pure mathematical utility functions for tip calculations.
  *
  * All functions in this module are pure (no side effects, no state).
  * All monetary values are in integer euro cents.
  *
- * @see src/lib/tipCalculator.ts for the main distribution algorithm
+ * @see src/lib/calc/tipCalculator.ts for the main distribution algorithm
  * @see src/hooks/useDenominationMatcher.ts for the matching algorithm
  *
  * @example
- * import { percentageOf, roundToNearest, clampInt } from '@/utils/calculations'
+ * import { percentageOf, roundToNearest, clampInt } from '@/lib/calc/calculations'
  */
 
 /**

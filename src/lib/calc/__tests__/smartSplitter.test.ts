@@ -1,5 +1,5 @@
 /**
- * @file src/lib/__tests__/smartSplitter.test.ts
+ * @file src/lib/calc/__tests__/smartSplitter.test.ts
  * @description Comprehensive tests for the smart splitting algorithm.
  */
 

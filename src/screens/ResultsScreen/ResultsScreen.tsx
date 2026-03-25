@@ -28,7 +28,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
 import { formatEurFromCents } from '@/config/currency';
 import { DEFAULT_FAIRNESS_THRESHOLD, SMART_SPLIT_DEFAULT_THRESHOLD_KEY } from '@/config/smartSplit';
-import { resolveEmployeeName } from '@/lib/employeeUtils';
+import { resolveEmployeeName } from '@/lib/employee';
 import { cn } from '@/lib/utils';
 import type { Shift, DifferenceLine } from '@/types/shift';
 

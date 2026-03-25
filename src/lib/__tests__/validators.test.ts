@@ -4,7 +4,7 @@ import {
   validateSplit,
   validateDenominations,
   validateSession,
-} from '@/utils/validators';
+} from '@/lib/validators';
 import { makeEmployee, makeSplit, makeDenomQty } from '@/test/factories';
 
 describe('validateEmployees', () => {

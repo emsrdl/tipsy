@@ -1,5 +1,5 @@
 /**
- * @file src/lib/exportPdf.ts
+ * @file src/lib/io/exportPdf.ts
  * @description PDF export for tip distribution results.
  *
  * Uses the browser's print dialog with a print-optimized layout,
@@ -9,16 +9,16 @@
  * This is a lightweight approach — opens a new window with formatted HTML
  * and calls window.print(). The OS print dialog handles PDF saving.
  *
- * @see src/lib/exportCsv.ts for CSV export
+ * @see src/lib/io/exportCsv.ts for CSV export
  * @see src/types/session.ts for DistributionResult type
  *
  * @example
- * import { exportTipsPdf } from '@/lib/exportPdf'
+ * import { exportTipsPdf } from '@/lib/io/exportPdf'
  * exportTipsPdf(results, { locale: 'de', title: 'Trinkgeld 2024-03-21', labels: { name: 'Name', group: 'Gruppe', hours: 'Stunden', amount: 'Betrag', total: 'Gesamt', kitchen: 'Küche', service: 'Service' } })
  */
 
 import type { DistributionResult } from '@/types/session';
-import { formatEurFromCents } from './formatCurrency';
+import { formatEurFromCents } from '@/lib/format/formatCurrency';
 
 export interface ExportPdfOptions {
   /** BCP 47 locale for number formatting. Defaults to 'de-DE'. */

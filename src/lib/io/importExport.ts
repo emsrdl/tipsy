@@ -1,5 +1,5 @@
 /**
- * @file src/lib/importExport.ts
+ * @file src/lib/io/importExport.ts
  * @description Import/export functions for shift data.
  *
  * Supports three formats:
@@ -8,10 +8,10 @@
  * - JSON: internal backup format with full shift data and dedup on import
  *
  * @see src/types/shift.ts for Shift, ImportResult types
- * @see src/lib/formatCurrency.ts for EUR formatting
+ * @see src/lib/format/formatCurrency.ts for EUR formatting
  */
 
-import { formatEurFromCents } from './formatCurrency';
+import { formatEurFromCents } from '@/lib/format/formatCurrency';
 import type { Shift, ImportResult } from '@/types/shift';
 
 /**

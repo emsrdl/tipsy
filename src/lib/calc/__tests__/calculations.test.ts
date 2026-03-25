@@ -7,7 +7,7 @@ import {
   mean,
   tipPerHour,
   rmsd,
-} from '@/utils/calculations';
+} from '@/lib/calc/calculations';
 
 describe('percentageOf', () => {
   it('calculates 30% of €100', () => {

@@ -1,5 +1,5 @@
 /**
- * @file src/lib/tipCalculator.ts
+ * @file src/lib/calc/tipCalculator.ts
  * @description Core tip distribution algorithm.
  *
  * Distributes a total cash amount among employees proportionally by hours,
@@ -16,10 +16,10 @@
  * All monetary values are in integer euro cents to avoid floating-point drift.
  *
  * @see src/types/session.ts for Employee, TipSplit, DistributionResult
- * @see src/lib/denominationParser.ts for computing the total from denominations
+ * @see src/lib/calc/denominationParser.ts for computing the total from denominations
  *
  * @example
- * import { calculateDistribution } from '@/lib/tipCalculator'
+ * import { calculateDistribution } from '@/lib/calc/tipCalculator'
  * const results = calculateDistribution({
  *   totalInCents: 10000,
  *   employees: [

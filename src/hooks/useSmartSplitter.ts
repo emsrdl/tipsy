@@ -5,7 +5,7 @@
  * Wraps the smartSplit function with memoization and integrates with
  * the tip session context for input data.
  *
- * @see src/lib/smartSplitter.ts for the algorithm
+ * @see src/lib/calc/smartSplitter.ts for the algorithm
  * @see src/types/shift.ts for SmartSplitInput, SmartSplitOutput
  *
  * @example
@@ -13,7 +13,7 @@
  */
 
 import { useMemo, useState, useCallback } from 'react';
-import { smartSplit } from '@/lib/smartSplitter';
+import { smartSplit } from '@/lib/calc/smartSplitter';
 import { useLocalStorage } from './useLocalStorage';
 import {
   DEFAULT_FAIRNESS_THRESHOLD,

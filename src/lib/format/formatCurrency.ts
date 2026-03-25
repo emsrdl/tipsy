@@ -1,5 +1,5 @@
 /**
- * @file src/lib/formatCurrency.ts
+ * @file src/lib/format/formatCurrency.ts
  * @description EUR currency formatting utilities.
  *
  * All monetary values in the app are stored as integer euro cents

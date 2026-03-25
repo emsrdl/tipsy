@@ -5,7 +5,7 @@
  * Wraps the importExport library functions with loading/error state
  * and integrates with useShifts for persistence.
  *
- * @see src/lib/importExport.ts for the underlying functions
+ * @see src/lib/io/importExport.ts for the underlying functions
  * @see src/hooks/useShifts.ts for shift persistence
  *
  * @example
@@ -20,7 +20,7 @@ import {
   exportShiftsPdf,
   downloadBackupJson,
   importShiftsJson,
-} from '@/lib/importExport';
+} from '@/lib/io/importExport';
 import type { ImportResult, Shift } from '@/types/shift';
 
 export interface UseImportExportReturn {

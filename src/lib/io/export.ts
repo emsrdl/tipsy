@@ -1,21 +1,21 @@
 /**
- * @file src/utils/export.ts
+ * @file src/lib/io/export.ts
  * @description Export utility functions — format data for PDF/CSV output.
  *
  * These are pure data-preparation functions. The actual file download
- * and browser interactions are in src/lib/exportPdf.ts and src/lib/exportCsv.ts.
+ * and browser interactions are in src/lib/io/exportPdf.ts and src/lib/io/exportCsv.ts.
  *
- * @see src/lib/exportPdf.ts for PDF rendering and download trigger
- * @see src/lib/exportCsv.ts for CSV generation and download trigger
+ * @see src/lib/io/exportPdf.ts for PDF rendering and download trigger
+ * @see src/lib/io/exportCsv.ts for CSV generation and download trigger
  * @see src/hooks/useExport.ts for the React hook wrapping these
  *
  * @example
- * import { formatResultsForExport, buildCsvString } from '@/utils/export'
+ * import { formatResultsForExport, buildCsvString } from '@/lib/io/export'
  */
 
 import type { DistributionResult } from '@/types/session';
 import type { EmployeePayoutPlan } from '@/types/calculation';
-import { formatEurFromCents } from '@/lib/formatCurrency';
+import { formatEurFromCents } from '@/lib/format/formatCurrency';
 
 /**
  * A single row of export data, ready for CSV or PDF rendering.

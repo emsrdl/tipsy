@@ -14,7 +14,7 @@
  * The session can be reset at any time (e.g. "new shift").
  *
  * @see src/types/session.ts for TipSession type
- * @see src/lib/tipCalculator.ts for the calculation logic
+ * @see src/lib/calc/tipCalculator.ts for the calculation logic
  * @see src/hooks/useTipCalculator.ts for the consumer hook
  *
  * @example
@@ -24,8 +24,8 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import type { TipSession, TipSplit, DistributionResult } from '@/types/session';
 import type { Employee } from '@/types/employee';
-import { calculateDistribution } from '@/lib/tipCalculator';
-import { sumDenominations } from '@/lib/denominationParser';
+import { calculateDistribution } from '@/lib/calc/tipCalculator';
+import { sumDenominations } from '@/lib/calc/denominationParser';
 import { DENOMINATIONS } from '@/config/currency';
 import { readDefaultKitchenPercent } from '@/config/smartSplit';
 

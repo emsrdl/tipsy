@@ -1,5 +1,5 @@
 /**
- * @file src/lib/__tests__/formatCurrency.test.ts
+ * @file src/lib/format/__tests__/formatCurrency.test.ts
  * @description Tests for EUR currency formatting utilities.
  */
 

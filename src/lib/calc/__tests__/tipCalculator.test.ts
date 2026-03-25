@@ -1,5 +1,5 @@
 /**
- * @file src/lib/__tests__/tipCalculator.test.ts
+ * @file src/lib/calc/__tests__/tipCalculator.test.ts
  * @description Tests for the tip distribution algorithm.
  *
  * Critical invariants tested:

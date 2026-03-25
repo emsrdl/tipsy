@@ -1,12 +1,12 @@
 /**
- * @file src/lib/denominationParser.ts
+ * @file src/lib/calc/denominationParser.ts
  * @description Converts denomination quantities to a total in euro cents.
  *
  * @see src/config/currency.ts for the DENOMINATIONS array
  * @see src/types/session.ts for DenominationQuantity type
  *
  * @example
- * import { sumDenominations } from '@/lib/denominationParser'
+ * import { sumDenominations } from '@/lib/calc/denominationParser'
  * const total = sumDenominations(
  *   [{ denominationId: 'eur_10', quantity: 5 }],
  *   DENOMINATIONS

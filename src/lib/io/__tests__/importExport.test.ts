@@ -1,5 +1,5 @@
 /**
- * @file src/lib/__tests__/importExport.test.ts
+ * @file src/lib/io/__tests__/importExport.test.ts
  * @description Tests for shift import/export functions.
  */
 
