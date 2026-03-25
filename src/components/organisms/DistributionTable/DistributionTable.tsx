@@ -12,7 +12,7 @@
  * <DistributionTable results={session.results} totalInCents={totalInCents} />
  */
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/atoms/Badge/Badge';
 import { Icon } from '@/components/atoms/Icon/Icon';
@@ -31,6 +31,8 @@ export interface DistributionTableProps {
   personShares?: PersonShare[];
   /** Optional payout plans with denomination assignments (from smart split). */
   payoutPlans?: EmployeePayoutPlan[];
+  /** Optional slot rendered between employee groups and the summary/total card. */
+  beforeSummary?: ReactNode;
 }
 
 /**
@@ -47,6 +49,7 @@ export function DistributionTable({
   totalInCents,
   personShares,
   payoutPlans,
+  beforeSummary,
 }: DistributionTableProps) {
   const { t } = useTranslation(['common', 'screens']);
   const { locale } = useLocale();
@@ -238,6 +241,8 @@ export function DistributionTable({
         'kitchen',
         'utensils-crossed',
       )}
+
+      {beforeSummary}
 
       {/* Summary card */}
       <div className="overflow-hidden rounded-xl shadow-elevation-2">

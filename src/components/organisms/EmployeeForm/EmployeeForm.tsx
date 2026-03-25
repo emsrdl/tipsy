@@ -5,8 +5,6 @@
  * Touch-first redesign:
  * - Each employee as a Material card (EmployeeRow)
  * - Large 56px FAB-style "Add Employee" button
- * - Material Slider for kitchen/service split (no keyboard)
- * - Live split display with percentage badges
  *
  * @example
  * <EmployeeForm />
@@ -16,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { EmployeeRow } from '@/components/molecules/EmployeeRow/EmployeeRow';
 import { Button } from '@/components/atoms/Button/Button';
 import { Icon } from '@/components/atoms/Icon/Icon';
-import { Slider } from '@/components/molecules/Slider/Slider';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
 import type { Employee } from '@/types/employee';
 
@@ -28,16 +25,14 @@ function generateId(): string {
  * Complete employee setup form with Material Design interactions.
  * Reads and writes session state via useTipCalculator hook.
  *
- * @returns section with employee cards, add button, and split slider
+ * @returns section with employee cards and add button
  *
  * @example
  * <EmployeeForm />
  */
 export function EmployeeForm() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
-  const { session, addEmployee, removeEmployee, updateEmployee, setSplit } = useTipCalculator();
-
-  const splitError = session.split.kitchenPercent + session.split.servicePercent !== 100;
+  const { session, addEmployee, removeEmployee, updateEmployee } = useTipCalculator();
 
   const sortedEmployees = [...session.employees].sort((a, b) => {
     const aIsProfile = a.id.startsWith('profile-emp-');
@@ -105,25 +100,6 @@ export function EmployeeForm() {
         {t('common:actions.addEmployee')}
       </Button>
 
-      {/* Kitchen / Service split — Material Slider */}
-      <div className="space-y-4 rounded-xl bg-surface-raised p-4 shadow-elevation-1">
-        <div className="flex items-center gap-2">
-          <Icon name="utensils-crossed" size={16} className="text-text-secondary" />
-          <p className="text-sm font-semibold text-text-primary">{t('screens:setup.splitTitle')}</p>
-        </div>
-
-        <Slider
-          value={session.split.servicePercent}
-          onChange={(s) => setSplit({ kitchenPercent: 100 - s, servicePercent: s })}
-          label={t('screens:setup.groupService')}
-          counterLabel={t('screens:setup.groupKitchen')}
-          aria-label={t('screens:setup.splitTitle')}
-        />
-
-        {splitError && (
-          <p className="text-xs text-status-error">{t('errors:validation.splitMustEqual100')}</p>
-        )}
-      </div>
     </div>
   );
 }

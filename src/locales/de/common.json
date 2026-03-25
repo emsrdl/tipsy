@@ -83,7 +83,6 @@
     "fairnessScore": "Fairness-Score",
     "deviation": "Abweichung",
     "transfers": "Ausgleichszahlungen",
-    "noTransfers": "Keine Ausgleichszahlungen nötig",
     "transferFrom": "{{from}} zahlt {{amount}} an {{to}}",
     "remaining": "Restbetrag",
     "descSmart": "Optimiert Münzen & Scheine Nutzung",

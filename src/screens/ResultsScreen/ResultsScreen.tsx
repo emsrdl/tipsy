@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { DistributionTable } from '@/components/organisms/DistributionTable/DistributionTable';
+import { Slider } from '@/components/molecules/Slider/Slider';
 import { Button } from '@/components/atoms/Button/Button';
 import { Alert } from '@/components/molecules/Alert/Alert';
 import { Icon } from '@/components/atoms/Icon/Icon';
@@ -48,7 +49,7 @@ const STEP_ROUTES: Record<number, string> = {
 export function ResultsScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
-  const { session, totalInCents, reset } = useTipCalculator();
+  const { session, totalInCents, reset, setSplit } = useTipCalculator();
   const { exportPdf, exportCsv, isExporting } = useExport();
   const { addShift } = useShifts();
   const { activeProfile } = useProfiles();
@@ -62,6 +63,7 @@ export function ResultsScreen() {
   );
   const [exportOpen, setExportOpen] = useState(false);
   const [showThresholdHelp, setShowThresholdHelp] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const results = session.results ?? [];
 
@@ -116,6 +118,10 @@ export function ResultsScreen() {
 
   const hasResults = results.length > 0;
 
+  const hasKitchen = session.employees.some((e) => e.group === 'kitchen');
+  const hasService = session.employees.some((e) => e.group === 'service');
+  const hasBothGroups = hasKitchen && hasService;
+
   // When smart mode is on, show actual (smart-adjusted) amounts; otherwise show proportional results.
   const displayResults =
     isSmartMode && smartOutput.output
@@ -127,10 +133,6 @@ export function ResultsScreen() {
           amountInCents: s.actualShareInCents,
         }))
       : normalizedResults;
-
-  function handleToggleSmartMode() {
-    toggleSmartMode();
-  }
 
   function handleSaveAndFinish() {
     if (!hasResults) return;
@@ -180,6 +182,162 @@ export function ResultsScreen() {
   const fairnessScore = smartOutput.output?.distribution.fairnessScore;
   const transfers: DifferenceLine[] = smartOutput.output?.differences ?? [];
 
+  const settingsDropdown = (<>
+    <div className="rounded-xl bg-surface-raised shadow-elevation-1 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setShowSettings(!showSettings)}
+        className="flex w-full items-center gap-2 px-4 py-2.5"
+      >
+        <Icon name="settings" size={13} className="text-text-secondary shrink-0" />
+        <div className="flex flex-1 flex-wrap items-center gap-1.5 min-w-0">
+          {hasBothGroups && (
+            <>
+              <span className="rounded-full bg-teal-100 px-2 py-0.5 font-mono text-xs font-semibold text-teal-800 dark:bg-teal-900/30 dark:text-teal-300">
+                {t('screens:setup.groupService')} {session.split.servicePercent}%
+              </span>
+              <span className="rounded-full bg-orange-100 px-2 py-0.5 font-mono text-xs font-semibold text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                {t('screens:setup.groupKitchen')} {session.split.kitchenPercent}%
+              </span>
+            </>
+          )}
+          <span
+            className={cn(
+              'rounded-full px-2 py-0.5 font-mono text-xs font-semibold',
+              isSmartMode ? 'bg-accent/15 text-accent' : 'bg-surface-overlay text-text-secondary',
+            )}
+          >
+            {isSmartMode
+              ? `${t('common:smartSplit.smart')} · ${formatEurFromCents(thresholdInCents, fmtLocale)}`
+              : t('common:smartSplit.normal')}
+          </span>
+        </div>
+        <Icon
+          name={showSettings ? 'chevron-up' : 'chevron-down'}
+          size={14}
+          className="text-text-secondary shrink-0"
+        />
+      </button>
+
+      {showSettings && (
+        <div className="border-t border-border divide-y divide-border">
+          {hasBothGroups && (
+            <div className="px-4 pt-3 pb-3">
+              <Slider
+                value={session.split.servicePercent}
+                onChange={(s) => setSplit({ kitchenPercent: 100 - s, servicePercent: s })}
+                label={t('screens:setup.groupService')}
+                counterLabel={t('screens:setup.groupKitchen')}
+                aria-label={t('screens:setup.splitTitle')}
+              />
+            </div>
+          )}
+          <div className="px-4 py-2.5 space-y-2">
+            <button
+              type="button"
+              onClick={toggleSmartMode}
+              className="flex h-9 w-full items-center justify-between gap-3"
+              aria-pressed={isSmartMode}
+            >
+              <div className="flex items-center gap-2">
+                <Icon
+                  name="zap"
+                  size={15}
+                  className={isSmartMode ? 'text-accent' : 'text-text-secondary'}
+                />
+                <span
+                  className={cn(
+                    'text-sm font-medium',
+                    isSmartMode ? 'text-accent' : 'text-text-primary',
+                  )}
+                >
+                  {t('common:smartSplit.modeLabel')} —{' '}
+                  {isSmartMode ? t('common:smartSplit.smart') : t('common:smartSplit.normal')}
+                </span>
+              </div>
+              <Icon
+                name={isSmartMode ? 'toggle-right' : 'toggle-left'}
+                size={26}
+                className={isSmartMode ? 'text-accent' : 'text-text-secondary'}
+              />
+            </button>
+            {isSmartMode && (
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium whitespace-nowrap text-text-secondary">
+                    {t('common:smartSplit.threshold')}:
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <input
+                      ref={thresholdInputRef}
+                      type="number"
+                      inputMode="decimal"
+                      min="0.50"
+                      max="50"
+                      step="0.50"
+                      value={thresholdInput}
+                      onChange={(e) => handleThresholdChange(e.target.value)}
+                      onBlur={handleThresholdBlur}
+                      className="h-7 w-16 rounded-lg border border-border bg-surface-overlay px-2 text-center font-mono text-xs text-text-primary focus:border-accent focus:outline-none"
+                    />
+                    <span className="text-xs text-text-secondary">€</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowThresholdHelp(!showThresholdHelp)}
+                  className="text-xs whitespace-nowrap text-accent underline"
+                >
+                  {showThresholdHelp ? t('common:smartSplit.helpClose') : t('common:smartSplit.helpWhat')}
+                </button>
+              </div>
+            )}
+            {showThresholdHelp && (
+              <p className="rounded-lg bg-surface-overlay p-3 text-xs text-text-secondary">
+                {t('common:smartSplit.helpText')}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+
+    {isSmartMode && transfers.length > 0 && (
+      <div className="overflow-hidden rounded-xl bg-status-warning/10 shadow-elevation-1">
+        <div className="flex items-center gap-2 border-b border-status-warning/20 px-4 py-3">
+          <Icon name="arrow-right" size={14} className="text-status-warning" />
+          <span className="text-sm font-semibold text-text-primary">
+            {t('common:smartSplit.transfers')}
+          </span>
+          <Badge
+            variant="default"
+            className="ml-auto border-0 bg-status-warning/20 text-xs text-status-warning"
+          >
+            {t('common:smartSplit.aboveThreshold', {
+              amount: formatEurFromCents(thresholdInCents, fmtLocale),
+            })}
+          </Badge>
+        </div>
+        <div className="divide-y divide-status-warning/10">
+          {transfers.map((diff, i) => (
+            <div key={i} className="flex items-center justify-between px-4 py-3">
+              <span className="text-sm text-text-primary">
+                <span className="font-medium">{diff.fromPerson.name}</span>
+                {' → '}
+                <span className="font-medium">{diff.toPerson.name}</span>
+              </span>
+              <span className="font-mono text-sm font-bold text-status-warning">
+                {formatEurFromCents(diff.amountInCents, fmtLocale)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </>);
+
+
+
   function handleStepClick(s: number) {
     void navigate(STEP_ROUTES[s]);
   }
@@ -198,7 +356,6 @@ export function ResultsScreen() {
         <Alert status="info" message={t('errors:validation.noEmployees')} />
       ) : (
         <div className="space-y-4">
-          {/* Distribution table */}
           <DistributionTable
             results={displayResults}
             totalInCents={totalInCents}
@@ -208,173 +365,40 @@ export function ResultsScreen() {
                   payoutPlans: smartOutput.output.payoutPlans,
                 }
               : {})}
+            beforeSummary={settingsDropdown}
           />
 
-          {/* Smart mode toggle + threshold (card, matches SetupScreen style) */}
-          <div className="space-y-3 rounded-xl bg-surface-raised p-4 shadow-elevation-1">
-            <button
-              type="button"
-              onClick={handleToggleSmartMode}
-              className="flex min-h-12 w-full items-center justify-between gap-3"
-              aria-pressed={isSmartMode}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={cn(
-                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
-                    isSmartMode ? 'bg-accent/10' : 'bg-surface-overlay',
-                  )}
-                >
-                  <Icon
-                    name="zap"
-                    size={16}
-                    className={isSmartMode ? 'text-accent' : 'text-text-secondary'}
-                  />
-                </div>
-                <div className="text-left">
-                  <p
-                    className={cn(
-                      'text-sm font-semibold',
-                      isSmartMode ? 'text-accent' : 'text-text-primary',
-                    )}
-                  >
-                    {t('common:smartSplit.modeLabel')} —{' '}
-                    {isSmartMode ? t('common:smartSplit.smart') : t('common:smartSplit.normal')}
-                  </p>
-                  <p className="mt-0.5 text-xs text-text-secondary">
-                    {isSmartMode
-                      ? t('common:smartSplit.descSmart')
-                      : t('common:smartSplit.descNormal')}
-                  </p>
-                </div>
-              </div>
-              <Icon
-                name={isSmartMode ? 'toggle-right' : 'toggle-left'}
-                size={28}
-                className={isSmartMode ? 'text-accent' : 'text-text-secondary'}
-              />
-            </button>
-
-            {/* Threshold — same structure as SetupScreen */}
-            {isSmartMode && (
-              <div className="space-y-2 border-t border-border pt-2">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex flex-1 items-center gap-2">
-                    <span className="text-xs font-medium whitespace-nowrap text-text-secondary">
-                      {t('common:smartSplit.threshold')}:
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <input
-                        ref={thresholdInputRef}
-                        type="number"
-                        inputMode="decimal"
-                        min="0.50"
-                        max="50"
-                        step="0.50"
-                        value={thresholdInput}
-                        onChange={(e) => handleThresholdChange(e.target.value)}
-                        onBlur={handleThresholdBlur}
-                        className="h-9 w-20 rounded-lg border border-border bg-surface-overlay px-2 text-center font-mono text-sm text-text-primary focus:border-accent focus:outline-none"
-                      />
-                      <span className="text-sm text-text-secondary">€</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowThresholdHelp(!showThresholdHelp)}
-                    className="text-xs whitespace-nowrap text-accent underline"
-                  >
-                    {showThresholdHelp
-                      ? t('common:smartSplit.helpClose')
-                      : t('common:smartSplit.helpWhat')}
-                  </button>
-                </div>
-                {showThresholdHelp && (
-                  <p className="rounded-lg bg-surface-overlay p-3 text-xs text-text-secondary">
-                    {t('common:smartSplit.helpText')}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Fairness score (smart mode) */}
           {isSmartMode && fairnessScore !== undefined && (
-            <div
-              className={cn(
-                'flex items-center justify-between rounded-xl px-4 py-3 shadow-elevation-1',
-                fairnessScore >= 95 ? 'bg-status-success/10' : 'bg-status-warning/10',
-              )}
-            >
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 px-1 pt-1">
+              <div className="flex items-center gap-1.5">
                 <Icon
                   name="star"
-                  size={16}
+                  size={14}
                   className={fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning'}
                 />
-                <span className="text-sm font-medium text-text-primary">
+                <span className="text-sm text-text-secondary">
                   {t('common:smartSplit.fairnessScore')}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-24 overflow-hidden rounded-full bg-surface-overlay">
-                  <div
-                    className={cn(
-                      'h-full rounded-full transition-all',
-                      fairnessScore >= 95 ? 'bg-status-success' : 'bg-status-warning',
-                    )}
-                    style={{ width: `${fairnessScore}%` }}
-                  />
-                </div>
-                <span className="font-mono text-sm font-bold text-text-primary">
-                  {fairnessScore}%
-                </span>
+              <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-overlay">
+                <div
+                  className={cn(
+                    'h-full rounded-full transition-all duration-500',
+                    fairnessScore >= 95 ? 'bg-status-success' : 'bg-status-warning',
+                  )}
+                  style={{ width: `${fairnessScore}%` }}
+                />
               </div>
+              <span
+                className={cn(
+                  'shrink-0 font-mono text-base font-bold',
+                  fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning',
+                )}
+              >
+                {fairnessScore}%
+              </span>
             </div>
           )}
-
-          {/* Transfers (smart mode) */}
-          {isSmartMode && transfers.length > 0 && (
-            <div className="overflow-hidden rounded-xl bg-status-warning/10 shadow-elevation-1">
-              <div className="flex items-center gap-2 border-b border-status-warning/20 px-4 py-3">
-                <Icon name="arrow-right" size={14} className="text-status-warning" />
-                <span className="text-sm font-semibold text-text-primary">
-                  {t('common:smartSplit.transfers')}
-                </span>
-                <Badge
-                  variant="default"
-                  className="ml-auto border-0 bg-status-warning/20 text-xs text-status-warning"
-                >
-                  {t('common:smartSplit.aboveThreshold', {
-                    amount: formatEurFromCents(thresholdInCents, fmtLocale),
-                  })}
-                </Badge>
-              </div>
-              <div className="divide-y divide-status-warning/10">
-                {transfers.map((diff, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-3">
-                    <span className="text-sm text-text-primary">
-                      <span className="font-medium">{diff.fromPerson.name}</span>
-                      {' → '}
-                      <span className="font-medium">{diff.toPerson.name}</span>
-                    </span>
-                    <span className="font-mono text-sm font-bold text-status-warning">
-                      {formatEurFromCents(diff.amountInCents, fmtLocale)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {isSmartMode &&
-            transfers.length === 0 &&
-            fairnessScore !== undefined &&
-            fairnessScore >= 95 && (
-              <p className="py-1 text-center text-xs text-text-secondary">
-                {t('common:smartSplit.noTransfers')}
-              </p>
-            )}
         </div>
       )}
 

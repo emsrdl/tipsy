@@ -83,7 +83,6 @@
     "fairnessScore": "Fairness score",
     "deviation": "Deviation",
     "transfers": "Balance transfers",
-    "noTransfers": "No balance transfers needed",
     "transferFrom": "{{from}} pays {{amount}} to {{to}}",
     "remaining": "Remaining",
     "descSmart": "Optimises coin & note usage",
