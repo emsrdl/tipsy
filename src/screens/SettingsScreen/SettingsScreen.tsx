@@ -578,7 +578,7 @@ export function SettingsScreen() {
         {/* ── Data Management ── */}
         <section>
           <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-            Daten
+            {t('screens:settings.sectionData')}
           </h2>
 
           <div className="divide-y divide-border overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
@@ -631,9 +631,12 @@ export function SettingsScreen() {
 
         {/* ── About ── */}
         <section>
+          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            {t('screens:settings.sectionAbout')}
+          </h2>
           <div className="divide-y divide-border overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
             <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-text-secondary">Version</span>
+              <span className="text-sm text-text-secondary">{t('screens:settings.version')}</span>
               <span className="font-mono text-sm text-text-primary">
                 {import.meta.env.VITE_APP_VERSION}
                 {import.meta.env.DEV && ' (dev)'}

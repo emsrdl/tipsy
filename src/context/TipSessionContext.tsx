@@ -93,7 +93,7 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
   const [session, setSession] = useState<TipSession>(
     () => initialSession ?? persisted ?? makeDefaultSession(),
   );
-  const [wasRestored] = useState(() => persisted !== null && !initialSession);
+  const [wasRestored, setWasRestored] = useState(() => persisted !== null && !initialSession);
 
   const totalInCents = sumDenominations(session.denominations, DENOMINATIONS);
 
@@ -161,6 +161,7 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
       // ignore
     }
     setSession(makeDefaultSession());
+    setWasRestored(false);
   }, []);
 
   return (

@@ -112,12 +112,6 @@ export function ResultsScreen() {
       setThresholdInput(clamped.toFixed(2));
       setThreshold(Math.round(clamped * 100));
     }
-    showToast(
-      t('common:toast.thresholdUpdated', {
-        amount: formatEurFromCents(thresholdInCents, fmtLocale),
-      }),
-      'info',
-    );
   }
 
   const hasResults = results.length > 0;
@@ -136,7 +130,6 @@ export function ResultsScreen() {
 
   function handleToggleSmartMode() {
     toggleSmartMode();
-    showToast(t('common:toast.calculationUpdated'), 'info');
   }
 
   function handleSaveAndFinish() {
@@ -181,7 +174,6 @@ export function ResultsScreen() {
   function handleResetAll() {
     setThreshold(defaultThreshold);
     reset();
-    showToast(t('common:toast.allReset'), 'info');
     void navigate('/calculate');
   }
 

@@ -63,7 +63,6 @@ export function CashInputScreen() {
     reset();
     setThreshold(defaultThreshold);
     setSmartMode(SMART_SPLIT_ENABLED);
-    showToast(t('common:toast.allReset'), 'info');
     void navigate('/calculate');
   }
 
