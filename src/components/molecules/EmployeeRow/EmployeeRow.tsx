@@ -67,7 +67,7 @@ export function EmployeeRow({
             {t('common:profile.thisIsYou')}
           </div>
           <div className="flex items-center gap-3 px-4 pb-3 pt-1.5">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
               {getInitials(employee.name) || '?'}
             </div>
             <div className="min-w-0 flex-1">
@@ -77,7 +77,7 @@ export function EmployeeRow({
               type="button"
               onClick={() => void navigate('/settings')}
               aria-label={t('common:profile.headerMenu.editProfile')}
-              className="ripple flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-overlay hover:text-accent"
+              className="ripple flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-overlay hover:text-accent"
             >
               <Icon name="edit-2" size={18} />
             </button>
@@ -101,7 +101,7 @@ export function EmployeeRow({
             onClick={() => onRemove(employee.id)}
             aria-label={t('common:actions.removeEmployee')}
             className={cn(
-              'ripple flex h-12 w-12 flex-shrink-0 items-center justify-center',
+              'ripple flex h-12 w-12 shrink-0 items-center justify-center',
               'rounded-full text-text-secondary transition-colors',
               'hover:bg-red-50 hover:text-status-error',
               'active:bg-red-100',

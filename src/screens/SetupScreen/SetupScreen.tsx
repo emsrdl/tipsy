@@ -228,7 +228,7 @@ export function SetupScreen() {
           <div className="flex items-center gap-3">
             <div
               className={cn(
-                'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full',
+                'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
                 isSmartMode ? 'bg-accent/10' : 'bg-surface-overlay',
               )}
             >

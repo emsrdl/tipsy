@@ -60,7 +60,7 @@ export function useExport(): UseExportReturn {
         setIsExporting(false);
       }
     },
-    [locale],
+    [locale, t],
   );
 
   const exportCsv = useCallback(
@@ -86,7 +86,7 @@ export function useExport(): UseExportReturn {
         setIsExporting(false);
       }
     },
-    [locale],
+    [locale, t],
   );
 
   return { exportPdf, exportCsv, isExporting, exportError };

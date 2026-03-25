@@ -60,7 +60,7 @@ export function DenominationItem({
       {/* Denomination symbol — pill */}
       <div
         className={cn(
-          'flex h-10 w-16 flex-shrink-0 items-center justify-center rounded-lg font-mono text-sm font-bold',
+          'flex h-10 w-16 shrink-0 items-center justify-center rounded-lg font-mono text-sm font-bold',
           isActive
             ? 'bg-accent text-accent-foreground shadow-elevation-1'
             : 'bg-surface-overlay text-text-primary',
@@ -85,7 +85,7 @@ export function DenominationItem({
       {/* Subtotal */}
       <div
         className={cn(
-          'w-20 flex-shrink-0 text-right font-mono text-sm',
+          'w-20 shrink-0 text-right font-mono text-sm',
           isActive ? 'font-semibold text-text-primary' : 'text-text-secondary',
         )}
       >

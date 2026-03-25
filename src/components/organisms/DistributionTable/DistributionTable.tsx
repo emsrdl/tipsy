@@ -117,7 +117,7 @@ export function DistributionTable({
                       {r.hours}h{perHour && <span className="ml-1">· {perHour}/h</span>}
                     </p>
                   </div>
-                  <div className="flex flex-shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <p className="font-mono text-xl font-bold text-text-primary">
                       {formatEurFromCents(r.amountInCents, fmtLocale)}
                     </p>
@@ -137,7 +137,7 @@ export function DistributionTable({
                       {r.hours}h{perHour && <span className="ml-1">· {perHour}/h</span>}
                     </p>
                   </div>
-                  <div className="flex-shrink-0 text-right">
+                  <div className="shrink-0 text-right">
                     <p className="font-mono text-xl font-bold text-text-primary">
                       {formatEurFromCents(r.amountInCents, fmtLocale)}
                     </p>

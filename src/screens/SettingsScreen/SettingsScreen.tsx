@@ -273,7 +273,7 @@ export function SettingsScreen() {
                       type="button"
                       onClick={() => switchProfile(profile.id)}
                       className={cn(
-                        'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold',
                         activeProfile?.id === profile.id && !isGuestMode
                           ? 'bg-accent text-accent-foreground'
                           : 'bg-surface-overlay text-text-secondary',
@@ -293,7 +293,7 @@ export function SettingsScreen() {
                         </span>
                         <ProfileRoleBadge role={profile.role} />
                         {activeProfile?.id === profile.id && !isGuestMode && (
-                          <Icon name="check" size={14} className="flex-shrink-0 text-accent" />
+                          <Icon name="check" size={14} className="shrink-0 text-accent" />
                         )}
                       </div>
                       <p className="mt-0.5 text-xs text-text-secondary">
@@ -304,7 +304,7 @@ export function SettingsScreen() {
                       </p>
                     </button>
 
-                    <div className="flex flex-shrink-0 gap-1">
+                    <div className="flex shrink-0 gap-1">
                       <button
                         type="button"
                         onClick={() => handleStartEdit(profile.id)}
@@ -339,7 +339,7 @@ export function SettingsScreen() {
                 isGuestMode && 'bg-accent-subtle',
               )}
             >
-              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-surface-overlay">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-overlay">
                 <Icon name="user" size={16} className="text-text-secondary" />
               </div>
               <div className="flex min-w-0 flex-1 items-center gap-2 text-left">
@@ -442,7 +442,7 @@ export function SettingsScreen() {
               onClick={toggleColorMode}
               className="flex w-full items-center gap-3 px-4 py-4 transition-colors hover:bg-surface-overlay"
             >
-              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-surface-overlay">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-overlay">
                 <Icon
                   name={colorMode === 'dark' ? 'moon' : 'sun'}
                   size={18}

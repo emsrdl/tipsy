@@ -90,7 +90,7 @@ export function ProfileAvatar() {
               </p>
               <ProfileRoleBadge
                 role={isGuestMode ? null : (activeProfile?.role ?? null)}
-                className="flex-shrink-0"
+                className="shrink-0"
               />
             </div>
           </div>
@@ -119,7 +119,7 @@ export function ProfileAvatar() {
                   >
                     <span className="flex-1 truncate">{profile.name}</span>
                     {isActive && (
-                      <Icon name="check" size={14} className="text-accent flex-shrink-0" />
+                      <Icon name="check" size={14} className="text-accent shrink-0" />
                     )}
                   </button>
                 );
@@ -135,7 +135,7 @@ export function ProfileAvatar() {
                 }}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-accent transition-colors hover:bg-surface-overlay"
               >
-                <Icon name="user-plus" size={14} className="flex-shrink-0" />
+                <Icon name="user-plus" size={14} className="shrink-0" />
                 <span className="flex-1">{t('actions.createProfile')}</span>
               </button>
             )}
@@ -165,9 +165,9 @@ export function ProfileAvatar() {
               }}
               className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:bg-surface-overlay"
             >
-              <Icon name="users" size={14} className="flex-shrink-0" />
+              <Icon name="users" size={14} className="shrink-0" />
               <span className="flex-1">{t('profile.headerMenu.moreProfiles')}</span>
-              <Icon name="chevron-right" size={14} className="flex-shrink-0" />
+              <Icon name="chevron-right" size={14} className="shrink-0" />
             </button>
           </div>
         </div>

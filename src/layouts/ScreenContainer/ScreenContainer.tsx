@@ -118,7 +118,7 @@ export function ScreenContainer({
             <button
               type="button"
               onClick={() => setConfirmOpen(true)}
-              className="-my-3 -mr-1 flex flex-shrink-0 items-center justify-center p-3 text-text-secondary opacity-50 transition-opacity hover:opacity-100"
+              className="-my-3 -mr-1 flex shrink-0 items-center justify-center p-3 text-text-secondary opacity-50 transition-opacity hover:opacity-100"
               aria-label={t('resetAllDialog.trigger')}
             >
               <Icon name="refresh-cw" size={14} />
@@ -132,7 +132,7 @@ export function ScreenContainer({
         <div className="flex items-baseline justify-between">
           <h1 className="text-2xl font-bold leading-tight text-text-primary">{title}</h1>
           {showSteps && (
-            <span className="ml-4 flex-shrink-0 text-sm text-text-secondary">
+            <span className="ml-4 shrink-0 text-sm text-text-secondary">
               {step}/{totalSteps}
             </span>
           )}

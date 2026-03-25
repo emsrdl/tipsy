@@ -356,7 +356,7 @@ export function HistoryScreen() {
                     className="flex min-h-14 w-full items-center justify-between px-4 py-3 transition-colors hover:bg-surface-overlay"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="bg-accent/10 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full">
+                      <div className="bg-accent/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
                         <Icon name="clock" size={16} className="text-accent" />
                       </div>
                       <div className="text-left">

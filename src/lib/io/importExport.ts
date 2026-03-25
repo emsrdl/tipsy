@@ -141,7 +141,7 @@ export function exportShiftsPdf(
   <h1>${escapeHtml(title)}</h1>
   <p class="summary">${totalShifts} Schichten — Gesamt: ${formatEurFromCents(totalTips, fmtLocale)}</p>
   ${shiftBlocks.join('')}
-  <script>window.onload = () => { window.print(); window.close(); }<\/script>
+  <script>window.onload = () => { window.print(); window.close(); }</script>
 </body>
 </html>`;
 

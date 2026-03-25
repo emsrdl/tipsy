@@ -72,7 +72,7 @@ export function ProfileSelector() {
       >
         <div
           className={cn(
-            'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full',
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
             isGuestMode || !activeProfile ? 'bg-surface-overlay' : 'bg-accent/10',
           )}
         >
@@ -108,7 +108,7 @@ export function ProfileSelector() {
         <Icon
           name={isOpen ? 'chevron-up' : 'chevron-down'}
           size={16}
-          className="flex-shrink-0 text-text-secondary"
+          className="shrink-0 text-text-secondary"
         />
       </button>
 
@@ -128,7 +128,7 @@ export function ProfileSelector() {
             >
               <div
                 className={cn(
-                  'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold',
                   activeProfile?.id === profile.id
                     ? 'bg-accent text-accent-foreground'
                     : 'bg-surface-overlay text-text-secondary',
@@ -162,7 +162,7 @@ export function ProfileSelector() {
               isGuestMode && 'bg-accent-subtle',
             )}
           >
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-surface-overlay">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-overlay">
               <Icon name="user" size={16} className="text-text-secondary" />
             </div>
             <span className="flex-1 text-left text-sm font-medium text-text-primary">

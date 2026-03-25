@@ -99,7 +99,7 @@ export function exportTipsPdf(results: DistributionResult[], options: ExportPdfO
       </tr>
     </tfoot>
   </table>
-  <script>window.onload = () => { window.print(); window.close(); }<\/script>
+  <script>window.onload = () => { window.print(); window.close(); }</script>
 </body>
 </html>`;
 

@@ -220,7 +220,7 @@ export function ResultsScreen() {
               <div className="flex items-center gap-3">
                 <div
                   className={cn(
-                    'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full',
+                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
                     isSmartMode ? 'bg-accent/10' : 'bg-surface-overlay',
                   )}
                 >
@@ -259,7 +259,7 @@ export function ResultsScreen() {
               <div className="space-y-2 border-t border-border pt-2">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex flex-1 items-center gap-2">
-                    <span className="whitespace-nowrap text-xs font-medium text-text-secondary">
+                    <span className="text-xs font-medium whitespace-nowrap text-text-secondary">
                       {t('common:smartSplit.threshold')}:
                     </span>
                     <div className="flex items-center gap-1">
@@ -281,7 +281,7 @@ export function ResultsScreen() {
                   <button
                     type="button"
                     onClick={() => setShowThresholdHelp(!showThresholdHelp)}
-                    className="whitespace-nowrap text-xs text-accent underline"
+                    className="text-xs whitespace-nowrap text-accent underline"
                   >
                     {showThresholdHelp
                       ? t('common:smartSplit.helpClose')
@@ -334,22 +334,22 @@ export function ResultsScreen() {
 
           {/* Transfers (smart mode) */}
           {isSmartMode && transfers.length > 0 && (
-            <div className="bg-status-warning/10 overflow-hidden rounded-xl shadow-elevation-1">
-              <div className="border-status-warning/20 flex items-center gap-2 border-b px-4 py-3">
+            <div className="overflow-hidden rounded-xl bg-status-warning/10 shadow-elevation-1">
+              <div className="flex items-center gap-2 border-b border-status-warning/20 px-4 py-3">
                 <Icon name="arrow-right" size={14} className="text-status-warning" />
                 <span className="text-sm font-semibold text-text-primary">
                   {t('common:smartSplit.transfers')}
                 </span>
                 <Badge
                   variant="default"
-                  className="bg-status-warning/20 ml-auto border-0 text-xs text-status-warning"
+                  className="ml-auto border-0 bg-status-warning/20 text-xs text-status-warning"
                 >
                   {t('common:smartSplit.aboveThreshold', {
                     amount: formatEurFromCents(thresholdInCents, fmtLocale),
                   })}
                 </Badge>
               </div>
-              <div className="divide-status-warning/10 divide-y">
+              <div className="divide-y divide-status-warning/10">
                 {transfers.map((diff, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <span className="text-sm text-text-primary">
