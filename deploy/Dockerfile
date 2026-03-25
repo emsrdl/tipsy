@@ -38,7 +38,7 @@ RUN VITE_APP_VERSION=${VITE_APP_VERSION:-$(node -p "require('./package.json').ve
 FROM nginx:1.27-alpine AS serve
 
 # Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built assets from builder stage and set ownership to nginx user (UID 101)
 # using --chown so files are not root-owned inside the image.
