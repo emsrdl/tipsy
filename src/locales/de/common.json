@@ -42,15 +42,13 @@
     "editProfile": "Profil bearbeiten",
     "deleteProfile": "Profil löschen",
     "resetStats": "Statistiken zurücksetzen",
-    "guestMode": "Gastmodus",
-    "exitGuestMode": "Gastmodus beenden",
     "signOut": "Abmelden",
     "export": "Exportieren",
     "import": "Importieren"
   },
   "profile": {
     "guest": "Gast",
-    "guestBadge": "Gast Modus",
+    "signedOut": "Abgemeldet",
     "thisIsYou": "Das bist du",
     "role": {
       "kitchen": "Küche",
@@ -67,12 +65,10 @@
       "signOut": "Abmelden",
       "settings": "Einstellungen",
       "createProfile": "Profil erstellen",
-      "guestMode": "Gast Modus",
-      "moreProfiles": "Weitere Profile",
-      "signedOut": "Abgemeldet"
+      "moreProfiles": "Weitere Profile"
     },
-    "noShiftsGuest": "Keine Schichten (Gast Modus)",
-    "noShiftsGuestSub": "Wechsle zu einem Profil, um Schichten zu speichern.",
+    "noShiftsSignedOut": "Keine Schichten",
+    "noShiftsSignedOutSub": "Melde dich an, um Schichten zu speichern.",
     "deleteWithShifts_one": "Profil und {{count}} Schicht löschen?",
     "deleteWithShifts_other": "Profil und {{count}} Schichten löschen?",
     "deleteWithShiftsInfo_one": "Dies kann nicht rückgängig gemacht werden. {{count}} Schicht wird gelöscht.",

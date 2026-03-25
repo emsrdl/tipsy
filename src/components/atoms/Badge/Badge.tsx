@@ -7,7 +7,6 @@
  * @example
  * <Badge variant="kitchen">Küche</Badge>
  * <Badge variant="service">Service</Badge>
- * <Badge variant="guest">Gast Modus</Badge>
  * <Badge>Default</Badge>
  */
 
@@ -16,7 +15,7 @@ import { cn } from '@/lib/utils';
 
 export interface BadgeProps {
   /** Visual style variant. @default "default" */
-  variant?: 'default' | 'kitchen' | 'service' | 'accent' | 'guest' | 'signed-out';
+  variant?: 'default' | 'kitchen' | 'service' | 'accent' | 'signed-out';
   children: ReactNode;
   className?: string | undefined;
 }
@@ -26,7 +25,6 @@ const VARIANT_CLASSES: Record<NonNullable<BadgeProps['variant']>, string> = {
   kitchen: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
   service: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
   accent: 'bg-accent text-accent-foreground',
-  guest: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
   'signed-out': 'bg-status-error/15 text-status-error',
 };
 

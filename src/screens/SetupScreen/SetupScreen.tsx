@@ -47,7 +47,7 @@ export function SetupScreen() {
   const navigate = useNavigate();
   const { session, totalInCents, addEmployee, removeEmployee, updateEmployee, setSplit, calculate, reset, wasRestored } =
     useTipCalculator();
-  const { activeProfile, isGuestMode } = useProfiles();
+  const { activeProfile } = useProfiles();
   const { showToast } = useToast();
   const [showSmartHelp, setShowSmartHelp] = useState(false);
 
@@ -82,8 +82,8 @@ export function SetupScreen() {
 
   // Auto-add/update/remove the profile employee when active profile changes
   useEffect(() => {
-    if (isGuestMode || !activeProfile) {
-      // Remove any profile-owned employee when entering guest mode
+    if (activeProfile === null) {
+      // Remove any profile-owned employee when signed out
       const profileEmp = session.employees.find((e) => e.id.startsWith(PROFILE_EMP_PREFIX));
       if (profileEmp) removeEmployee(profileEmp.id);
       return;
@@ -119,7 +119,7 @@ export function SetupScreen() {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeProfile?.id, activeProfile?.name, activeProfile?.role, isGuestMode]);
+  }, [activeProfile?.id, activeProfile?.name, activeProfile?.role]);
 
   function handleThresholdInputChange(value: string) {
     setThresholdInputValue(value);

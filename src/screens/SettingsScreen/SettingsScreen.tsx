@@ -42,12 +42,10 @@ export function SettingsScreen() {
   const {
     profiles,
     activeProfile,
-    isGuestMode,
     createProfile,
     updateProfile,
     deleteProfile,
     switchProfile,
-    enterGuestMode,
   } = useProfiles();
   const { theme, accentColor, colorMode, setTheme, setAccentColor, toggleColorMode } = useTheme();
   const { locale, setLocale } = useLocale();
@@ -274,7 +272,7 @@ export function SettingsScreen() {
                       onClick={() => switchProfile(profile.id)}
                       className={cn(
                         'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                        activeProfile?.id === profile.id && !isGuestMode
+                        activeProfile?.id === profile.id
                           ? 'bg-accent text-accent-foreground'
                           : 'bg-surface-overlay text-text-secondary',
                       )}
@@ -292,7 +290,7 @@ export function SettingsScreen() {
                           {profile.name}
                         </span>
                         <ProfileRoleBadge role={profile.role} />
-                        {activeProfile?.id === profile.id && !isGuestMode && (
+                        {activeProfile?.id === profile.id && (
                           <Icon name="check" size={14} className="shrink-0 text-accent" />
                         )}
                       </div>
@@ -329,27 +327,6 @@ export function SettingsScreen() {
                 )}
               </div>
             ))}
-
-            {/* Guest mode row */}
-            <button
-              type="button"
-              onClick={isGuestMode ? undefined : enterGuestMode}
-              className={cn(
-                'flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-overlay',
-                isGuestMode && 'bg-accent-subtle',
-              )}
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-overlay">
-                <Icon name="user" size={16} className="text-text-secondary" />
-              </div>
-              <div className="flex min-w-0 flex-1 items-center gap-2 text-left">
-                <span className="truncate text-sm font-medium text-text-primary">
-                  {t('common:profile.guest')}
-                </span>
-                <ProfileRoleBadge role={null} />
-              </div>
-              {isGuestMode && <Icon name="check" size={14} className="text-accent" />}
-            </button>
 
             {/* Create new profile */}
             <div className="p-3">

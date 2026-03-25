@@ -51,7 +51,7 @@ export function ResultsScreen() {
   const { session, totalInCents, reset } = useTipCalculator();
   const { exportPdf, exportCsv, isExporting } = useExport();
   const { addShift } = useShifts();
-  const { activeProfile, isGuestMode } = useProfiles();
+  const { activeProfile } = useProfiles();
   const { showToast } = useToast();
   const { locale } = useLocale();
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
@@ -397,7 +397,7 @@ export function ResultsScreen() {
               className="min-h-14 w-full text-base font-semibold"
             >
               <Icon name="save" size={18} />
-              {isGuestMode ? t('screens:results.finishNoSave') : t('screens:results.saveAndFinish')}
+              {activeProfile === null ? t('screens:results.finishNoSave') : t('screens:results.saveAndFinish')}
             </Button>
 
             {/* Export button */}

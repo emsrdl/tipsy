@@ -21,7 +21,6 @@ describe('useProfileContext', () => {
     const { result } = renderHook(() => useProfileContext(), { wrapper });
     expect(result.current.profiles).toEqual([]);
     expect(result.current.activeProfile).toBeNull();
-    expect(result.current.isGuestMode).toBe(true);
   });
 
   it('throws when used outside provider', () => {
@@ -80,18 +79,18 @@ describe('useProfileContext', () => {
       expect(result.current.activeProfile!.name).toBe('Bob');
     });
 
-    it('exits guest mode when creating active profile', () => {
+    it('sets active profile when creating active profile', () => {
       const { result } = renderHook(() => useProfileContext(), { wrapper });
 
       act(() => {
-        result.current.enterGuestMode();
+        result.current.signOut();
       });
-      expect(result.current.isGuestMode).toBe(true);
+      expect(result.current.activeProfile).toBeNull();
 
       act(() => {
         result.current.createProfile('Anna', 'service');
       });
-      expect(result.current.isGuestMode).toBe(false);
+      expect(result.current.activeProfile).not.toBeNull();
     });
   });
 
@@ -115,7 +114,7 @@ describe('useProfileContext', () => {
       expect(result.current.activeProfile!.name).toBe('Anna');
     });
 
-    it('exits guest mode on switch', () => {
+    it('sets active profile on switch after sign-out', () => {
       const { result } = renderHook(() => useProfileContext(), { wrapper });
 
       act(() => {
@@ -124,13 +123,15 @@ describe('useProfileContext', () => {
       const annaId = result.current.profiles[0]!.id;
 
       act(() => {
-        result.current.enterGuestMode();
+        result.current.signOut();
       });
+      expect(result.current.activeProfile).toBeNull();
+
       act(() => {
         result.current.switchProfile(annaId);
       });
-
-      expect(result.current.isGuestMode).toBe(false);
+      expect(result.current.activeProfile).not.toBeNull();
+      expect(result.current.activeProfile!.name).toBe('Anna');
     });
   });
 
@@ -226,19 +227,8 @@ describe('useProfileContext', () => {
     });
   });
 
-  describe('guest mode', () => {
-    it('enters guest mode', () => {
-      const { result } = renderHook(() => useProfileContext(), { wrapper });
-
-      act(() => {
-        result.current.enterGuestMode();
-      });
-
-      expect(result.current.isGuestMode).toBe(true);
-      expect(result.current.activeProfile).toBeNull();
-    });
-
-    it('deactivates profiles when entering guest mode', () => {
+  describe('signOut', () => {
+    it('clears the active profile', () => {
       const { result } = renderHook(() => useProfileContext(), { wrapper });
 
       act(() => {
@@ -247,30 +237,25 @@ describe('useProfileContext', () => {
       expect(result.current.activeProfile).not.toBeNull();
 
       act(() => {
-        result.current.enterGuestMode();
+        result.current.signOut();
       });
 
       expect(result.current.activeProfile).toBeNull();
-      expect(result.current.isGuestMode).toBe(true);
     });
 
-    it('exits guest mode when a profile is switched to', () => {
+    it('deactivates all profiles when signing out', () => {
       const { result } = renderHook(() => useProfileContext(), { wrapper });
 
       act(() => {
         result.current.createProfile('Anna', 'service');
       });
-      const id = result.current.profiles[0]!.id;
 
       act(() => {
-        result.current.enterGuestMode();
+        result.current.signOut();
       });
-      expect(result.current.isGuestMode).toBe(true);
 
-      act(() => {
-        result.current.switchProfile(id);
-      });
-      expect(result.current.isGuestMode).toBe(false);
+      expect(result.current.activeProfile).toBeNull();
+      expect(result.current.profiles.every((p) => !p.isActive)).toBe(true);
     });
   });
 

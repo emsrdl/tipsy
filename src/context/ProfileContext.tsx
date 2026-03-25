@@ -2,8 +2,8 @@
  * @file src/context/ProfileContext.tsx
  * @description React context for multi-user profile management.
  *
- * Manages profiles in localStorage, active profile selection, and guest mode.
- * Guest mode uses no localStorage — session is in-memory only.
+ * Manages profiles in localStorage and the active profile selection.
+ * When no profile is active (activeProfile === null) the user is signed out.
  *
  * @see src/types/profile.ts for Profile type
  * @see src/hooks/useProfiles.ts for the consumer hook
@@ -29,24 +29,22 @@ function generateId(): string {
 export interface ProfileContextValue {
   /** All saved profiles. */
   profiles: Profile[];
-  /** Currently active profile, or null if guest mode. */
+  /** Currently active profile, or null when signed out. */
   activeProfile: Profile | null;
-  /** Whether guest mode is active. */
-  isGuestMode: boolean;
   /** Create a new profile and optionally activate it. */
   createProfile: (name: string, role: ProfileRole, activate?: boolean) => Profile;
-  /** Switch to an existing profile by ID. Disables guest mode. */
+  /** Switch to an existing profile by ID. */
   switchProfile: (profileId: string) => void;
   /** Update a profile's name or role. */
   updateProfile: (profileId: string, updates: Partial<Pick<Profile, 'name' | 'role'>>) => void;
   /** Update a profile's stats. */
   updateProfileStats: (profileId: string, stats: ProfileStats) => void;
-  /** Delete a profile (cannot delete if it's the active one during calculation). */
+  /** Delete a profile. Clears the active profile if it was the deleted one. */
   deleteProfile: (profileId: string) => void;
   /** Reset a profile's stats to zero. */
   resetProfileStats: (profileId: string) => void;
-  /** Enter guest mode — clears the active profile. */
-  enterGuestMode: () => void;
+  /** Sign out — clears the active profile. */
+  signOut: () => void;
 }
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -66,9 +64,6 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
   );
 
   const activeProfile = profiles.find((p) => p.id === activeProfileId) ?? null;
-
-  /** Guest mode is derived: no active profile = guest. */
-  const isGuestMode = activeProfile === null;
 
   const createProfile = useCallback(
     (name: string, role: ProfileRole, activate = true): Profile => {
@@ -140,7 +135,7 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
     [setProfiles],
   );
 
-  const enterGuestMode = useCallback(() => {
+  const signOut = useCallback(() => {
     setActiveProfileId(null);
     setProfiles((prev) => prev.map((p) => ({ ...p, isActive: false })));
   }, [setActiveProfileId, setProfiles]);
@@ -150,14 +145,13 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
       value={{
         profiles,
         activeProfile,
-        isGuestMode,
         createProfile,
         switchProfile,
         updateProfile,
         updateProfileStats,
         deleteProfile,
         resetProfileStats,
-        enterGuestMode,
+        signOut,
       }}
     >
       {children}

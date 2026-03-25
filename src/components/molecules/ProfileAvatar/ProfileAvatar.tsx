@@ -3,7 +3,7 @@
  * @description ProfileAvatar — circular avatar in the header with inline dropdown menu.
  *
  * Shows initials derived from the active profile name (up to 2 letters).
- * Guest mode shows "G" with muted styling.
+ * Shows initials when signed in, "G" (Gast) when signed out.
  * On click: toggles an inline dropdown with profile actions.
  *
  * @example
@@ -35,7 +35,7 @@ function getInitials(name: string): string {
 export function ProfileAvatar() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
-  const { profiles, activeProfile, isGuestMode, enterGuestMode, switchProfile } = useProfiles();
+  const { profiles, activeProfile, signOut, switchProfile } = useProfiles();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -71,7 +71,7 @@ export function ProfileAvatar() {
           'flex h-10 w-10 items-center justify-center rounded-full',
           'text-xs font-bold transition-all',
           'ring-2 ring-offset-2 ring-offset-surface',
-          isGuestMode
+          activeProfile === null
             ? 'bg-surface-overlay text-text-secondary ring-border'
             : 'ring-accent/40 bg-accent text-accent-foreground',
           isOpen && 'scale-95',
@@ -89,7 +89,7 @@ export function ProfileAvatar() {
                 {displayName}
               </p>
               <ProfileRoleBadge
-                role={isGuestMode ? null : (activeProfile?.role ?? null)}
+                role={activeProfile?.role ?? null}
                 className="shrink-0"
               />
             </div>
@@ -106,7 +106,7 @@ export function ProfileAvatar() {
               )
               .slice(0, 3)
               .map((profile) => {
-                const isActive = !isGuestMode && activeProfile?.id === profile.id;
+                const isActive = activeProfile?.id === profile.id;
                 return (
                   <button
                     key={profile.id}
@@ -141,11 +141,11 @@ export function ProfileAvatar() {
             )}
 
             {/* Sign out — only shown when a profile is active */}
-            {!isGuestMode && activeProfile !== null && (
+            {activeProfile !== null && (
               <button
                 type="button"
                 onClick={() => {
-                  enterGuestMode();
+                  signOut();
                   setIsOpen(false);
                 }}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-status-error transition-colors hover:bg-status-error/5"

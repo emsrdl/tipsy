@@ -42,15 +42,13 @@
     "editProfile": "Edit profile",
     "deleteProfile": "Delete profile",
     "resetStats": "Reset stats",
-    "guestMode": "Guest mode",
-    "exitGuestMode": "Exit guest mode",
     "signOut": "Sign out",
     "export": "Export",
     "import": "Import"
   },
   "profile": {
     "guest": "Guest",
-    "guestBadge": "Guest Mode",
+    "signedOut": "Signed out",
     "thisIsYou": "That's you",
     "role": {
       "kitchen": "Kitchen",
@@ -67,12 +65,10 @@
       "signOut": "Sign out",
       "settings": "Settings",
       "createProfile": "Create profile",
-      "guestMode": "Guest Mode",
-      "moreProfiles": "More profiles",
-      "signedOut": "Signed out"
+      "moreProfiles": "More profiles"
     },
-    "noShiftsGuest": "No shifts (Guest Mode)",
-    "noShiftsGuestSub": "Switch to a profile to save shifts.",
+    "noShiftsSignedOut": "No shifts",
+    "noShiftsSignedOutSub": "Sign in to save shifts.",
     "deleteWithShifts_one": "Delete profile and {{count}} shift?",
     "deleteWithShifts_other": "Delete profile and {{count}} shifts?",
     "deleteWithShiftsInfo_one": "This cannot be undone. {{count}} shift will be deleted.",

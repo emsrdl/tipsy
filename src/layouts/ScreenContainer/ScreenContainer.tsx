@@ -121,7 +121,7 @@ export function ScreenContainer({
               className="-my-3 -mr-1 flex shrink-0 items-center justify-center p-3 text-text-secondary opacity-50 transition-opacity hover:opacity-100"
               aria-label={t('resetAllDialog.trigger')}
             >
-              <Icon name="refresh-cw" size={14} />
+              <Icon name="refresh-cw" size={18} />
             </button>
           )}
         </nav>
@@ -130,7 +130,7 @@ export function ScreenContainer({
       {/* Title area */}
       <div className="mb-6">
         <div className="flex items-baseline justify-between">
-          <h1 className="text-2xl font-bold leading-tight text-text-primary">{title}</h1>
+          <h1 className="text-2xl leading-tight font-bold text-text-primary">{title}</h1>
           {showSteps && (
             <span className="ml-4 shrink-0 text-sm text-text-secondary">
               {step}/{totalSteps}
