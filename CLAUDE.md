@@ -7,12 +7,12 @@ Deployment: Docker via Dokploy → `tipsy.emsr.cc`
 ## Commands
 
 ```bash
-npm run dev           # Vite dev server (port 5173, HMR)
-npm run build         # Type-check + production bundle
-npm run type-check    # Standalone TypeScript check
-npm run lint          # ESLint (strict, max-warnings 0)
-npm run format        # Prettier write
-npm test              # Vitest single-run (CI)
+bun run dev           # Vite dev server (port 5173, HMR)
+bun run build         # Type-check + production bundle
+bun run type-check    # Standalone TypeScript check
+bun run lint          # ESLint (strict, max-warnings 0)
+bun run format        # Prettier write
+bun test              # Vitest single-run (CI)
 ```
 
 ## Docs

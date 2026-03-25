@@ -3,9 +3,9 @@
 **Runner:** Vitest + jsdom. **Coverage:** v8, 80% lines/functions, 75% branches.
 
 ```bash
-npm test              # single run (CI)
-npm run test:watch    # interactive watch
-npm run test:coverage # coverage report → coverage/
+bun test              # single run (CI)
+bun run test:watch    # interactive watch
+bun run test:coverage # coverage report → coverage/
 ```
 
 ## Test File Locations

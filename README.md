@@ -7,10 +7,10 @@ Live: `tipsy.emsr.cc`
 ## Quick start
 
 ```bash
-npm install
-npm run dev      # dev server at localhost:5173
-npm run build    # type-check + production bundle
-npm test         # run tests
+bun install
+bun run dev      # dev server at localhost:5173
+bun run build    # type-check + production bundle
+bun test         # run tests
 ```
 
 ## Docker
