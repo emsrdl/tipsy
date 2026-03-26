@@ -34,6 +34,9 @@ ARG VITE_OIDC_SCOPE
 # Copy source and build
 COPY . .
 
+# Fetch tags so git describe can produce a version like v0.2.2-3-gabcd123
+RUN git fetch --unshallow --tags 2>/dev/null || git fetch --tags 2>/dev/null || true
+
 RUN bun run build
 
 # ---- Stage 2: Serve ----

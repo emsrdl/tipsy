@@ -24,7 +24,7 @@ import { version } from './package.json';
 
 function gitDescribe(): string {
   try {
-    return execSync('git describe --tags --dirty --always', { encoding: 'utf8' }).trim();
+    return execSync('git describe --tags --always', { encoding: 'utf8' }).trim();
   } catch {
     return version;
   }
