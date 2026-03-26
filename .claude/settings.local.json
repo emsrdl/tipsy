@@ -8,7 +8,8 @@
       "Bash(ls:*)",
       "Bash(bun run:*)",
       "Bash(bun test:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(gh pr:*)"
     ]
   }
 }
