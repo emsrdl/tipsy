@@ -1,3 +1,45 @@
+## [0.2.0](https://github.com/emsrdl/tipsy/compare/v0.1.2...v0.2.0) (2026-03-26)
+
+
+### Features
+
+* add import/export functionality for shift data ([6d0dd36](https://github.com/emsrdl/tipsy/commit/6d0dd367481828047a274ecd331fe1f1c4532ba3))
+* update guest mode references to signed out state and improve related logic across components ([263c856](https://github.com/emsrdl/tipsy/commit/263c8564c82a4e02ac2d472e74a901208944e160))
+
+
+### Bug Fixes
+
+* add 'user-plus' icon and update profile avatar component for profile switching ([270ac6d](https://github.com/emsrdl/tipsy/commit/270ac6d5d60a4b76b91b379acb944a4a68f158ce))
+* add create profile button in guest mode when no profiles exist ([a8f5bd8](https://github.com/emsrdl/tipsy/commit/a8f5bd81129767754a6db75a1fab3e1e7c5c9c8a))
+* add default kitchen percentage and update related settings in Smart Split functionality ([db070c9](https://github.com/emsrdl/tipsy/commit/db070c9988d86d1e0579f1a2b92e4bfdb29eba41))
+* add guest variant to Badge component and update ProfileAvatar and SettingsScreen for guest mode ([43740de](https://github.com/emsrdl/tipsy/commit/43740de5be3ec4499e687a6dc49c675b848149d6))
+* add lastUsedAt property to Profile and update related components for guest mode handling ([eb60c9a](https://github.com/emsrdl/tipsy/commit/eb60c9a3de6e6a509ac75f05a1812b58e1a2cf9f))
+* add missing Bash(ls:*) permission and correct Dockerfile copy command ([b4c68dd](https://github.com/emsrdl/tipsy/commit/b4c68dda368e283570d1ef8b0b8e94668089d691))
+* add reset all functionality with confirmation dialog across multiple screens ([839400b](https://github.com/emsrdl/tipsy/commit/839400bb225489071663f03a42cea232e1a5eaba))
+* append 'development' label to app version in SettingsScreen for better clarity in dev mode ([4150d29](https://github.com/emsrdl/tipsy/commit/4150d29962d37bbc62158dee0cf84b3efe029380))
+* disable remove button for profile owner and update employee group on reset ([26d91da](https://github.com/emsrdl/tipsy/commit/26d91da28ab690bc7e563f758775dc226ee12f15))
+* enhance button styles and accessibility for role selection in SettingsScreen ([437e50a](https://github.com/emsrdl/tipsy/commit/437e50af97dc6437aad1a5b2da0d418ce010d9ad))
+* enhance profile management and guest mode functionality ([#4](https://github.com/emsrdl/tipsy/issues/4)) ([ca3b399](https://github.com/emsrdl/tipsy/commit/ca3b39971255c4c3143375cf4c5491e987e6c2d2))
+* enhance step navigation in ScreenContainer and related screens with clickable step pills ([e72ae3b](https://github.com/emsrdl/tipsy/commit/e72ae3b555acbe2d68647b19f5105c3cec123358))
+* implement confirmation dialog for reset all functionality across multiple screens ([bb4cb3b](https://github.com/emsrdl/tipsy/commit/bb4cb3b36c5c1c0978ba0e5701be4d2d3d963db6))
+* implement fallback name logic for employee display and normalize names across components ([cfa4450](https://github.com/emsrdl/tipsy/commit/cfa4450606a44ec40d5ad1b1a7e84fe604ead344))
+* refactor threshold input handling in Results and Settings screens with new custom hook ([4dd5e57](https://github.com/emsrdl/tipsy/commit/4dd5e577392160573292a3accbb66bd91dc9021e))
+* remove unused animations.css and integrate keyframes into globals.css ([88a9b53](https://github.com/emsrdl/tipsy/commit/88a9b53ce0982900c21a2362bbdfe1e1e152c6ee))
+* remove unused smart split features and clean up SetupScreen component ([62dc885](https://github.com/emsrdl/tipsy/commit/62dc88530a86d31357258b061361fcfbe9458914))
+* simplify nav element and enhance step pill styling in ScreenContainer ([f7d6bc8](https://github.com/emsrdl/tipsy/commit/f7d6bc8af464c7e60049dfc24803e28f46c3ee35))
+* update badge and employee group colors, swap kitchen and service references in components ([7ec0f3e](https://github.com/emsrdl/tipsy/commit/7ec0f3e647d8489442a84b95774705dcab86eac9))
+* update BadgeProps className type and sort employees in EmployeeForm for improved handling ([1b33cb0](https://github.com/emsrdl/tipsy/commit/1b33cb0889ce056c320dfe0c13e708180a6e51fc))
+* update class names to remove unnecessary flex-shrink properties and improve consistency across components ([4d0ead2](https://github.com/emsrdl/tipsy/commit/4d0ead2258b047e1e1ade28d124c8a798283c65d))
+* update dialog component styles for improved animations and layout consistency ([d83d37d](https://github.com/emsrdl/tipsy/commit/d83d37d531d18971629802fd09859735c1bbc0c7))
+* update documentation with architecture, data model, i18n, smart split, styling, and testing details ([2c7f80d](https://github.com/emsrdl/tipsy/commit/2c7f80d7f401424e83b03d41e3bb6032b726ac54))
+* update EmployeeRow component to enhance profile owner display and add initials functionality ([90debba](https://github.com/emsrdl/tipsy/commit/90debba315b5bec857d69b903a9b57f8712ce14b))
+* update guest mode logic and permissions in Profile components and settings ([46ea97e](https://github.com/emsrdl/tipsy/commit/46ea97e8ff138ca4b8d130d25cdd2254583f7fdf))
+* update HeaderBar component structure and improve logo navigation ([2475522](https://github.com/emsrdl/tipsy/commit/2475522c7b48e65dbcdd7bd59000e052e66ab855))
+* update localization keys and improve reset functionality across screens ([3743b31](https://github.com/emsrdl/tipsy/commit/3743b310343a60a2166293f805cce5aec1e378fa))
+* update settings.local.json permissions structure, add VITE_APP_VERSION to docker-compose.yml, and improve employee name resolution in ResultsScreen ([94cc26c](https://github.com/emsrdl/tipsy/commit/94cc26cb79697ae0f60c861b2f3241264f16de60))
+* update styling for step pills and adjust color variables in Katzentempel theme ([e568a69](https://github.com/emsrdl/tipsy/commit/e568a692c023674962acc7487e8cb74d770370a2))
+* update toast messages and improve localization in common and screens files ([7a80ecd](https://github.com/emsrdl/tipsy/commit/7a80ecdafb2f52756a52fbfdc425e29399c08167))
+
 ## [0.1.2](https://github.com/emsrdl/tipsy/compare/v0.1.1...v0.1.2) (2026-03-22)
 
 ### Bug Fixes
