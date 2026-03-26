@@ -1,3 +1,11 @@
+## [0.3.4](https://github.com/emsrdl/tipsy/compare/v0.3.3...v0.3.4) (2026-03-26)
+
+
+### Bug Fixes
+
+* add pull-requests write permission in preview cleanup workflow ([afbc298](https://github.com/emsrdl/tipsy/commit/afbc298d75cea28127c98e568fb4ac53401030d1))
+* add pull-requests write permission in preview cleanup workflow ([#11](https://github.com/emsrdl/tipsy/issues/11)) ([b1c2a0e](https://github.com/emsrdl/tipsy/commit/b1c2a0e8dbc23e91ce6f1c2f9b3706613e496f76))
+
 ## [0.3.3](https://github.com/emsrdl/tipsy/compare/v0.3.2...v0.3.3) (2026-03-26)
 
 
