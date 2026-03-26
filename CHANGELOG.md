@@ -1,3 +1,22 @@
+## [0.3.0](https://github.com/emsrdl/tipsy/compare/v0.2.2...v0.3.0) (2026-03-26)
+
+
+### Features
+
+* add workflow for cleaning up preview deployments on pull request closure ([6e74156](https://github.com/emsrdl/tipsy/commit/6e741569c877b1d66692b2dcb1968cf786645055))
+
+
+### Bug Fixes
+
+* add CI workflow for build, lint, and test processes ([81feedf](https://github.com/emsrdl/tipsy/commit/81feedf90e1900b95dfbff180abe70ede778c1e8))
+* add workflow for cleaning up preview deployments on pull request closure ([#7](https://github.com/emsrdl/tipsy/issues/7)) ([7db2fdb](https://github.com/emsrdl/tipsy/commit/7db2fdb702c37de30fb813bedcd72e844d552365))
+* clean up workflow configurations and improve permissions handling ([177524e](https://github.com/emsrdl/tipsy/commit/177524ea55a0c3718e4d2a3634e01a1935ad30b7))
+* enhance CI workflow with fetch depth for checkout; update Dockerfile to fetch git tags; modify git describe command in Vite config ([8e0b0a5](https://github.com/emsrdl/tipsy/commit/8e0b0a5ffd8f1de0223f1605f76edc0699aac60f))
+* enhance preview cleanup workflow with error handling and support for multiple deployments ([6a65fb1](https://github.com/emsrdl/tipsy/commit/6a65fb18a182576e78031bcae9b06c4a44141dbb))
+* optimize git fetch in Dockerfile to reduce network I/O; update version resolution comment in Vite config ([27bfdc4](https://github.com/emsrdl/tipsy/commit/27bfdc4a17fecc378eac4137c08f09ad84e44761))
+* update .dockerignore to exclude .git; enhance Vite config version resolution context ([73bdc46](https://github.com/emsrdl/tipsy/commit/73bdc46894f34ea2b30e02de8c876943c0686933))
+* update CI workflow with concurrency settings and timeout for jobs; refactor preview cleanup script for improved readability; enhance version resolution in Vite config ([b954152](https://github.com/emsrdl/tipsy/commit/b9541524a65b428323af4975d64ec44c3cf960de))
+
 ## [0.2.2](https://github.com/emsrdl/tipsy/compare/v0.2.1...v0.2.2) (2026-03-26)
 
 
