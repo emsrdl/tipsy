@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [closed]
 
+permissions: {}
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
@@ -13,7 +15,7 @@ jobs:
           DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
           BRANCH: ${{ github.head_ref }}
         run: |
-          DEPLOYMENTS=$(curl -s -G "https://core.emsr.cc/api/previewDeployment.all" \
+          DEPLOYMENTS=$(curl -sf -G "https://core.emsr.cc/api/previewDeployment.all" \
             --data-urlencode 'input={"applicationId":"jputpM5xsLcDcvrqXAn1Y"}' \
             -H "x-api-key: $DOKPLOY_API_KEY")
 
@@ -24,7 +26,7 @@ jobs:
             exit 0
           fi
 
-          curl -s -X POST "https://core.emsr.cc/api/previewDeployment.delete" \
+          curl -sf -X POST "https://core.emsr.cc/api/previewDeployment.delete" \
             -H "x-api-key: $DOKPLOY_API_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"previewDeploymentId\": \"$PREVIEW_ID\"}"

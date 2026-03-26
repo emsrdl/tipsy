@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "allow",
     "allow": [
       "Bash(npm run:*)",
       "WebSearch",
