@@ -1,3 +1,12 @@
+## [0.3.1](https://github.com/emsrdl/tipsy/compare/v0.3.0...v0.3.1) (2026-03-26)
+
+
+### Bug Fixes
+
+* enhance Dokploy preview cleanup workflow with improved API request handling and concurrency management ([dc5b2b0](https://github.com/emsrdl/tipsy/commit/dc5b2b03f2c6ee5ea37a68b9f9677b62b67807cd))
+* update Dokploy preview cleanup workflow to include CF client credentials in API requests ([20809a8](https://github.com/emsrdl/tipsy/commit/20809a8578d01c2f9eae6d0ab2fca82405ee7893))
+* update Dokploy preview cleanup workflow to include CF client credentials in API requests ([#8](https://github.com/emsrdl/tipsy/issues/8)) ([168cf74](https://github.com/emsrdl/tipsy/commit/168cf74bbfe28f7979aebe526638f03956587d61))
+
 ## [0.3.0](https://github.com/emsrdl/tipsy/compare/v0.2.2...v0.3.0) (2026-03-26)
 
 
