@@ -2,9 +2,10 @@ name: Cleanup Preview Deployment
 
 on:
   pull_request:
-    types: [closed]
+    types: [closed, unlabeled]
 
-permissions: {}
+permissions:
+  pull-requests: write
 
 concurrency:
   group: preview-cleanup-${{ github.event.pull_request.number }}
@@ -13,8 +14,19 @@ concurrency:
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: |
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (
+        github.event.action == 'closed' ||
+        (github.event.action == 'unlabeled' && github.event.label.name == 'preview' && github.actor != 'github-actions[bot]')
+      )
     steps:
+      - name: Remove preview label
+        if: github.event.action == 'closed'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit ${{ github.event.pull_request.number }} --remove-label "preview" 2>/dev/null || true
+
       - name: Delete Dokploy Preview Deployment
         env:
           DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
