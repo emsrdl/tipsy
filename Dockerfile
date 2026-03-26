@@ -35,7 +35,8 @@ ARG VITE_OIDC_SCOPE
 COPY . .
 
 # Fetch tags so git describe can produce a version like v0.2.2-3-gabcd123
-RUN git fetch --unshallow --tags 2>/dev/null || git fetch --tags 2>/dev/null || true
+# Skip if VITE_APP_VERSION is already set (e.g. in CI) to avoid unnecessary network I/O
+RUN [ -n "$VITE_APP_VERSION" ] || git fetch --unshallow --tags 2>/dev/null || git fetch --tags 2>/dev/null || true
 
 RUN bun run build
 
