@@ -13,6 +13,9 @@ FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
+# Install git for version detection via git describe
+RUN apk add --no-cache git
+
 # Install dependencies first (cached layer)
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
@@ -31,8 +34,11 @@ ARG VITE_OIDC_SCOPE
 # Copy source and build
 COPY . .
 
-# VITE_APP_VERSION falls back to package.json if not passed as build arg
-RUN VITE_APP_VERSION=${VITE_APP_VERSION:-$(bun -e "console.log(require('./package.json').version)")} bun run build
+# Fetch tags so git describe can produce a version like v0.2.2-3-gabcd123
+# Skip if VITE_APP_VERSION is already set (e.g. in CI) to avoid unnecessary network I/O
+RUN [ -n "$VITE_APP_VERSION" ] || git fetch --unshallow --tags 2>/dev/null || git fetch --tags 2>/dev/null || true
+
+RUN bun run build
 
 # ---- Stage 2: Serve ----
 FROM nginx:1.27-alpine AS serve

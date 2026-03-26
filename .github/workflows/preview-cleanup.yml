@@ -1,0 +1,53 @@
+name: Cleanup Preview Deployment
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Delete Dokploy Preview Deployment
+        env:
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          DEPLOYMENTS_RESPONSE=$(curl -sS -w "HTTPSTATUS:%{http_code}" -G "https://core.emsr.cc/api/previewDeployment.all" \
+            --data-urlencode 'input={"applicationId":"jputpM5xsLcDcvrqXAn1Y"}' \
+            -H "x-api-key: $DOKPLOY_API_KEY")
+
+          DEPLOYMENTS=$(echo "$DEPLOYMENTS_RESPONSE" | sed -e 's/HTTPSTATUS:[0-9]\{3\}$//')
+          HTTP_STATUS=$(echo "$DEPLOYMENTS_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Error: Failed to fetch preview deployments (HTTP status $HTTP_STATUS)"
+            exit 1
+          fi
+
+          if ! echo "$DEPLOYMENTS" | jq empty > /dev/null 2>&1; then
+            echo "Error: Unexpected non-JSON response when fetching preview deployments"
+            exit 1
+          fi
+
+          PREVIEW_IDS=$(echo "$DEPLOYMENTS" | jq -r --arg branch "$BRANCH" '.[] | select(.branch == $branch) | .previewDeploymentId')
+
+          if [ -z "$PREVIEW_IDS" ]; then
+            echo "No preview deployment found for branch $BRANCH"
+            exit 0
+          fi
+
+          while IFS= read -r PREVIEW_ID; do
+            if curl -fsS -X POST "https://core.emsr.cc/api/previewDeployment.delete" \
+              -H "x-api-key: $DOKPLOY_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"previewDeploymentId\": \"$PREVIEW_ID\"}"; then
+              echo "✅ Deleted preview deployment $PREVIEW_ID for branch $BRANCH"
+            else
+              echo "❌ Failed to delete preview deployment $PREVIEW_ID for branch $BRANCH" >&2
+              exit 1
+            fi
+          done <<< "$PREVIEW_IDS"

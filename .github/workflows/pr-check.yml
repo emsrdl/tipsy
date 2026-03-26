@@ -9,7 +9,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  title:
+  pr-title:
     runs-on: ubuntu-latest
     steps:
       - name: Validate PR title and label consistency
