@@ -6,6 +6,10 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: preview-cleanup-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
@@ -17,23 +21,19 @@ jobs:
           CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
           BRANCH: ${{ github.head_ref }}
+          APP_ID: jputpM5xsLcDcvrqXAn1Y
         run: |
+          CURL_AUTH=(-H "x-api-key: $DOKPLOY_API_KEY" -H "CF-Access-Client-Id: $CF_CLIENT_ID" -H "CF-Access-Client-Secret: $CF_CLIENT_SECRET")
+
           DEPLOYMENTS_RESPONSE=$(curl -sS -w "HTTPSTATUS:%{http_code}" \
-            "https://core.emsr.cc/api/previewDeployment.all?applicationId=jputpM5xsLcDcvrqXAn1Y" \
-            -H "x-api-key: $DOKPLOY_API_KEY" \
-            -H "CF-Access-Client-Id: $CF_CLIENT_ID" \
-            -H "CF-Access-Client-Secret: $CF_CLIENT_SECRET")
+            "https://core.emsr.cc/api/previewDeployment.all?applicationId=$APP_ID" \
+            "${CURL_AUTH[@]}")
 
           DEPLOYMENTS=$(echo "$DEPLOYMENTS_RESPONSE" | sed -e 's/HTTPSTATUS:[0-9]\{3\}$//')
           HTTP_STATUS=$(echo "$DEPLOYMENTS_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
 
           if [ "$HTTP_STATUS" -ne 200 ]; then
             echo "Error: Failed to fetch preview deployments (HTTP status $HTTP_STATUS)"
-            exit 1
-          fi
-
-          if ! echo "$DEPLOYMENTS" | jq empty > /dev/null 2>&1; then
-            echo "Error: Unexpected non-JSON response when fetching preview deployments"
             exit 1
           fi
 
@@ -44,16 +44,17 @@ jobs:
             exit 0
           fi
 
+          FAILED=0
           while IFS= read -r PREVIEW_ID; do
             if curl -fsS -X POST "https://core.emsr.cc/api/previewDeployment.delete" \
-              -H "x-api-key: $DOKPLOY_API_KEY" \
-              -H "CF-Access-Client-Id: $CF_CLIENT_ID" \
-              -H "CF-Access-Client-Secret: $CF_CLIENT_SECRET" \
+              "${CURL_AUTH[@]}" \
               -H "Content-Type: application/json" \
               -d "{\"previewDeploymentId\": \"$PREVIEW_ID\"}"; then
               echo "✅ Deleted preview deployment $PREVIEW_ID for branch $BRANCH"
             else
               echo "❌ Failed to delete preview deployment $PREVIEW_ID for branch $BRANCH" >&2
-              exit 1
+              FAILED=1
             fi
           done <<< "$PREVIEW_IDS"
+
+          [ "$FAILED" -eq 0 ] || exit 1
