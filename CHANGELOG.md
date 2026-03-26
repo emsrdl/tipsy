@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/emsrdl/tipsy/compare/v0.2.1...v0.2.2) (2026-03-26)
+
+
+### Bug Fixes
+
+* update permissions for gh api command and remove skip ci from release message ([e7f6287](https://github.com/emsrdl/tipsy/commit/e7f6287b561af10fe404600329c98863a3576233))
+
 ## [0.2.1](https://github.com/emsrdl/tipsy/compare/v0.2.0...v0.2.1) (2026-03-26)
 
 
