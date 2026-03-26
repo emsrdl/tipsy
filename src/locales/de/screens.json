@@ -16,6 +16,7 @@
     "employeeCount_one": "{{count}} Mitarbeiter",
     "employeeCount_other": "{{count}} Mitarbeiter",
     "resetEmployees": "Mitarbeiter zurücksetzen",
+    "resetPage": "Seite zurücksetzen",
     "defaultEmployeeName": "Mitarbeiter {{n}}"
   },
   "cashInput": {
@@ -25,6 +26,7 @@
     "totalLabel": "Gesamtbetrag",
     "denominationSection": "Scheine",
     "resetCash": "Bargeld zurücksetzen",
+    "resetPage": "Seite zurücksetzen",
     "coinSection": "Münzen"
   },
   "results": {
@@ -54,7 +56,13 @@
   "settings": {
     "sectionProfiles": "Profile",
     "sectionAppearance": "Darstellung",
+    "sectionDefaults": "Voreinstellungen",
+    "sectionData": "Daten",
+    "sectionAbout": "Info",
+    "version": "Version",
     "accentColor": "Akzentfarbe",
+    "defaultSplitTitle": "Standard Küche / Service Aufteilung",
+    "defaultSplitDesc": "Wird als Startaufteilung beim Einrichten einer neuen Schicht verwendet.",
     "smartSplitDesc": "Ausgleichszahlungen werden ab diesem Betrag vorgeschlagen."
   },
   "profile": {

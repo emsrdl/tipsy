@@ -87,7 +87,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {/* Toast container — top center */}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed left-1/2 top-16 z-50 flex -translate-x-1/2 flex-col items-center gap-2"
+        className="pointer-events-none fixed left-1/2 top-6 z-50 flex -translate-x-1/2 flex-col items-center gap-2"
       >
         {toasts.map((toast) => (
           <div key={toast.id} className="pointer-events-auto">

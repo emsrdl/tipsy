@@ -8,7 +8,7 @@
  * - History persistence via {@link useLocalStorage}
  * - Session snapshot creation for the history log
  *
- * @see src/lib/tipCalculator.ts for the core distribution algorithm
+ * @see src/lib/calc/tipCalculator.ts for the core distribution algorithm
  * @see src/hooks/useLocalStorage.ts for persistence
  * @see src/types/calculation.ts for HistoryEntry type
  *
@@ -32,7 +32,7 @@
  */
 
 import { useMemo, useCallback } from 'react';
-import { calculateDistribution, type CalculateDistributionInput } from '@/lib/tipCalculator';
+import { calculateDistribution, type CalculateDistributionInput } from '@/lib/calc/tipCalculator';
 import type { DistributionResult } from '@/types/session';
 import type { HistoryEntry } from '@/types/calculation';
 import { useLocalStorage } from '@/hooks/useLocalStorage';

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCalculation } from '@/hooks/useCalculation';
 import { makeEmployee, makeSplit } from '@/test/factories';
-import type { CalculateDistributionInput } from '@/lib/tipCalculator';
+import type { CalculateDistributionInput } from '@/lib/calc/tipCalculator';
 
 describe('useCalculation', () => {
   beforeEach(() => {

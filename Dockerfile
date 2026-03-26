@@ -1,7 +1,7 @@
 # ============================================================
 # Tipsy PWA — Multi-stage Dockerfile
 #
-# Stage 1 (builder): Node 20 Alpine — install deps and build
+# Stage 1 (builder): Bun Alpine — install deps and build
 # Stage 2 (serve):   Nginx Alpine — serve the built dist/
 #
 # Build args must match all VITE_* variables in .env.example.
@@ -9,13 +9,13 @@
 # ============================================================
 
 # ---- Stage 1: Build ----
-FROM node:20-alpine AS builder
+FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
 # Install dependencies first (cached layer)
-COPY package.json package-lock.json ./
-RUN npm ci --frozen-lockfile
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 # Build-time environment variables (Vite bakes these into the bundle)
 ARG VITE_APP_DOMAIN=auto
@@ -32,7 +32,7 @@ ARG VITE_OIDC_SCOPE
 COPY . .
 
 # VITE_APP_VERSION falls back to package.json if not passed as build arg
-RUN VITE_APP_VERSION=${VITE_APP_VERSION:-$(node -p "require('./package.json').version")} npm run build
+RUN VITE_APP_VERSION=${VITE_APP_VERSION:-$(bun -e "console.log(require('./package.json').version)")} bun run build
 
 # ---- Stage 2: Serve ----
 FROM nginx:1.27-alpine AS serve

@@ -2,7 +2,7 @@
  * @file src/screens/HistoryScreen/HistoryScreen.tsx
  * @description History screen — shift history with recharts graphs and import/export.
  *
- * Shows only shifts for the active profile (or guest message if in guest mode).
+ * Shows only shifts for the active profile (or a sign-in prompt when signed out).
  *
  * @example
  * // Rendered via React Router at route "/history"
@@ -106,7 +106,7 @@ export function HistoryScreen() {
   const { t } = useTranslation(['common', 'screens']);
   const { shifts: allShifts, deleteShift } = useShifts();
   const { locale } = useLocale();
-  const { activeProfile, isGuestMode } = useProfiles();
+  const { activeProfile } = useProfiles();
   const { showToast } = useToast();
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
 
@@ -117,12 +117,10 @@ export function HistoryScreen() {
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
 
-  // Filter shifts by active profile
-  const shifts = isGuestMode
+  // Filter shifts by active profile; empty when signed out
+  const shifts = activeProfile === null
     ? []
-    : activeProfile
-      ? allShifts.filter((s) => s.profileId === activeProfile.id)
-      : allShifts;
+    : allShifts.filter((s) => s.profileId === activeProfile.id);
 
   // Export only profile-filtered shifts; import reassigns to active profile
   const { exportCsv, exportPdf, exportJson, importJson, isProcessing } = useImportExport(shifts);
@@ -175,8 +173,8 @@ export function HistoryScreen() {
     showToast(t('common:toast.shiftDeleted'), 'info');
   }
 
-  // Guest mode empty state
-  if (isGuestMode) {
+  // Signed-out empty state
+  if (activeProfile === null) {
     return (
       <ScreenContainer title={t('screens:shifts.title')} subtitle={t('screens:shifts.subtitle')}>
         <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -184,9 +182,9 @@ export function HistoryScreen() {
             <Icon name="user" size={32} className="text-text-secondary" />
           </div>
           <p className="mb-1 text-base font-semibold text-text-primary">
-            {t('common:profile.noShiftsGuest')}
+            {t('common:profile.noShiftsSignedOut')}
           </p>
-          <p className="mb-6 text-sm text-text-secondary">{t('common:profile.noShiftsGuestSub')}</p>
+          <p className="mb-6 text-sm text-text-secondary">{t('common:profile.noShiftsSignedOutSub')}</p>
         </div>
       </ScreenContainer>
     );
@@ -356,7 +354,7 @@ export function HistoryScreen() {
                     className="flex min-h-14 w-full items-center justify-between px-4 py-3 transition-colors hover:bg-surface-overlay"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="bg-accent/10 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full">
+                      <div className="bg-accent/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
                         <Icon name="clock" size={16} className="text-accent" />
                       </div>
                       <div className="text-left">

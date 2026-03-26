@@ -16,6 +16,7 @@
     "employeeCount_one": "{{count}} employee",
     "employeeCount_other": "{{count}} employees",
     "resetEmployees": "Reset employees",
+    "resetPage": "Reset page",
     "defaultEmployeeName": "Employee {{n}}"
   },
   "cashInput": {
@@ -25,6 +26,7 @@
     "totalLabel": "Total amount",
     "denominationSection": "Banknotes",
     "resetCash": "Reset cash",
+    "resetPage": "Reset page",
     "coinSection": "Coins"
   },
   "results": {
@@ -54,7 +56,13 @@
   "settings": {
     "sectionProfiles": "Profiles",
     "sectionAppearance": "Appearance",
+    "sectionDefaults": "Defaults",
+    "sectionData": "Data",
+    "sectionAbout": "About",
+    "version": "Version",
     "accentColor": "Accent colour",
+    "defaultSplitTitle": "Default Kitchen / Service split",
+    "defaultSplitDesc": "Used as the starting split when setting up a new shift.",
     "smartSplitDesc": "Balance transfers are suggested when the deviation exceeds this amount."
   },
   "profile": {

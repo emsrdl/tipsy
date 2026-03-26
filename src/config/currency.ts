@@ -5,7 +5,7 @@
  * DENOMINATIONS is the authoritative ordered list of EUR cash denominations
  * used in the denomination grid. Order is descending by value (€500 → 1ct).
  *
- * @see src/lib/formatCurrency.ts for the formatEurFromCents implementation
+ * @see src/lib/format/formatCurrency.ts for the formatEurFromCents implementation
  * @see src/components/organisms/DenominationGrid for the UI using this list
  *
  * @example
@@ -14,7 +14,7 @@
  * console.log(formatEurFromCents(total)) // "€12,50"
  */
 
-import { formatEurFromCents } from '@/lib/formatCurrency';
+import { formatEurFromCents } from '@/lib/format/formatCurrency';
 
 /**
  * A single EUR denomination with its metadata.

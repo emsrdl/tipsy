@@ -1,9 +1,9 @@
 /**
  * @file src/components/organisms/ProfileSelector/ProfileSelector.tsx
- * @description ProfileSelector — dropdown to switch profiles or enter guest mode.
+ * @description ProfileSelector — dropdown to switch profiles or sign out.
  *
- * Shows the active profile with name + role badge, or "Gast Modus" if no profile.
- * Tapping opens an inline panel to switch, create, or enter guest mode.
+ * Shows the active profile with name + role badge, or "Gast" when signed out.
+ * Tapping opens an inline panel to switch, create, or sign out.
  *
  * @example
  * <ProfileSelector />
@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
  */
 export function ProfileSelector() {
   const { t } = useTranslation(['common', 'screens']);
-  const { profiles, activeProfile, isGuestMode, switchProfile, createProfile, enterGuestMode } =
+  const { profiles, activeProfile, switchProfile, createProfile, signOut } =
     useProfiles();
   const { shifts } = useShifts();
 
@@ -38,8 +38,8 @@ export function ProfileSelector() {
     setIsOpen(false);
   }
 
-  function handleGuestMode() {
-    enterGuestMode();
+  function handleSignOut() {
+    signOut();
     setIsOpen(false);
   }
 
@@ -52,7 +52,7 @@ export function ProfileSelector() {
   }
 
   const displayName =
-    isGuestMode || !activeProfile ? t('common:profile.guestBadge') : activeProfile.name;
+    activeProfile === null ? t('common:profile.guest') : activeProfile.name;
 
   const displayRole = activeProfile?.role ?? null;
 
@@ -72,29 +72,26 @@ export function ProfileSelector() {
       >
         <div
           className={cn(
-            'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full',
-            isGuestMode || !activeProfile ? 'bg-surface-overlay' : 'bg-accent/10',
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+            activeProfile === null ? 'bg-surface-overlay' : 'bg-accent/10',
           )}
         >
           <Icon
-            name={isGuestMode || !activeProfile ? 'user' : 'user'}
+            name="user"
             size={18}
-            className={isGuestMode || !activeProfile ? 'text-text-secondary' : 'text-accent'}
+            className={activeProfile === null ? 'text-text-secondary' : 'text-accent'}
           />
         </div>
 
         <div className="flex-1 text-left">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-text-primary">{displayName}</span>
-            {isGuestMode && (
-              <Badge
-                variant="default"
-                className="bg-status-warning/20 border-0 text-xs text-status-warning"
-              >
-                {t('common:profile.guestBadge')}
+            {activeProfile === null && (
+              <Badge variant="signed-out">
+                {t('common:profile.signedOut')}
               </Badge>
             )}
-            {displayRole && !isGuestMode && (
+            {displayRole && activeProfile !== null && (
               <Badge variant={displayRole === 'kitchen' ? 'kitchen' : 'service'}>
                 {displayRole === 'kitchen'
                   ? t('common:profile.role.kitchen')
@@ -108,7 +105,7 @@ export function ProfileSelector() {
         <Icon
           name={isOpen ? 'chevron-up' : 'chevron-down'}
           size={16}
-          className="flex-shrink-0 text-text-secondary"
+          className="shrink-0 text-text-secondary"
         />
       </button>
 
@@ -128,7 +125,7 @@ export function ProfileSelector() {
             >
               <div
                 className={cn(
-                  'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold',
                   activeProfile?.id === profile.id
                     ? 'bg-accent text-accent-foreground'
                     : 'bg-surface-overlay text-text-secondary',
@@ -153,23 +150,21 @@ export function ProfileSelector() {
             </button>
           ))}
 
-          {/* Guest mode */}
-          <button
-            type="button"
-            onClick={handleGuestMode}
-            className={cn(
-              'flex w-full items-center gap-3 border-t border-border px-4 py-3 transition-colors hover:bg-surface-overlay',
-              isGuestMode && 'bg-accent-subtle',
-            )}
-          >
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-surface-overlay">
-              <Icon name="user" size={16} className="text-text-secondary" />
-            </div>
-            <span className="flex-1 text-left text-sm font-medium text-text-primary">
-              {t('common:actions.guestMode')}
-            </span>
-            {isGuestMode && <Icon name="check" size={16} className="text-accent" />}
-          </button>
+          {/* Sign out */}
+          {activeProfile !== null && (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="flex w-full items-center gap-3 border-t border-border px-4 py-3 text-status-error transition-colors hover:bg-status-error/5"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-overlay">
+                <Icon name="user" size={16} className="text-text-secondary" />
+              </div>
+              <span className="flex-1 text-left text-sm font-medium">
+                {t('common:actions.signOut')}
+              </span>
+            </button>
+          )}
 
           {/* Create new profile */}
           <div className="border-t border-border p-3">

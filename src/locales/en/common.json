@@ -10,7 +10,17 @@
     "calculate": "Calculate",
     "history": "History",
     "settings": "Settings",
+    "createProfile": "Profiles",
     "main": "Main navigation"
+  },
+  "navigation": {
+    "steps": "Steps",
+    "goToStep": "Go to step {{step}} of {{total}}"
+  },
+  "resetAllDialog": {
+    "trigger": "Reset all",
+    "title": "Reset everything?",
+    "message": "All employees, cash, and settings for this shift will be cleared."
   },
   "actions": {
     "next": "Next",
@@ -32,15 +42,13 @@
     "editProfile": "Edit profile",
     "deleteProfile": "Delete profile",
     "resetStats": "Reset stats",
-    "guestMode": "Guest mode",
-    "exitGuestMode": "Exit guest mode",
     "signOut": "Sign out",
     "export": "Export",
     "import": "Import"
   },
   "profile": {
     "guest": "Guest",
-    "guestBadge": "Guest Mode",
+    "signedOut": "Signed out",
     "thisIsYou": "That's you",
     "role": {
       "kitchen": "Kitchen",
@@ -55,10 +63,12 @@
       "editProfile": "Edit profile",
       "switchProfile": "Switch profile",
       "signOut": "Sign out",
-      "settings": "Settings"
+      "settings": "Settings",
+      "createProfile": "Create profile",
+      "moreProfiles": "More profiles"
     },
-    "noShiftsGuest": "No shifts (Guest Mode)",
-    "noShiftsGuestSub": "Switch to a profile to save shifts.",
+    "noShiftsSignedOut": "No shifts",
+    "noShiftsSignedOutSub": "Sign in to save shifts.",
     "deleteWithShifts_one": "Delete profile and {{count}} shift?",
     "deleteWithShifts_other": "Delete profile and {{count}} shifts?",
     "deleteWithShiftsInfo_one": "This cannot be undone. {{count}} shift will be deleted.",
@@ -73,7 +83,6 @@
     "fairnessScore": "Fairness score",
     "deviation": "Deviation",
     "transfers": "Balance transfers",
-    "noTransfers": "No balance transfers needed",
     "transferFrom": "{{from}} pays {{amount}} to {{to}}",
     "remaining": "Remaining",
     "descSmart": "Optimises coin & note usage",
@@ -93,19 +102,14 @@
     "profileDeleted": "Profile deleted",
     "profileDeletedWithShifts_one": "Profile deleted, {{count}} shift removed",
     "profileDeletedWithShifts_other": "Profile deleted, {{count}} shifts removed",
-    "statsReset": "Statistics reset",
+    "cashReset": "Cash reset",
+    "pageReset": "Page reset",
+    "allReset": "Everything reset",
     "historyCleared": "History cleared",
-    "backupExported": "Backup exported",
-    "csvExported": "CSV exported",
-    "pdfExported": "PDF exported",
     "importSuccess": "{{added}} shifts imported",
     "importPartial": "{{added}} shifts imported, {{skipped}} skipped",
     "importFailed": "Import failed",
     "sessionRestored": "Shift restored",
-    "cashReset": "Cash reset",
-    "employeesReset": "Employees reset",
-    "thresholdUpdated": "Threshold: {{amount}}",
-    "calculationUpdated": "Calculation updated",
     "backupDownloaded": "Backup downloaded",
     "csvDownloaded": "CSV downloaded",
     "pdfOpened": "Opening PDF"

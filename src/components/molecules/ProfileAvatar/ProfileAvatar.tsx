@@ -3,7 +3,7 @@
  * @description ProfileAvatar — circular avatar in the header with inline dropdown menu.
  *
  * Shows initials derived from the active profile name (up to 2 letters).
- * Guest mode shows "G" with muted styling.
+ * Shows initials when signed in, "G" (Gast) when signed out.
  * On click: toggles an inline dropdown with profile actions.
  *
  * @example
@@ -14,7 +14,8 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useProfiles } from '@/hooks/useProfiles';
-import { Badge } from '@/components/atoms/Badge/Badge';
+import { ProfileRoleBadge } from '@/components/molecules/ProfileRoleBadge/ProfileRoleBadge';
+import { Icon } from '@/components/atoms/Icon/Icon';
 import { cn } from '@/lib/utils';
 
 /** Derives initials from a display name (e.g. "Elias Meyer" → "EM", "Anna" → "A"). */
@@ -34,7 +35,7 @@ function getInitials(name: string): string {
 export function ProfileAvatar() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
-  const { activeProfile, isGuestMode, enterGuestMode } = useProfiles();
+  const { profiles, activeProfile, signOut, switchProfile } = useProfiles();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -53,13 +54,11 @@ export function ProfileAvatar() {
   }, [isOpen]);
 
   const initials =
-    isGuestMode || !activeProfile
+    activeProfile === null
       ? (t('profile.guest')[0]?.toUpperCase() ?? 'G')
       : getInitials(activeProfile.name) || '?';
 
-  const displayName = isGuestMode || !activeProfile ? t('profile.guestBadge') : activeProfile.name;
-
-  const displayRole = !isGuestMode && activeProfile?.role;
+  const displayName = activeProfile === null ? t('profile.guest') : activeProfile.name;
 
   return (
     <div ref={containerRef} className="relative">
@@ -72,7 +71,7 @@ export function ProfileAvatar() {
           'flex h-10 w-10 items-center justify-center rounded-full',
           'text-xs font-bold transition-all',
           'ring-2 ring-offset-2 ring-offset-surface',
-          isGuestMode || !activeProfile
+          activeProfile === null
             ? 'bg-surface-overlay text-text-secondary ring-border'
             : 'ring-accent/40 bg-accent text-accent-foreground',
           isOpen && 'scale-95',
@@ -89,75 +88,87 @@ export function ProfileAvatar() {
               <p className="flex-1 truncate text-sm font-semibold text-text-primary">
                 {displayName}
               </p>
-              {isGuestMode && (
-                <Badge
-                  variant="default"
-                  className="bg-status-warning/20 flex-shrink-0 border-0 text-xs text-status-warning"
-                >
-                  {t('profile.guestBadge')}
-                </Badge>
-              )}
-              {displayRole && (
-                <Badge
-                  variant={displayRole === 'kitchen' ? 'kitchen' : 'service'}
-                  className="flex-shrink-0"
-                >
-                  {displayRole === 'kitchen'
-                    ? t('profile.role.kitchen')
-                    : t('profile.role.service')}
-                </Badge>
-              )}
+              <ProfileRoleBadge
+                role={activeProfile?.role ?? null}
+                className="shrink-0"
+              />
             </div>
           </div>
 
-          {/* Menu items */}
+          {/* Profile quick-switch list — up to 3 most recently used */}
           <div className="py-1">
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                void navigate('/settings');
-              }}
-              className="w-full px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
-            >
-              {t('profile.headerMenu.editProfile')}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                void navigate('/settings');
-              }}
-              className="w-full px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
-            >
-              {t('profile.headerMenu.switchProfile')}
-            </button>
+            {[...profiles]
+              .filter((p) => p.id !== activeProfile?.id)
+              .sort(
+                (a, b) =>
+                  new Date(b.lastUsedAt ?? b.createdAt).getTime() -
+                  new Date(a.lastUsedAt ?? a.createdAt).getTime(),
+              )
+              .slice(0, 3)
+              .map((profile) => {
+                const isActive = activeProfile?.id === profile.id;
+                return (
+                  <button
+                    key={profile.id}
+                    type="button"
+                    onClick={() => {
+                      switchProfile(profile.id);
+                      setIsOpen(false);
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
+                  >
+                    <span className="flex-1 truncate">{profile.name}</span>
+                    {isActive && (
+                      <Icon name="check" size={14} className="text-accent shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
 
-            {!isGuestMode && (
-              <button
-                type="button"
-                onClick={() => {
-                  enterGuestMode();
-                  setIsOpen(false);
-                }}
-                className="hover:bg-status-error/5 w-full px-4 py-3 text-left text-sm text-status-error transition-colors"
-              >
-                {t('actions.signOut')}
-              </button>
-            )}
-
-            <div className="mt-1 border-t border-border pt-1">
+            {/* Create profile — shown when no profile is active and no profiles exist */}
+            {activeProfile === null && profiles.length === 0 && (
               <button
                 type="button"
                 onClick={() => {
                   setIsOpen(false);
                   void navigate('/settings');
                 }}
-                className="w-full px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:bg-surface-overlay"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-accent transition-colors hover:bg-surface-overlay"
               >
-                {t('profile.headerMenu.settings')}
+                <Icon name="user-plus" size={14} className="shrink-0" />
+                <span className="flex-1">{t('actions.createProfile')}</span>
               </button>
-            </div>
+            )}
+
+            {/* Sign out — only shown when a profile is active */}
+            {activeProfile !== null && (
+              <button
+                type="button"
+                onClick={() => {
+                  signOut();
+                  setIsOpen(false);
+                }}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-status-error transition-colors hover:bg-status-error/5"
+              >
+                <span className="flex-1">{t('actions.signOut')}</span>
+              </button>
+            )}
+          </div>
+
+          {/* More profiles → Settings */}
+          <div className="border-t border-border">
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                void navigate('/settings');
+              }}
+              className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:bg-surface-overlay"
+            >
+              <Icon name="users" size={14} className="shrink-0" />
+              <span className="flex-1">{t('profile.headerMenu.moreProfiles')}</span>
+              <Icon name="chevron-right" size={14} className="shrink-0" />
+            </button>
           </div>
         </div>
       )}

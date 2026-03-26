@@ -49,6 +49,7 @@ import {
   Star,
   Zap,
   Edit2,
+  UserPlus,
   type LucideIcon,
 } from 'lucide-react';
 import type { IconName, IconProps } from './Icon.types';
@@ -90,6 +91,7 @@ const ICON_MAP: Record<IconName, LucideIcon> = {
   star: Star,
   zap: Zap,
   'edit-2': Edit2,
+  'user-plus': UserPlus,
 };
 
 /**

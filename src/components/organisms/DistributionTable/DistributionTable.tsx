@@ -12,7 +12,7 @@
  * <DistributionTable results={session.results} totalInCents={totalInCents} />
  */
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/atoms/Badge/Badge';
 import { Icon } from '@/components/atoms/Icon/Icon';
@@ -31,6 +31,8 @@ export interface DistributionTableProps {
   personShares?: PersonShare[];
   /** Optional payout plans with denomination assignments (from smart split). */
   payoutPlans?: EmployeePayoutPlan[];
+  /** Optional slot rendered between employee groups and the summary/total card. */
+  beforeSummary?: ReactNode;
 }
 
 /**
@@ -47,6 +49,7 @@ export function DistributionTable({
   totalInCents,
   personShares,
   payoutPlans,
+  beforeSummary,
 }: DistributionTableProps) {
   const { t } = useTranslation(['common', 'screens']);
   const { locale } = useLocale();
@@ -117,7 +120,7 @@ export function DistributionTable({
                       {r.hours}h{perHour && <span className="ml-1">· {perHour}/h</span>}
                     </p>
                   </div>
-                  <div className="flex flex-shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <p className="font-mono text-xl font-bold text-text-primary">
                       {formatEurFromCents(r.amountInCents, fmtLocale)}
                     </p>
@@ -137,7 +140,7 @@ export function DistributionTable({
                       {r.hours}h{perHour && <span className="ml-1">· {perHour}/h</span>}
                     </p>
                   </div>
-                  <div className="flex-shrink-0 text-right">
+                  <div className="shrink-0 text-right">
                     <p className="font-mono text-xl font-bold text-text-primary">
                       {formatEurFromCents(r.amountInCents, fmtLocale)}
                     </p>
@@ -231,39 +234,41 @@ export function DistributionTable({
 
   return (
     <div className="space-y-6">
+      {renderGroup(serviceResults, t('screens:results.groupService'), 'service', 'users')}
       {renderGroup(
         kitchenResults,
         t('screens:results.groupKitchen'),
         'kitchen',
         'utensils-crossed',
       )}
-      {renderGroup(serviceResults, t('screens:results.groupService'), 'service', 'users')}
+
+      {beforeSummary}
 
       {/* Summary card */}
       <div className="overflow-hidden rounded-xl shadow-elevation-2">
-        {kitchenResults.length > 0 && (
-          <div className="flex items-center justify-between border-b border-border bg-surface-raised px-4 py-3">
-            <div className="flex items-center gap-2">
-              <Icon name="utensils-crossed" size={14} className="text-orange-600" />
-              <span className="text-sm text-text-secondary">
-                {t('screens:results.kitchenPoolLabel')}
-              </span>
-            </div>
-            <span className="font-mono text-sm font-semibold">
-              {formatEurFromCents(kitchenTotal, fmtLocale)}
-            </span>
-          </div>
-        )}
         {serviceResults.length > 0 && (
           <div className="flex items-center justify-between border-b border-border bg-surface-raised px-4 py-3">
             <div className="flex items-center gap-2">
-              <Icon name="users" size={14} className="text-accent" />
+              <Icon name="users" size={14} className="text-teal-600 dark:text-teal-400" />
               <span className="text-sm text-text-secondary">
                 {t('screens:results.servicePoolLabel')}
               </span>
             </div>
             <span className="font-mono text-sm font-semibold">
               {formatEurFromCents(serviceTotal, fmtLocale)}
+            </span>
+          </div>
+        )}
+        {kitchenResults.length > 0 && (
+          <div className="flex items-center justify-between border-b border-border bg-surface-raised px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Icon name="utensils-crossed" size={14} className="text-orange-600 dark:text-orange-400" />
+              <span className="text-sm text-text-secondary">
+                {t('screens:results.kitchenPoolLabel')}
+              </span>
+            </div>
+            <span className="font-mono text-sm font-semibold">
+              {formatEurFromCents(kitchenTotal, fmtLocale)}
             </span>
           </div>
         )}

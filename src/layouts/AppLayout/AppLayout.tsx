@@ -9,7 +9,7 @@
  *
  * Touch-first:
  * - 56px bottom nav with 48px touch targets per tab
- * - Active tab: pill indicator (Material Navigation Bar style)
+ * - Active tab: full element highlight (bg-accent-subtle, rounded-xl)
  * - Safe area bottom padding (notch-aware via pb-safe)
  * - Backdrop blur for Material "tonal surface" effect
  *
@@ -78,15 +78,15 @@ export function AppLayout({ children }: AppLayoutProps) {
                 key={to}
                 to={to}
                 className={cn(
-                  'ripple flex w-24 flex-col items-center gap-1 rounded-xl px-3 py-2 transition-all',
+                  'flex w-24 flex-col items-center gap-1 py-3 transition-colors',
                   isActive ? 'text-accent' : 'text-text-secondary',
                 )}
               >
-                {/* Pill indicator for active tab */}
+                {/* MD3 active indicator pill — ripple stays within the pill */}
                 <div
                   className={cn(
-                    'flex h-8 min-w-[4rem] items-center justify-center rounded-full transition-all',
-                    isActive ? 'bg-accent-subtle px-4' : 'w-8',
+                    'ripple flex h-8 items-center justify-center rounded-full transition-all',
+                    isActive ? 'w-16 bg-accent-subtle' : 'w-16',
                   )}
                 >
                   <Icon name={icon} size={20} />

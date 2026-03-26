@@ -15,16 +15,17 @@ import { cn } from '@/lib/utils';
 
 export interface BadgeProps {
   /** Visual style variant. @default "default" */
-  variant?: 'default' | 'kitchen' | 'service' | 'accent';
+  variant?: 'default' | 'kitchen' | 'service' | 'accent' | 'signed-out';
   children: ReactNode;
-  className?: string;
+  className?: string | undefined;
 }
 
 const VARIANT_CLASSES: Record<NonNullable<BadgeProps['variant']>, string> = {
   default: 'bg-surface-overlay text-text-secondary',
   kitchen: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-  service: 'bg-accent-subtle text-accent',
+  service: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
   accent: 'bg-accent text-accent-foreground',
+  'signed-out': 'bg-status-error/15 text-status-error',
 };
 
 /**

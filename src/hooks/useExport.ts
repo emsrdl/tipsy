@@ -2,8 +2,8 @@
  * @file src/hooks/useExport.ts
  * @description Hook for triggering PDF and CSV exports.
  *
- * @see src/lib/exportPdf.ts
- * @see src/lib/exportCsv.ts
+ * @see src/lib/io/exportPdf.ts
+ * @see src/lib/io/exportCsv.ts
  *
  * @example
  * const { exportPdf, exportCsv, isExporting } = useExport()
@@ -12,8 +12,8 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from './useLocale';
-import { exportTipsPdf } from '@/lib/exportPdf';
-import { exportTipsCsv } from '@/lib/exportCsv';
+import { exportTipsPdf } from '@/lib/io/exportPdf';
+import { exportTipsCsv } from '@/lib/io/exportCsv';
 import type { DistributionResult } from '@/types/session';
 
 export interface UseExportReturn {
@@ -60,7 +60,7 @@ export function useExport(): UseExportReturn {
         setIsExporting(false);
       }
     },
-    [locale],
+    [locale, t],
   );
 
   const exportCsv = useCallback(
@@ -86,7 +86,7 @@ export function useExport(): UseExportReturn {
         setIsExporting(false);
       }
     },
-    [locale],
+    [locale, t],
   );
 
   return { exportPdf, exportCsv, isExporting, exportError };

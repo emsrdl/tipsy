@@ -16,4 +16,6 @@ export interface EmployeeRowProps {
   onHoursChange: (id: string, hours: number) => void;
   /** Called when group is toggled. */
   onGroupChange: (id: string, group: 'kitchen' | 'service') => void;
+  /** Used as the name when the user leaves the field empty. */
+  fallbackName: string;
 }

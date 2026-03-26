@@ -49,6 +49,8 @@ export interface Profile {
   role: ProfileRole;
   /** ISO 8601 creation timestamp. */
   createdAt: string;
+  /** ISO 8601 timestamp of the last time this profile was activated. */
+  lastUsedAt: string;
   /** Whether this profile is currently active. */
   isActive: boolean;
   /** Aggregated career stats. */

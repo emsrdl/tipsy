@@ -18,11 +18,18 @@ import { useShifts } from '@/hooks/useShifts';
 import { useImportExport } from '@/hooks/useImportExport';
 import { useToast } from '@/context/ToastContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useThresholdInput } from '@/hooks/useThresholdInput';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { Button } from '@/components/atoms/Button/Button';
-import { Badge } from '@/components/atoms/Badge/Badge';
+import { ProfileRoleBadge } from '@/components/molecules/ProfileRoleBadge/ProfileRoleBadge';
 import { THEMES, THEME_IDS } from '@/config/themes';
-import { SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD } from '@/config/smartSplit';
+import {
+  SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
+  DEFAULT_FAIRNESS_THRESHOLD,
+  DEFAULT_SPLIT_KEY,
+  DEFAULT_KITCHEN_PERCENT,
+} from '@/config/smartSplit';
+import { Slider } from '@/components/molecules/Slider/Slider';
 import { formatEurFromCents } from '@/config/currency';
 import { cn } from '@/lib/utils';
 import type { ProfileRole } from '@/types/profile';
@@ -36,12 +43,10 @@ export function SettingsScreen() {
   const {
     profiles,
     activeProfile,
-    isGuestMode,
     createProfile,
     updateProfile,
     deleteProfile,
     switchProfile,
-    enterGuestMode,
   } = useProfiles();
   const { theme, accentColor, colorMode, setTheme, setAccentColor, toggleColorMode } = useTheme();
   const { locale, setLocale } = useLocale();
@@ -55,11 +60,16 @@ export function SettingsScreen() {
   } = useImportExport();
   const { showToast } = useToast();
 
-  const [threshold, setThreshold] = useLocalStorage<number>(
-    SMART_SPLIT_THRESHOLD_KEY,
+  const [threshold, setThresholdStorage] = useLocalStorage<number>(
+    SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
     DEFAULT_FAIRNESS_THRESHOLD,
   );
-  const [thresholdInput, setThresholdInput] = useState((threshold / 100).toFixed(2));
+  const thresholdInput = useThresholdInput(threshold, setThresholdStorage);
+
+  const [defaultKitchenPercent, setDefaultKitchenPercent] = useLocalStorage<number>(
+    DEFAULT_SPLIT_KEY,
+    DEFAULT_KITCHEN_PERCENT,
+  );
 
   // Profile editing state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -125,26 +135,6 @@ export function SettingsScreen() {
       return acc + (myShare?.actualShareInCents ?? sh.totalTipsInCents);
     }, 0);
     return { totalShifts: ps.length, totalTipsInCents: totalTips };
-  }
-
-  function handleThresholdInputChange(value: string) {
-    setThresholdInput(value);
-    const parsed = parseFloat(value.replace(',', '.'));
-    if (!isNaN(parsed) && parsed >= 0.5 && parsed <= 50) {
-      setThreshold(Math.round(parsed * 100));
-    }
-  }
-
-  function handleThresholdInputBlur() {
-    const parsed = parseFloat(thresholdInput.replace(',', '.'));
-    if (isNaN(parsed) || parsed < 0.5) {
-      setThresholdInput((DEFAULT_FAIRNESS_THRESHOLD / 100).toFixed(2));
-      setThreshold(DEFAULT_FAIRNESS_THRESHOLD);
-    } else {
-      const clamped = Math.min(Math.max(parsed, 0.5), 50);
-      setThresholdInput(clamped.toFixed(2));
-      setThreshold(Math.round(clamped * 100));
-    }
   }
 
   function handleFileImport(file: File) {
@@ -213,24 +203,26 @@ export function SettingsScreen() {
                         type="button"
                         onClick={() => setEditRole('service')}
                         className={cn(
-                          'flex-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                          'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
                           editRole === 'service'
-                            ? 'bg-accent text-accent-foreground'
-                            : 'bg-surface-overlay text-text-secondary',
+                            ? 'bg-teal-100 text-teal-800 shadow-elevation-1 dark:bg-teal-900/40 dark:text-teal-300'
+                            : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
                         )}
                       >
+                        <Icon name="users" size={16} />
                         {t('common:profile.role.service')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setEditRole('kitchen')}
                         className={cn(
-                          'flex-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                          'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
                           editRole === 'kitchen'
-                            ? 'bg-accent text-accent-foreground'
-                            : 'bg-surface-overlay text-text-secondary',
+                            ? 'bg-orange-100 text-orange-800 shadow-elevation-1 dark:bg-orange-900/40 dark:text-orange-300'
+                            : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
                         )}
                       >
+                        <Icon name="utensils-crossed" size={16} />
                         {t('common:profile.role.kitchen')}
                       </button>
                     </div>
@@ -260,8 +252,8 @@ export function SettingsScreen() {
                       type="button"
                       onClick={() => switchProfile(profile.id)}
                       className={cn(
-                        'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                        activeProfile?.id === profile.id && !isGuestMode
+                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                        activeProfile?.id === profile.id
                           ? 'bg-accent text-accent-foreground'
                           : 'bg-surface-overlay text-text-secondary',
                       )}
@@ -278,13 +270,9 @@ export function SettingsScreen() {
                         <span className="truncate text-sm font-medium text-text-primary">
                           {profile.name}
                         </span>
-                        <Badge variant={profile.role === 'kitchen' ? 'kitchen' : 'service'}>
-                          {profile.role === 'kitchen'
-                            ? t('common:profile.role.kitchen')
-                            : t('common:profile.role.service')}
-                        </Badge>
-                        {activeProfile?.id === profile.id && !isGuestMode && (
-                          <Icon name="check" size={14} className="flex-shrink-0 text-accent" />
+                        <ProfileRoleBadge role={profile.role} />
+                        {activeProfile?.id === profile.id && (
+                          <Icon name="check" size={14} className="shrink-0 text-accent" />
                         )}
                       </div>
                       <p className="mt-0.5 text-xs text-text-secondary">
@@ -295,7 +283,7 @@ export function SettingsScreen() {
                       </p>
                     </button>
 
-                    <div className="flex flex-shrink-0 gap-1">
+                    <div className="flex shrink-0 gap-1">
                       <button
                         type="button"
                         onClick={() => handleStartEdit(profile.id)}
@@ -320,24 +308,6 @@ export function SettingsScreen() {
                 )}
               </div>
             ))}
-
-            {/* Guest mode row */}
-            <button
-              type="button"
-              onClick={isGuestMode ? undefined : enterGuestMode}
-              className={cn(
-                'flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-overlay',
-                isGuestMode && 'bg-accent-subtle',
-              )}
-            >
-              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-surface-overlay">
-                <Icon name="user" size={16} className="text-text-secondary" />
-              </div>
-              <span className="flex-1 text-left text-sm font-medium text-text-primary">
-                {t('common:actions.guestMode')}
-              </span>
-              {isGuestMode && <Icon name="check" size={14} className="text-accent" />}
-            </button>
 
             {/* Create new profile */}
             <div className="p-3">
@@ -367,24 +337,26 @@ export function SettingsScreen() {
                       type="button"
                       onClick={() => setNewRole('service')}
                       className={cn(
-                        'flex-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                        'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
                         newRole === 'service'
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-surface-overlay text-text-secondary',
+                          ? 'bg-teal-100 text-teal-800 shadow-elevation-1 dark:bg-teal-900/40 dark:text-teal-300'
+                          : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
                       )}
                     >
+                      <Icon name="users" size={16} />
                       {t('common:profile.role.service')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setNewRole('kitchen')}
                       className={cn(
-                        'flex-1 rounded-lg py-2 text-xs font-medium transition-colors',
+                        'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
                         newRole === 'kitchen'
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-surface-overlay text-text-secondary',
+                          ? 'bg-orange-100 text-orange-800 shadow-elevation-1 dark:bg-orange-900/40 dark:text-orange-300'
+                          : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
                       )}
                     >
+                      <Icon name="utensils-crossed" size={16} />
                       {t('common:profile.role.kitchen')}
                     </button>
                   </div>
@@ -428,7 +400,7 @@ export function SettingsScreen() {
               onClick={toggleColorMode}
               className="flex w-full items-center gap-3 px-4 py-4 transition-colors hover:bg-surface-overlay"
             >
-              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-surface-overlay">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-overlay">
                 <Icon
                   name={colorMode === 'dark' ? 'moon' : 'sun'}
                   size={18}
@@ -534,13 +506,30 @@ export function SettingsScreen() {
           </div>
         </section>
 
-        {/* ── Smart Split ── */}
+        {/* ── Defaults ── */}
         <section>
           <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-            Smart Split
+            {t('screens:settings.sectionDefaults')}
           </h2>
 
           <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
+            <div className="space-y-2 px-4 py-4">
+              <p className="text-sm font-medium text-text-primary">
+                {t('screens:settings.defaultSplitTitle')}
+              </p>
+              <p className="text-xs text-text-secondary">
+                {t('screens:settings.defaultSplitDesc')}
+              </p>
+              <Slider
+                value={100 - defaultKitchenPercent}
+                onChange={(v) => setDefaultKitchenPercent(100 - v)}
+                label={t('screens:setup.groupService')}
+                counterLabel={t('screens:setup.groupKitchen')}
+                aria-label={t('screens:setup.splitTitle')}
+                className="pt-1"
+              />
+            </div>
+
             <div className="space-y-2 px-4 py-4">
               <p className="text-sm font-medium text-text-primary">
                 {t('common:smartSplit.thresholdDefault')}
@@ -553,10 +542,10 @@ export function SettingsScreen() {
                   min="0.50"
                   max="50"
                   step="0.50"
-                  value={thresholdInput}
-                  onChange={(e) => handleThresholdInputChange(e.target.value)}
-                  onBlur={handleThresholdInputBlur}
-                  className="h-10 w-24 rounded-lg border border-border bg-surface-overlay px-3 text-center font-mono text-sm text-text-primary focus:border-accent focus:outline-none"
+                  value={thresholdInput.value}
+                  onChange={(e) => thresholdInput.onChange(e.target.value)}
+                  onBlur={thresholdInput.onBlur}
+                  className="h-7 w-20 rounded-full bg-surface-overlay px-2 text-center font-mono text-sm font-bold text-text-primary focus:outline-none"
                 />
                 <span className="text-sm text-text-secondary">€</span>
                 <span className="ml-2 text-xs text-text-secondary">
@@ -570,7 +559,7 @@ export function SettingsScreen() {
         {/* ── Data Management ── */}
         <section>
           <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-            Daten
+            {t('screens:settings.sectionData')}
           </h2>
 
           <div className="divide-y divide-border overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
@@ -623,10 +612,19 @@ export function SettingsScreen() {
 
         {/* ── About ── */}
         <section>
+          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            {t('screens:settings.sectionAbout')}
+          </h2>
           <div className="divide-y divide-border overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
             <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-text-secondary">Version</span>
-              <span className="font-mono text-sm text-text-primary">{import.meta.env.VITE_APP_VERSION}</span>
+              <span className="text-sm text-text-secondary">{t('screens:settings.version')}</span>
+              <span className="font-mono text-sm text-text-primary">
+                {import.meta.env.VITE_APP_VERSION}
+                {import.meta.env.DEV && ' (dev)'}
+                {!import.meta.env.DEV &&
+                  window.location.hostname.includes('prvw.') &&
+                  ' (preview)'}
+              </span>
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-text-secondary">{t('common:app.name')}</span>

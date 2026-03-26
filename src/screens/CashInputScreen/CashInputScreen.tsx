@@ -17,7 +17,20 @@ import { Alert } from '@/components/molecules/Alert/Alert';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
 import { useToast } from '@/context/ToastContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { DENOMINATIONS } from '@/config/currency';
+import {
+  DEFAULT_FAIRNESS_THRESHOLD,
+  SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
+  SMART_SPLIT_THRESHOLD_KEY,
+  SMART_SPLIT_ENABLED,
+} from '@/config/smartSplit';
+
+const STEP_ROUTES: Record<number, string> = {
+  1: '/calculate',
+  2: '/calculate/cash',
+  3: '/calculate/results',
+};
 
 /**
  * Cash input screen — step 2 of 3.
@@ -25,19 +38,32 @@ import { DENOMINATIONS } from '@/config/currency';
 export function CashInputScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
-  const { totalInCents, calculate, setDenominationQuantity } = useTipCalculator();
+  const { totalInCents, calculate, setDenominationQuantity, reset } = useTipCalculator();
   const { showToast } = useToast();
+  const [defaultThreshold] = useLocalStorage<number>(
+    SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
+    DEFAULT_FAIRNESS_THRESHOLD,
+  );
+  const [, setThreshold] = useLocalStorage<number>(SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD);
+  const [, setSmartMode] = useLocalStorage<boolean>('tipsy_smart_mode', SMART_SPLIT_ENABLED);
 
   const hasTotal = totalInCents > 0;
 
-  function handleCalculate() {
-    calculate();
-    void navigate('/calculate/results');
+  function handleStepClick(s: number) {
+    if (s === 3) calculate();
+    void navigate(STEP_ROUTES[s]);
   }
 
   function handleReset() {
     DENOMINATIONS.forEach((d) => setDenominationQuantity(d.id, 0));
     showToast(t('common:toast.cashReset'), 'info');
+  }
+
+  function handleResetAll() {
+    reset();
+    setThreshold(defaultThreshold);
+    setSmartMode(SMART_SPLIT_ENABLED);
+    void navigate('/calculate');
   }
 
   return (
@@ -46,8 +72,11 @@ export function CashInputScreen() {
       subtitle={t('screens:cashInput.subtitle')}
       step={2}
       totalSteps={3}
+      maxReachableStep={hasTotal ? 3 : 2}
+      onStepClick={handleStepClick}
+      onReset={handleResetAll}
     >
-      {/* Reset button — top right */}
+      {/* Reset page — upper right */}
       <div className="mb-2 flex justify-end">
         <Button
           type="button"
@@ -56,7 +85,7 @@ export function CashInputScreen() {
           className="min-h-10 gap-1.5 text-sm text-text-secondary"
         >
           <Icon name="refresh-cw" size={14} />
-          {t('screens:cashInput.resetCash')}
+          {t('screens:cashInput.resetPage')}
         </Button>
       </div>
 
@@ -71,7 +100,7 @@ export function CashInputScreen() {
         <Button
           type="button"
           disabled={!hasTotal}
-          onClick={handleCalculate}
+          onClick={() => handleStepClick(3)}
           className="min-h-14 w-full text-base font-semibold"
         >
           {t('common:actions.calculate')}
@@ -80,7 +109,7 @@ export function CashInputScreen() {
         <Button
           type="button"
           variant="ghost"
-          onClick={() => void navigate('/calculate')}
+          onClick={() => handleStepClick(1)}
           className="min-h-12 w-full"
         >
           <Icon name="chevron-left" size={16} />

@@ -10,7 +10,17 @@
     "calculate": "Berechnen",
     "history": "Verlauf",
     "settings": "Einstellungen",
+    "createProfile": "Profile",
     "main": "Hauptnavigation"
+  },
+  "navigation": {
+    "steps": "Schritte",
+    "goToStep": "Zu Schritt {{step}} von {{total}}"
+  },
+  "resetAllDialog": {
+    "trigger": "Alles zurücksetzen",
+    "title": "Alles zurücksetzen?",
+    "message": "Alle Mitarbeiter, Bargeld und Einstellungen dieser Schicht werden zurückgesetzt."
   },
   "actions": {
     "next": "Weiter",
@@ -32,15 +42,13 @@
     "editProfile": "Profil bearbeiten",
     "deleteProfile": "Profil löschen",
     "resetStats": "Statistiken zurücksetzen",
-    "guestMode": "Gastmodus",
-    "exitGuestMode": "Gastmodus beenden",
     "signOut": "Abmelden",
     "export": "Exportieren",
     "import": "Importieren"
   },
   "profile": {
     "guest": "Gast",
-    "guestBadge": "Gast Modus",
+    "signedOut": "Abgemeldet",
     "thisIsYou": "Das bist du",
     "role": {
       "kitchen": "Küche",
@@ -55,10 +63,12 @@
       "editProfile": "Profil bearbeiten",
       "switchProfile": "Profil wechseln",
       "signOut": "Abmelden",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "createProfile": "Profil erstellen",
+      "moreProfiles": "Weitere Profile"
     },
-    "noShiftsGuest": "Keine Schichten (Gast Modus)",
-    "noShiftsGuestSub": "Wechsle zu einem Profil, um Schichten zu speichern.",
+    "noShiftsSignedOut": "Keine Schichten",
+    "noShiftsSignedOutSub": "Melde dich an, um Schichten zu speichern.",
     "deleteWithShifts_one": "Profil und {{count}} Schicht löschen?",
     "deleteWithShifts_other": "Profil und {{count}} Schichten löschen?",
     "deleteWithShiftsInfo_one": "Dies kann nicht rückgängig gemacht werden. {{count}} Schicht wird gelöscht.",
@@ -73,7 +83,6 @@
     "fairnessScore": "Fairness-Score",
     "deviation": "Abweichung",
     "transfers": "Ausgleichszahlungen",
-    "noTransfers": "Keine Ausgleichszahlungen nötig",
     "transferFrom": "{{from}} zahlt {{amount}} an {{to}}",
     "remaining": "Restbetrag",
     "descSmart": "Optimiert Münzen & Scheine Nutzung",
@@ -93,19 +102,14 @@
     "profileDeleted": "Profil gelöscht",
     "profileDeletedWithShifts_one": "Profil gelöscht, {{count}} Schicht entfernt",
     "profileDeletedWithShifts_other": "Profil gelöscht, {{count}} Schichten entfernt",
-    "statsReset": "Statistiken zurückgesetzt",
+    "cashReset": "Bargeld zurückgesetzt",
+    "pageReset": "Seite zurückgesetzt",
+    "allReset": "Alles zurückgesetzt",
     "historyCleared": "Verlauf gelöscht",
-    "backupExported": "Backup exportiert",
-    "csvExported": "CSV exportiert",
-    "pdfExported": "PDF exportiert",
     "importSuccess": "{{added}} Schichten importiert",
     "importPartial": "{{added}} Schichten importiert, {{skipped}} übersprungen",
     "importFailed": "Import fehlgeschlagen",
     "sessionRestored": "Schicht wiederhergestellt",
-    "cashReset": "Bargeld zurückgesetzt",
-    "employeesReset": "Mitarbeiter zurückgesetzt",
-    "thresholdUpdated": "Schwellwert: {{amount}}",
-    "calculationUpdated": "Berechnung aktualisiert",
     "backupDownloaded": "Backup heruntergeladen",
     "csvDownloaded": "CSV heruntergeladen",
     "pdfOpened": "PDF wird geöffnet"

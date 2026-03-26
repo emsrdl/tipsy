@@ -9,6 +9,7 @@ services:
         VITE_APP_NAME: ${VITE_APP_NAME:-Tipsy}
         VITE_DEFAULT_THEME: ${VITE_DEFAULT_THEME:-tipsy}
         VITE_DEFAULT_LANG: ${VITE_DEFAULT_LANG:-de}
+        VITE_APP_VERSION: ${VITE_APP_VERSION:-}
         VITE_OIDC_AUTHORITY: ${VITE_OIDC_AUTHORITY:-}
         VITE_OIDC_CLIENT_ID: ${VITE_OIDC_CLIENT_ID:-}
         VITE_OIDC_REDIRECT_URI: ${VITE_OIDC_REDIRECT_URI:-}
@@ -20,12 +21,12 @@ services:
   # Dev server: Vite with HMR (use: docker compose --profile dev up)
   app-dev:
     profiles: [dev]
-    image: node:20-alpine
+    image: oven/bun:1-alpine
     working_dir: /app
     volumes:
       - .:/app
       - /app/node_modules
-    command: sh -c "npm install && npm run dev -- --host"
+    command: sh -c "bun install && bun run dev -- --host"
     ports:
       - '5173:5173'
     env_file:

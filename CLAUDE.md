@@ -1,59 +1,29 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this
-repository.
-
-## Project
-
-**tipsy** — a Progressive Web App for splitting cash tips among restaurant staff.
-
-Stack: **Vite + React 18 + TypeScript + Tailwind CSS + shadcn/ui + Vitest** Deployment: Docker via
-Dokploy → `tipsy.emsr.cc`
+**tipsy** — PWA for splitting cash tips among restaurant staff.
+Stack: Vite + React 18 + TypeScript + Tailwind CSS + shadcn/ui + Vitest.
+Deployment: Docker via Dokploy → `tipsy.emsr.cc`
 
 ## Commands
 
 ```bash
-npm run dev           # Vite dev server (port 5173, HMR)
-npm run build         # Type-check + production bundle
-npm run preview       # Serve dist/ locally
-npm run type-check    # Standalone TypeScript check
-npm run lint          # ESLint (strict, max-warnings 0)
-npm run lint:fix      # ESLint auto-fix
-npm run format        # Prettier write
-npm run format:check  # Prettier check (CI)
-npm test              # Vitest single-run (CI)
-npm run test:watch    # Vitest interactive watch
-npm run test:coverage # Coverage report to coverage/
+bun run dev           # Vite dev server (port 5173, HMR)
+bun run build         # Type-check + production bundle
+bun run type-check    # Standalone TypeScript check
+bun run lint          # ESLint (strict, max-warnings 0)
+bun run format        # Prettier write
+bun test              # Vitest single-run (CI)
 ```
 
-## Architecture
+## Docs
 
-### Component Layers (Atomic Design)
+- [Architecture](docs/architecture.md) — component layers, state, calculation flow
+- [Styling](docs/styling.md) — Material Design 3, Tailwind conventions, theming
+- [i18n](docs/i18n.md) — translations, namespaces, adding new strings
+- [Data Model](docs/data-model.md) — all TypeScript types (Employee, Session, Shift, Profile, …)
+- [Testing](docs/testing.md) — Vitest setup, renderWithProviders, factories, what to test
+- [Smart Split](docs/smart-split.md) — algorithm, fairness score, transfers, threshold logic
 
-- `src/components/ui/` — shadcn/ui output. **Do not edit directly.**
-- `src/components/atoms/` — wrap shadcn primitives with app-specific behavior
-- `src/components/molecules/` — compose atoms
-- `src/components/organisms/` — complex, compose molecules
-- `src/layouts/` — AppLayout, ScreenContainer
-- `src/screens/` — SetupScreen, CashInputScreen, ResultsScreen
+**Docs must be kept up to date.** When making changes that affect architecture, styling conventions, or i18n patterns, update the relevant doc file in the same step.
 
-### Key Conventions
-
-- **No hardcoded values**: colors via CSS variables, strings via i18n, domain via `env.ts`
-- **All colors** in `src/styles/globals.css` via CSS custom properties; theme switched via
-  `data-theme`/`data-mode` on `<html>`
-- **i18n**: 3 namespaces per language (`common`, `screens`, `errors`); default DE, fallback EN
-- **Money**: always integer euro cents; `formatEurFromCents()` for display
-- **Border radius**: `rounded-md` = 12px everywhere (set in `tailwind.config.ts`)
-
-### Themes
-
-- `tipsy`: 5 selectable accent colors (blue/purple/pink/orange/green)
-- `katzentempel`: fixed primary #6BA644, no accent picker
-
-### Docker
-
-```bash
-docker compose --profile dev up   # dev server with HMR
-docker compose up --build         # production nginx preview
-```
+**JSDoc must be kept up to date.** When changing a function's signature, behaviour, or purpose, update its JSDoc comment in the same step.
