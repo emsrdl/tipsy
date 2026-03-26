@@ -8,8 +8,8 @@
  * - Dev server settings
  *
  * Version resolution order:
- * 1. `VITE_APP_VERSION` env var (set by CI/release workflow)
- * 2. `git describe --tags --dirty --always` (dev, preview builds)
+ * 1. `VITE_APP_VERSION` env var (set by CI, release, and Dokploy preview builds)
+ * 2. `git describe --tags --dirty --always` (local dev)
  * 3. `version` from package.json (fallback when git is unavailable)
  *
  * @see tsconfig.json for matching path alias declarations
