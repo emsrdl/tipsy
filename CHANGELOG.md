@@ -1,3 +1,11 @@
+## [0.2.1](https://github.com/emsrdl/tipsy/compare/v0.2.0...v0.2.1) (2026-03-26)
+
+
+### Bug Fixes
+
+* dokploy tag detection deploy ([c5c7d51](https://github.com/emsrdl/tipsy/commit/c5c7d511122012b216db43a10d363f5d2b271d58))
+* dokploy tag detection deploy ([#5](https://github.com/emsrdl/tipsy/issues/5)) ([4911547](https://github.com/emsrdl/tipsy/commit/4911547224455bccdbe77f5fefae4aa1c0a377b2))
+
 ## [0.2.0](https://github.com/emsrdl/tipsy/compare/v0.1.2...v0.2.0) (2026-03-26)
 
 
