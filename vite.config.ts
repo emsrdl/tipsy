@@ -9,8 +9,8 @@
  *
  * Version resolution order:
  * 1. `VITE_APP_VERSION` env var (set by CI, release, and Dokploy preview builds)
- * 2. `git describe --tags --long --always` (local dev server — always includes commit count + hash)
- * 3. `git describe --tags --always` (production/preview builds — clean tag at release, hash when ahead)
+ * 2. `git describe --tags --long --always` (dev server — always includes commit count + hash)
+ * 3. `git describe --tags --always` (builds — clean tag at release, hash when ahead of tag)
  * 4. `version` from package.json (fallback when git is unavailable)
  *
  * @see tsconfig.json for matching path alias declarations
@@ -36,12 +36,15 @@ function r(path: string) {
   return fileURLToPath(new URL(path, import.meta.url));
 }
 
-export default defineConfig(({ command }) => ({
+const isDevServer =
+  process.argv.some((a) => /[/\\]vite$/.test(a)) && !process.argv.includes('build');
+
+export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '/',
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(
-      process.env.VITE_APP_VERSION ?? gitDescribe(command === 'serve'),
+      process.env.VITE_APP_VERSION ?? gitDescribe(isDevServer),
     ),
   },
   resolve: {
@@ -64,4 +67,4 @@ export default defineConfig(({ command }) => ({
     port: 5173,
     host: true,
   },
-}));
+});
