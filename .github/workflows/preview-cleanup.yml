@@ -5,6 +5,7 @@ on:
     types: [closed, unlabeled]
 
 permissions:
+  issues: write
   pull-requests: write
 
 concurrency:
