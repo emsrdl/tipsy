@@ -40,7 +40,7 @@ jobs:
             exit 0
           fi
 
-          echo "$PREVIEW_IDS" | while IFS= read -r PREVIEW_ID; do
+          while IFS= read -r PREVIEW_ID; do
             if curl -fsS -X POST "https://core.emsr.cc/api/previewDeployment.delete" \
               -H "x-api-key: $DOKPLOY_API_KEY" \
               -H "Content-Type: application/json" \
@@ -50,4 +50,4 @@ jobs:
               echo "❌ Failed to delete preview deployment $PREVIEW_ID for branch $BRANCH" >&2
               exit 1
             fi
-          done
+          done <<< "$PREVIEW_IDS"
