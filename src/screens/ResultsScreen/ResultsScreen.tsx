@@ -23,6 +23,7 @@ import { useExport } from '@/hooks/useExport';
 import { useShifts } from '@/hooks/useShifts';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useSmartSplitter } from '@/hooks/useSmartSplitter';
+import { useThresholdInput } from '@/hooks/useThresholdInput';
 import { useToast } from '@/context/ToastContext';
 import { useLocale } from '@/hooks/useLocale';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -93,28 +94,8 @@ export function ResultsScreen() {
   );
 
   const { isSmartMode, toggleSmartMode, thresholdInCents, setThreshold } = smartOutput;
-  const [thresholdInput, setThresholdInput] = useState((thresholdInCents / 100).toFixed(2));
+  const thresholdInput = useThresholdInput(thresholdInCents, setThreshold);
   const thresholdInputRef = useRef<HTMLInputElement>(null);
-
-  function handleThresholdChange(value: string) {
-    setThresholdInput(value);
-    const parsed = parseFloat(value.replace(',', '.'));
-    if (!isNaN(parsed) && parsed >= 0.5 && parsed <= 50) {
-      setThreshold(Math.round(parsed * 100));
-    }
-  }
-
-  function handleThresholdBlur() {
-    const parsed = parseFloat(thresholdInput.replace(',', '.'));
-    if (isNaN(parsed) || parsed < 0.5) {
-      setThresholdInput((DEFAULT_FAIRNESS_THRESHOLD / 100).toFixed(2));
-      setThreshold(DEFAULT_FAIRNESS_THRESHOLD);
-    } else {
-      const clamped = Math.min(Math.max(parsed, 0.5), 50);
-      setThresholdInput(clamped.toFixed(2));
-      setThreshold(Math.round(clamped * 100));
-    }
-  }
 
   const hasResults = results.length > 0;
 
@@ -189,7 +170,7 @@ export function ResultsScreen() {
         onClick={() => setShowSettings(!showSettings)}
         className="flex w-full items-center gap-2 px-4 py-2.5"
       >
-        <Icon name="settings" size={13} className="text-text-secondary shrink-0" />
+        <Icon name="settings" size={14} className="text-text-secondary shrink-0" />
         <div className="flex flex-1 flex-wrap items-center gap-1.5 min-w-0">
           {hasBothGroups && (
             <>
@@ -263,25 +244,23 @@ export function ResultsScreen() {
             </button>
             {isSmartMode && (
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium whitespace-nowrap text-text-secondary">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-medium text-text-primary">
                     {t('common:smartSplit.threshold')}:
                   </span>
-                  <div className="flex items-center gap-1">
-                    <input
-                      ref={thresholdInputRef}
-                      type="number"
-                      inputMode="decimal"
-                      min="0.50"
-                      max="50"
-                      step="0.50"
-                      value={thresholdInput}
-                      onChange={(e) => handleThresholdChange(e.target.value)}
-                      onBlur={handleThresholdBlur}
-                      className="h-7 w-16 rounded-lg border border-border bg-surface-overlay px-2 text-center font-mono text-xs text-text-primary focus:border-accent focus:outline-none"
-                    />
-                    <span className="text-xs text-text-secondary">€</span>
-                  </div>
+                  <input
+                    ref={thresholdInputRef}
+                    type="number"
+                    inputMode="decimal"
+                    min="0.50"
+                    max="50"
+                    step="0.50"
+                    value={thresholdInput.value}
+                    onChange={(e) => thresholdInput.onChange(e.target.value)}
+                    onBlur={thresholdInput.onBlur}
+                    className="h-7 w-16 rounded-full bg-surface-overlay px-2 text-center font-mono text-sm font-bold text-text-primary focus:outline-none"
+                  />
+                  <span className="text-sm text-text-secondary">€</span>
                 </div>
                 <button
                   type="button"

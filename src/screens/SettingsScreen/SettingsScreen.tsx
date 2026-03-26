@@ -18,6 +18,7 @@ import { useShifts } from '@/hooks/useShifts';
 import { useImportExport } from '@/hooks/useImportExport';
 import { useToast } from '@/context/ToastContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useThresholdInput } from '@/hooks/useThresholdInput';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { Button } from '@/components/atoms/Button/Button';
 import { ProfileRoleBadge } from '@/components/molecules/ProfileRoleBadge/ProfileRoleBadge';
@@ -59,11 +60,11 @@ export function SettingsScreen() {
   } = useImportExport();
   const { showToast } = useToast();
 
-  const [threshold, setThreshold] = useLocalStorage<number>(
+  const [threshold, setThresholdStorage] = useLocalStorage<number>(
     SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
     DEFAULT_FAIRNESS_THRESHOLD,
   );
-  const [thresholdInput, setThresholdInput] = useState((threshold / 100).toFixed(2));
+  const thresholdInput = useThresholdInput(threshold, setThresholdStorage);
 
   const [defaultKitchenPercent, setDefaultKitchenPercent] = useLocalStorage<number>(
     DEFAULT_SPLIT_KEY,
@@ -134,26 +135,6 @@ export function SettingsScreen() {
       return acc + (myShare?.actualShareInCents ?? sh.totalTipsInCents);
     }, 0);
     return { totalShifts: ps.length, totalTipsInCents: totalTips };
-  }
-
-  function handleThresholdInputChange(value: string) {
-    setThresholdInput(value);
-    const parsed = parseFloat(value.replace(',', '.'));
-    if (!isNaN(parsed) && parsed >= 0.5 && parsed <= 50) {
-      setThreshold(Math.round(parsed * 100));
-    }
-  }
-
-  function handleThresholdInputBlur() {
-    const parsed = parseFloat(thresholdInput.replace(',', '.'));
-    if (isNaN(parsed) || parsed < 0.5) {
-      setThresholdInput((DEFAULT_FAIRNESS_THRESHOLD / 100).toFixed(2));
-      setThreshold(DEFAULT_FAIRNESS_THRESHOLD);
-    } else {
-      const clamped = Math.min(Math.max(parsed, 0.5), 50);
-      setThresholdInput(clamped.toFixed(2));
-      setThreshold(Math.round(clamped * 100));
-    }
   }
 
   function handleFileImport(file: File) {
@@ -561,10 +542,10 @@ export function SettingsScreen() {
                   min="0.50"
                   max="50"
                   step="0.50"
-                  value={thresholdInput}
-                  onChange={(e) => handleThresholdInputChange(e.target.value)}
-                  onBlur={handleThresholdInputBlur}
-                  className="h-10 w-24 rounded-lg border border-border bg-surface-overlay px-3 text-center font-mono text-sm text-text-primary focus:border-accent focus:outline-none"
+                  value={thresholdInput.value}
+                  onChange={(e) => thresholdInput.onChange(e.target.value)}
+                  onBlur={thresholdInput.onBlur}
+                  className="h-7 w-20 rounded-full bg-surface-overlay px-2 text-center font-mono text-sm font-bold text-text-primary focus:outline-none"
                 />
                 <span className="text-sm text-text-secondary">€</span>
                 <span className="ml-2 text-xs text-text-secondary">
