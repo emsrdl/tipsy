@@ -1,3 +1,12 @@
+## [0.3.2](https://github.com/emsrdl/tipsy/compare/v0.3.1...v0.3.2) (2026-03-26)
+
+
+### Bug Fixes
+
+* improve git version resolution logic in Vite config ([46e581e](https://github.com/emsrdl/tipsy/commit/46e581ed44795be403b3e895868a641cb98bea09))
+* improve git version resolution logic in Vite config ([#9](https://github.com/emsrdl/tipsy/issues/9)) ([59fa631](https://github.com/emsrdl/tipsy/commit/59fa631596c92a816ab7c8d7145faf3aba950ca4))
+* update Vite config to improve version resolution logic for dev server ([357aa42](https://github.com/emsrdl/tipsy/commit/357aa4263fe0739968df98a8de1ed25bd757a30d))
+
 ## [0.3.1](https://github.com/emsrdl/tipsy/compare/v0.3.0...v0.3.1) (2026-03-26)
 
 
