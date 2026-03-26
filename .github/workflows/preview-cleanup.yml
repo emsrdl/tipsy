@@ -6,7 +6,6 @@ on:
 
 permissions:
   issues: write
-  pull-requests: write
 
 concurrency:
   group: preview-cleanup-${{ github.event.pull_request.number }}
@@ -26,7 +25,10 @@ jobs:
         if: github.event.action == 'closed'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh pr edit ${{ github.event.pull_request.number }} --remove-label "preview" 2>/dev/null || true
+        run: |
+          if ! OUTPUT=$(gh pr edit ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --remove-label "preview" 2>&1); then
+            echo "$OUTPUT" | grep -qi "label does not exist" || { echo "$OUTPUT" >&2; exit 1; }
+          fi
 
       - name: Delete Dokploy Preview Deployment
         env:
