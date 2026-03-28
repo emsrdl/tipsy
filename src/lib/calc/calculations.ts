@@ -171,3 +171,20 @@ export function rmsd(deviations: number[]): number {
   const sumSquares = deviations.reduce((sum, d) => sum + d * d, 0);
   return Math.sqrt(sumSquares / deviations.length);
 }
+
+/**
+ * Converts mean absolute deviation and mean ideal share into a 0–100 fairness score.
+ * Score 100 = everyone gets exactly their ideal; score 0 = average deviation ≥ 100% of ideal.
+ *
+ * @param meanAbsDev - Mean absolute deviation in cents
+ * @param meanIdeal - Mean ideal share per person in cents
+ * @returns Integer fairness score 0–100
+ *
+ * @example
+ * fairnessScoreFromMeanDev(0, 2000)   // 100 (perfect)
+ * fairnessScoreFromMeanDev(1000, 2000) // 50
+ */
+export function fairnessScoreFromMeanDev(meanAbsDev: number, meanIdeal: number): number {
+  if (meanIdeal === 0) return 100;
+  return Math.max(0, Math.round(100 * (1 - meanAbsDev / meanIdeal)));
+}

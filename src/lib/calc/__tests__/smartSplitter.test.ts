@@ -108,7 +108,37 @@ describe('smartSplit', () => {
 
       const shares = output.distribution.personShares;
       const totalDistributed = shares.reduce((s, p) => s + p.actualShareInCents, 0);
-      expect(totalDistributed).toBeLessThanOrEqual(10000);
+      expect(totalDistributed).toBe(10000); // all money distributed
+    });
+
+    it('distributes all available denominations with no leftovers', () => {
+      const output = smartSplit(
+        makeInput({
+          smartMode: true,
+          denominations: [makeDenomQty('eur_50', 2)],
+        }),
+      );
+      expect(output.distribution.remainingCents).toBe(0);
+    });
+
+    it('ensures every working employee gets a non-zero amount', () => {
+      const output = smartSplit(
+        makeInput({
+          smartMode: true,
+          employees: [
+            makeEmployee({ id: 'e1', name: 'Anna', hours: 8, group: 'service' }),
+            makeEmployee({ id: 'e2', name: 'Bob', hours: 4, group: 'service' }),
+            makeEmployee({ id: 'e3', name: 'Cara', hours: 2, group: 'service' }),
+          ],
+          totalInCents: 15000,
+          denominations: [makeDenomQty('eur_50', 3)],
+        }),
+      );
+      for (const share of output.distribution.personShares) {
+        if (share.hoursWorked > 0) {
+          expect(share.actualShareInCents).toBeGreaterThan(0);
+        }
+      }
     });
   });
 
@@ -270,7 +300,7 @@ describe('calculateTransfers', () => {
     expect(transfers[0]!.amountInCents).toBe(1000);
   });
 
-  it('limits transfers to MAX_TRANSFER_CHAINS', () => {
+  it('creates transfers for all over/underpaid pairs', () => {
     const shares: PersonShare[] = Array.from({ length: 10 }, (_, i) => ({
       id: `e${i}`,
       name: `Person ${i}`,
@@ -281,7 +311,11 @@ describe('calculateTransfers', () => {
       deviationInCents: i < 5 ? 1000 : -1000,
     }));
     const transfers = calculateTransfers(shares, 100);
-    expect(transfers.length).toBeLessThanOrEqual(3); // MAX_TRANSFER_CHAINS
+    // Should create enough transfers to settle all imbalances
+    expect(transfers.length).toBeGreaterThanOrEqual(5);
+    // Total transferred should balance overpaid and underpaid
+    const totalTransferred = transfers.reduce((s, t) => s + t.amountInCents, 0);
+    expect(totalTransferred).toBe(5000);
   });
 
   it('handles all underpaid or all overpaid', () => {

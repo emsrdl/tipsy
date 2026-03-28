@@ -6,11 +6,8 @@
  * @see src/types/shift.ts for related types
  */
 
-/** Default fairness threshold in cents. Transfers suggested when deviation exceeds this. */
-export const DEFAULT_FAIRNESS_THRESHOLD = 500;
-
-/** Maximum number of transfer chains to suggest. Prevents excessive transfer complexity. */
-export const MAX_TRANSFER_CHAINS = 3;
+/** Default fairness threshold in cents (€1). Transfers suggested when deviation exceeds this. */
+export const DEFAULT_FAIRNESS_THRESHOLD = 100;
 
 /** Whether smart splitting is enabled by default. */
 export const SMART_SPLIT_ENABLED = true;

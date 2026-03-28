@@ -64,9 +64,9 @@ describe('useSmartSplitter', () => {
     expect(result.current.isSmartMode).toBe(false);
   });
 
-  it('has default threshold of 500 cents', () => {
+  it('has default threshold of 100 cents', () => {
     const { result } = renderHook(() => useSmartSplitter(employees, 10000, 0, denominations));
-    expect(result.current.thresholdInCents).toBe(500);
+    expect(result.current.thresholdInCents).toBe(100);
   });
 
   it('allows threshold update', () => {

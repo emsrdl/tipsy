@@ -21,8 +21,15 @@
  *      between employees to reduce the maximum deviation. A swap is accepted if it
  *      reduces the sum of squared deviations (improving fairness).
  *
- *   4. **Compute fairness metrics** — calculate max deviation, mean deviation,
- *      unallocated remainder, and a 0–100 fairness score.
+ *   4. **Mop-up phase** — assign any remaining unallocated denominations to the most
+ *      underpaid employee. This guarantees all available cash is distributed.
+ *
+ *   5. **Best-effort safety net** — if any working employee has €0, try to move
+ *      the smallest denomination from the most overpaid employee to them.
+ *      Only possible when enough denomination units exist.
+ *
+ *   6. **Compute fairness metrics** — calculate max deviation, mean deviation,
+ *      and a 0–100 fairness score.
  *
  * ## Performance
  *
@@ -36,7 +43,7 @@
  * - **Single employee**: Gets all available cash (trivially optimal).
  * - **Insufficient denominations**: Assigns what's available, reports unallocated = 0
  *   but employees may be underpaid (deviation < 0).
- * - **Excess denominations**: Leftover denominations reported in `unallocated`.
+ * - **Excess denominations**: All denominations are distributed via the mop-up phase.
  * - **All same ideal amount**: Round-robin assignment ensures fairness.
  * - **One cent denomination available**: Can always match exactly (given enough 1ct coins).
  *
@@ -64,6 +71,7 @@
  */
 
 import { useMemo } from 'react';
+import { fairnessScoreFromMeanDev } from '@/lib/calc/calculations';
 import type { DistributionResult } from '@/types/session';
 import type {
   AvailableDenomination,
@@ -168,6 +176,12 @@ export function matchDenominations(input: DenominationMatchInput): DenominationM
   // Phase 2: Improvement swaps — try to reduce max deviation
   improveSwaps(distributions, assignmentMap, actualMap);
 
+  // Phase 3: Mop-up — assign all remaining denominations so nothing is left over
+  mopUp(distributions, pool, assignmentMap, actualMap);
+
+  // Phase 4: Best-effort safety net — try to avoid any working employee getting €0 where denominations allow
+  ensureNonZeroPayouts(distributions, assignmentMap, actualMap);
+
   // Build payouts
   const payouts: EmployeePayoutPlan[] = distributions.map((d) => {
     const assignments = assignmentMap.get(d.employeeId) ?? [];
@@ -194,6 +208,26 @@ export function matchDenominations(input: DenominationMatchInput): DenominationM
     unallocated,
     durationMs: performance.now() - start,
   };
+}
+
+/**
+ * Adds one unit of a denomination to an employee's assignment list.
+ * Creates a new entry if the denomination isn't already assigned.
+ *
+ * @internal
+ */
+function addUnit(
+  assignments: DenominationAssignment[],
+  denominationId: string,
+  valueInCents: number,
+): void {
+  const existing = assignments.find((a) => a.denominationId === denominationId);
+  if (existing) {
+    existing.count++;
+    existing.totalCents += valueInCents;
+  } else {
+    assignments.push({ denominationId, count: 1, totalCents: valueInCents });
+  }
 }
 
 /**
@@ -310,17 +344,7 @@ function improveSwaps(
             assignA.totalCents -= denomValue;
 
             const assignmentsB = assignmentMap.get(distB.employeeId) ?? [];
-            const existingB = assignmentsB.find((a) => a.denominationId === assignA.denominationId);
-            if (existingB) {
-              existingB.count++;
-              existingB.totalCents += denomValue;
-            } else {
-              assignmentsB.push({
-                denominationId: assignA.denominationId,
-                count: 1,
-                totalCents: denomValue,
-              });
-            }
+            addUnit(assignmentsB, assignA.denominationId, denomValue);
 
             actualMap.set(distA.employeeId, (actualMap.get(distA.employeeId) ?? 0) - denomValue);
             actualMap.set(distB.employeeId, (actualMap.get(distB.employeeId) ?? 0) + denomValue);
@@ -335,15 +359,123 @@ function improveSwaps(
 }
 
 /**
+ * Mop-up phase: assigns all remaining denominations to employees.
+ *
+ * Each remaining denomination unit goes to the employee with the smallest
+ * deviation (most underpaid). This guarantees all available cash is distributed.
+ *
+ * @internal
+ * @param distributions - Original ideal distributions
+ * @param pool - Mutable pool of available denominations
+ * @param assignmentMap - Mutable map of employee assignments
+ * @param actualMap - Mutable map of actual amounts
+ */
+function mopUp(
+  distributions: DistributionResult[],
+  pool: AvailableDenomination[],
+  assignmentMap: Map<string, DenominationAssignment[]>,
+  actualMap: Map<string, number>,
+): void {
+  if (distributions.length === 0) return;
+
+  for (const denom of pool) {
+    while (denom.available > 0) {
+      // Find the employee with the smallest deviation (most underpaid)
+      let bestId = distributions[0]!.employeeId;
+      let bestDeviation = Infinity;
+
+      for (const dist of distributions) {
+        const deviation = (actualMap.get(dist.employeeId) ?? 0) - dist.amountInCents;
+        if (deviation < bestDeviation) {
+          bestDeviation = deviation;
+          bestId = dist.employeeId;
+        }
+      }
+
+      // Assign one unit of this denomination to the best employee
+      let assignments = assignmentMap.get(bestId);
+      if (!assignments) {
+        assignments = [];
+        assignmentMap.set(bestId, assignments);
+      }
+      addUnit(assignments, denom.denominationId, denom.valueInCents);
+
+      actualMap.set(bestId, (actualMap.get(bestId) ?? 0) + denom.valueInCents);
+      denom.available--;
+    }
+  }
+}
+
+/**
+ * Safety net: ensures every employee with hours > 0 gets a non-zero payout.
+ *
+ * If an employee with hours > 0 has actualAmount === 0, moves the smallest
+ * denomination from the most overpaid employee to them.
+ *
+ * @internal
+ */
+function ensureNonZeroPayouts(
+  distributions: DistributionResult[],
+  assignmentMap: Map<string, DenominationAssignment[]>,
+  actualMap: Map<string, number>,
+): void {
+  for (const dist of distributions) {
+    if (dist.hours <= 0 || (actualMap.get(dist.employeeId) ?? 0) > 0) continue;
+
+    // Find the most overpaid employee (largest deviation) who has assignments
+    let bestDonorId: string | null = null;
+    let bestDonorDeviation = -Infinity;
+
+    for (const other of distributions) {
+      if (other.employeeId === dist.employeeId) continue;
+      const deviation = (actualMap.get(other.employeeId) ?? 0) - other.amountInCents;
+      const assignments = assignmentMap.get(other.employeeId) ?? [];
+      const hasAssignments = assignments.some((a) => a.count > 0);
+      if (deviation > bestDonorDeviation && hasAssignments) {
+        bestDonorDeviation = deviation;
+        bestDonorId = other.employeeId;
+      }
+    }
+
+    if (!bestDonorId) continue;
+
+    // Find the smallest denomination from the donor
+    const donorAssignments = assignmentMap.get(bestDonorId) ?? [];
+    const activeAssignments = donorAssignments.filter((a) => a.count > 0);
+    if (activeAssignments.length === 0) continue;
+
+    // Sort by value ascending to find smallest
+    activeAssignments.sort(
+      (a, b) => a.totalCents / a.count - b.totalCents / b.count,
+    );
+    const smallest = activeAssignments[0]!;
+    const denomValue = smallest.totalCents / smallest.count;
+
+    // Move one unit from donor to this employee
+    smallest.count--;
+    smallest.totalCents -= denomValue;
+    actualMap.set(bestDonorId, (actualMap.get(bestDonorId) ?? 0) - denomValue);
+
+    let recipientAssignments = assignmentMap.get(dist.employeeId);
+    if (!recipientAssignments) {
+      recipientAssignments = [];
+      assignmentMap.set(dist.employeeId, recipientAssignments);
+    }
+    addUnit(recipientAssignments, smallest.denominationId, denomValue);
+    actualMap.set(dist.employeeId, (actualMap.get(dist.employeeId) ?? 0) + denomValue);
+  }
+}
+
+/**
  * Computes aggregate fairness metrics for a set of payouts.
  *
  * The fairness score is computed as:
- *   `100 - min(100, (meanAbsDeviation / totalIdeal) × 10000)`
+ *   `100 × max(0, 1 − meanAbsDeviation / meanIdealPerPerson)`
  *
  * This means:
  * - Score 100 = all employees get exactly their ideal amount
- * - Score 0 = mean deviation is ≥ 1% of the total
- * - Typical scenarios score 95–100
+ * - Score 50 = average employee is off by 50% of their ideal share
+ * - Score 0 = average employee is off by 100%+ of their ideal share
  *
  * @internal
  * @param payouts - The employee payout plans
@@ -362,11 +494,8 @@ function computeFairness(payouts: EmployeePayoutPlan[], totalIdeal: number): Fai
 
   const isPerfect = maxDeviation === 0 && totalUnallocated === 0;
 
-  // Score: 100 when perfect, decreases as mean deviation increases relative to total
-  const score =
-    totalIdeal > 0
-      ? Math.max(0, Math.round(100 - Math.min(100, (meanDeviation / totalIdeal) * 10000)))
-      : 100;
+  const meanIdeal = totalIdeal / payouts.length;
+  const score = fairnessScoreFromMeanDev(meanDeviation, meanIdeal);
 
   return {
     maxDeviationInCents: maxDeviation,

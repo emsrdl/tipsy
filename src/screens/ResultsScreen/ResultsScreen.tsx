@@ -28,11 +28,13 @@ import { useToast } from '@/context/ToastContext';
 import { useLocale } from '@/hooks/useLocale';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
+import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
+import { fairnessScoreFromMeanDev } from '@/lib/calc/calculations';
 import { formatEurFromCents } from '@/config/currency';
 import { DEFAULT_FAIRNESS_THRESHOLD, SMART_SPLIT_DEFAULT_THRESHOLD_KEY } from '@/config/smartSplit';
 import { resolveEmployeeName } from '@/lib/employee';
 import { cn } from '@/lib/utils';
-import type { Shift, DifferenceLine } from '@/types/shift';
+import type { Shift } from '@/types/shift';
 
 function generateShiftId(): string {
   return `shift-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -63,6 +65,7 @@ export function ResultsScreen() {
     DEFAULT_FAIRNESS_THRESHOLD,
   );
   const [exportOpen, setExportOpen] = useState(false);
+  const [guestFinishOpen, setGuestFinishOpen] = useState(false);
   const [showThresholdHelp, setShowThresholdHelp] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -116,7 +119,7 @@ export function ResultsScreen() {
       : normalizedResults;
 
   function handleSaveAndFinish() {
-    if (!hasResults) return;
+    if (!hasResults || activeProfile === null) return;
 
     const distribution = smartOutput.output?.distribution ?? {
       personShares: normalizedResults.map((r) => ({
@@ -135,7 +138,7 @@ export function ResultsScreen() {
 
     const shift: Shift = {
       id: generateShiftId(),
-      profileId: activeProfile?.id ?? null,
+      profileId: activeProfile.id,
       date: new Date().toISOString(),
       kitchenPercent: session.split.kitchenPercent,
       employees: normalizedEmployees,
@@ -161,47 +164,67 @@ export function ResultsScreen() {
   }
 
   const fairnessScore = smartOutput.output?.distribution.fairnessScore;
-  const transfers: DifferenceLine[] = smartOutput.output?.differences ?? [];
+  const transfers = smartOutput.output?.differences ?? [];
 
-  const settingsDropdown = (<>
-    <div className="rounded-xl bg-surface-raised shadow-elevation-1 overflow-hidden">
+  const postTransferFairnessScore = useMemo(() => {
+    const shares = smartOutput.output?.distribution.personShares;
+    const diffs = smartOutput.output?.differences;
+    if (!shares || !diffs?.length) return undefined;
+
+    const effective = new Map(shares.map((s) => [s.id, s.actualShareInCents]));
+    for (const t of diffs) {
+      effective.set(t.fromPerson.id, (effective.get(t.fromPerson.id) ?? 0) - t.amountInCents);
+      effective.set(t.toPerson.id, (effective.get(t.toPerson.id) ?? 0) + t.amountInCents);
+    }
+    const meanIdeal = shares.reduce((s, p) => s + p.idealShareInCents, 0) / shares.length;
+    const meanAbsDev =
+      shares.reduce((s, p) => s + Math.abs((effective.get(p.id) ?? 0) - p.idealShareInCents), 0) /
+      shares.length;
+    return fairnessScoreFromMeanDev(meanAbsDev, meanIdeal);
+  }, [smartOutput.output?.distribution.personShares, smartOutput.output?.differences]);
+
+  const settingsDropdown = (
+    <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
       <button
         type="button"
         onClick={() => setShowSettings(!showSettings)}
         className="flex w-full items-center gap-2 px-4 py-2.5"
       >
-        <Icon name="settings" size={14} className="text-text-secondary shrink-0" />
-        <div className="flex flex-1 flex-wrap items-center gap-1.5 min-w-0">
+        <Icon name="settings" size={14} className="shrink-0 text-text-secondary" />
+        <span className="flex-1 text-left text-sm text-text-secondary">
+          {t('screens:setup.splitTitle')}
+        </span>
+        <div className="flex shrink-0 items-center gap-1">
           {hasBothGroups && (
-            <>
-              <span className="rounded-full bg-teal-100 px-2 py-0.5 font-mono text-xs font-semibold text-teal-800 dark:bg-teal-900/30 dark:text-teal-300">
-                {t('screens:setup.groupService')} {session.split.servicePercent}%
+            <span className="inline-flex overflow-hidden rounded-full font-mono text-xs font-semibold">
+              <span className="bg-teal-100 px-1.5 py-0.5 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300">
+                {session.split.servicePercent}%
               </span>
-              <span className="rounded-full bg-orange-100 px-2 py-0.5 font-mono text-xs font-semibold text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
-                {t('screens:setup.groupKitchen')} {session.split.kitchenPercent}%
+              <span className="bg-orange-100 px-1.5 py-0.5 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                {session.split.kitchenPercent}%
               </span>
-            </>
+            </span>
           )}
           <span
             className={cn(
-              'rounded-full px-2 py-0.5 font-mono text-xs font-semibold',
+              'rounded-full px-1.5 py-0.5 font-mono text-xs font-semibold',
               isSmartMode ? 'bg-accent/15 text-accent' : 'bg-surface-overlay text-text-secondary',
             )}
           >
             {isSmartMode
-              ? `${t('common:smartSplit.smart')} · ${formatEurFromCents(thresholdInCents, fmtLocale)}`
+              ? `${t('common:smartSplit.smart')} ${formatEurFromCents(thresholdInCents, fmtLocale)}`
               : t('common:smartSplit.normal')}
           </span>
         </div>
         <Icon
           name={showSettings ? 'chevron-up' : 'chevron-down'}
           size={14}
-          className="text-text-secondary shrink-0"
+          className="shrink-0 text-text-secondary"
         />
       </button>
 
       {showSettings && (
-        <div className="border-t border-border divide-y divide-border">
+        <div className="divide-y divide-border border-t border-border">
           {hasBothGroups && (
             <div className="px-4 pt-3 pb-3">
               <Slider
@@ -213,7 +236,7 @@ export function ResultsScreen() {
               />
             </div>
           )}
-          <div className="px-4 py-2.5 space-y-2">
+          <div className="space-y-2 px-4 py-2.5">
             <button
               type="button"
               onClick={toggleSmartMode}
@@ -267,7 +290,9 @@ export function ResultsScreen() {
                   onClick={() => setShowThresholdHelp(!showThresholdHelp)}
                   className="text-xs whitespace-nowrap text-accent underline"
                 >
-                  {showThresholdHelp ? t('common:smartSplit.helpClose') : t('common:smartSplit.helpWhat')}
+                  {showThresholdHelp
+                    ? t('common:smartSplit.helpClose')
+                    : t('common:smartSplit.helpWhat')}
                 </button>
               </div>
             )}
@@ -280,42 +305,7 @@ export function ResultsScreen() {
         </div>
       )}
     </div>
-
-    {isSmartMode && transfers.length > 0 && (
-      <div className="overflow-hidden rounded-xl bg-status-warning/10 shadow-elevation-1">
-        <div className="flex items-center gap-2 border-b border-status-warning/20 px-4 py-3">
-          <Icon name="arrow-right" size={14} className="text-status-warning" />
-          <span className="text-sm font-semibold text-text-primary">
-            {t('common:smartSplit.transfers')}
-          </span>
-          <Badge
-            variant="default"
-            className="ml-auto border-0 bg-status-warning/20 text-xs text-status-warning"
-          >
-            {t('common:smartSplit.aboveThreshold', {
-              amount: formatEurFromCents(thresholdInCents, fmtLocale),
-            })}
-          </Badge>
-        </div>
-        <div className="divide-y divide-status-warning/10">
-          {transfers.map((diff, i) => (
-            <div key={i} className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-text-primary">
-                <span className="font-medium">{diff.fromPerson.name}</span>
-                {' → '}
-                <span className="font-medium">{diff.toPerson.name}</span>
-              </span>
-              <span className="font-mono text-sm font-bold text-status-warning">
-                {formatEurFromCents(diff.amountInCents, fmtLocale)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-  </>);
-
-
+  );
 
   function handleStepClick(s: number) {
     void navigate(STEP_ROUTES[s]);
@@ -334,51 +324,92 @@ export function ResultsScreen() {
       {results.length === 0 ? (
         <Alert status="info" message={t('errors:validation.noEmployees')} />
       ) : (
-        <div className="space-y-4">
-          <DistributionTable
-            results={displayResults}
-            totalInCents={totalInCents}
-            {...(isSmartMode && smartOutput.output
-              ? {
-                  personShares: smartOutput.output.distribution.personShares,
-                  payoutPlans: smartOutput.output.payoutPlans,
-                }
-              : {})}
-            beforeSummary={settingsDropdown}
-          />
-
-          {isSmartMode && fairnessScore !== undefined && (
-            <div className="flex items-center gap-3 px-1 pt-1">
-              <div className="flex items-center gap-1.5">
+        <DistributionTable
+          results={displayResults}
+          totalInCents={totalInCents}
+          {...(isSmartMode && smartOutput.output
+            ? {
+                personShares: smartOutput.output.distribution.personShares,
+                payoutPlans: smartOutput.output.payoutPlans,
+              }
+            : {})}
+          belowGroups={
+            isSmartMode && transfers.length > 0 ? (
+              <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
+                <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+                  <Icon name="arrow-right" size={14} className="text-status-warning" />
+                  <span className="text-sm font-semibold text-text-primary">
+                    {t('common:smartSplit.transfers')}
+                  </span>
+                  <Badge
+                    variant="default"
+                    className="ml-auto border-0 bg-status-warning/15 text-xs text-status-warning"
+                  >
+                    {t('common:smartSplit.aboveThreshold', {
+                      amount: formatEurFromCents(thresholdInCents, fmtLocale),
+                    })}
+                  </Badge>
+                </div>
+                <div className="divide-y divide-border">
+                  {transfers.map((diff, i) => (
+                    <div key={i} className="flex items-center justify-between gap-3 px-4 py-3.5">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="truncate text-sm font-semibold text-text-primary">
+                          {diff.fromPerson.name}
+                        </span>
+                        <Icon
+                          name="arrow-right"
+                          size={14}
+                          className="shrink-0 text-status-warning"
+                        />
+                        <span className="truncate text-sm font-semibold text-text-primary">
+                          {diff.toPerson.name}
+                        </span>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-status-warning/15 px-2.5 py-0.5 font-mono text-sm font-bold text-status-warning">
+                        {formatEurFromCents(diff.amountInCents, fmtLocale)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : undefined
+          }
+          beforeSummary={
+            isSmartMode && fairnessScore !== undefined ? (
+              <div className="flex items-center gap-2 px-1">
                 <Icon
                   name="star"
                   size={14}
-                  className={fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning'}
+                  className={
+                    (postTransferFairnessScore ?? fairnessScore) >= 95
+                      ? 'text-status-success'
+                      : 'text-status-warning'
+                  }
                 />
-                <span className="text-sm text-text-secondary">
+                <span className="flex-1 text-sm text-text-secondary">
                   {t('common:smartSplit.fairnessScore')}
                 </span>
-              </div>
-              <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-overlay">
-                <div
-                  className={cn(
-                    'h-full rounded-full transition-all duration-500',
-                    fairnessScore >= 95 ? 'bg-status-success' : 'bg-status-warning',
-                  )}
-                  style={{ width: `${fairnessScore}%` }}
-                />
-              </div>
-              <span
-                className={cn(
-                  'shrink-0 font-mono text-base font-bold',
-                  fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning',
+                {postTransferFairnessScore !== undefined ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className={cn('font-mono text-sm font-bold', fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
+                      {fairnessScore}%
+                    </span>
+                    <Icon name="arrow-right" size={12} className="text-text-secondary" />
+                    <span className={cn('font-mono text-sm font-bold', postTransferFairnessScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
+                      {postTransferFairnessScore}%
+                    </span>
+                  </span>
+                ) : (
+                  <span className={cn('font-mono text-sm font-bold', fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
+                    {fairnessScore}%
+                  </span>
                 )}
-              >
-                {fairnessScore}%
-              </span>
-            </div>
-          )}
-        </div>
+              </div>
+            ) : undefined
+          }
+          afterSummary={settingsDropdown}
+        />
       )}
 
       {/* Actions */}
@@ -386,14 +417,24 @@ export function ResultsScreen() {
         {hasResults && (
           <>
             {/* Save & finish */}
-            <Button
-              type="button"
-              onClick={handleSaveAndFinish}
-              className="min-h-14 w-full text-base font-semibold"
-            >
-              <Icon name="save" size={18} />
-              {activeProfile === null ? t('screens:results.finishNoSave') : t('screens:results.saveAndFinish')}
-            </Button>
+            {activeProfile === null ? (
+              <Button
+                type="button"
+                onClick={() => setGuestFinishOpen(true)}
+                className="min-h-14 w-full text-base font-semibold"
+              >
+                {t('screens:results.finishGuest')}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleSaveAndFinish}
+                className="min-h-14 w-full text-base font-semibold"
+              >
+                <Icon name="save" size={18} />
+                {t('screens:results.saveAndFinish')}
+              </Button>
+            )}
 
             {/* Export button */}
             <Button
@@ -422,6 +463,16 @@ export function ResultsScreen() {
           </Button>
         </div>
       </div>
+
+      {/* Guest finish confirmation */}
+      <ConfirmDialog
+        isOpen={guestFinishOpen}
+        title={t('screens:results.finishGuestDialogTitle')}
+        message={t('screens:results.finishGuestDialogMessage')}
+        confirmLabel={t('screens:results.finishGuest')}
+        onConfirm={handleResetAll}
+        onCancel={() => setGuestFinishOpen(false)}
+      />
 
       {/* Export dialog */}
       <ExportDialog
