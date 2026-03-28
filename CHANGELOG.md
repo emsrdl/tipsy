@@ -1,3 +1,18 @@
+## [0.4.0](https://github.com/emsrdl/tipsy/compare/v0.3.4...v0.4.0) (2026-03-28)
+
+
+### Features
+
+* enhance distribution table and fairness scoring logic ([104b9b3](https://github.com/emsrdl/tipsy/commit/104b9b3a08bbda39251dd25d83a31550919ad419))
+* working tip splitting ([#12](https://github.com/emsrdl/tipsy/issues/12)) ([e8590a2](https://github.com/emsrdl/tipsy/commit/e8590a2c57b5a60cd30dae468a98c3e3bc4a93c5))
+
+
+### Bug Fixes
+
+* refactor group display for improved layout and styling ([9a4aa38](https://github.com/emsrdl/tipsy/commit/9a4aa38603853815d878f97d002a55c2dcc10eab))
+* update default threshold value in useSmartSplitter tests ([ec6528f](https://github.com/emsrdl/tipsy/commit/ec6528f8787bf7aa32e6c567cb90e5dd49cb2d70))
+* update smart split logic and enhance distribution handling ([675d8a1](https://github.com/emsrdl/tipsy/commit/675d8a1fb34c9d64e825f246c181260340b2b9a7))
+
 ## [0.3.4](https://github.com/emsrdl/tipsy/compare/v0.3.3...v0.3.4) (2026-03-26)
 
 
