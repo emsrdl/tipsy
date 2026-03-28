@@ -24,7 +24,11 @@
  *   4. **Mop-up phase** — assign any remaining unallocated denominations to the most
  *      underpaid employee. This guarantees all available cash is distributed.
  *
- *   5. **Compute fairness metrics** — calculate max deviation, mean deviation,
+ *   5. **Best-effort safety net** — if any working employee has €0, try to move
+ *      the smallest denomination from the most overpaid employee to them.
+ *      Only possible when enough denomination units exist.
+ *
+ *   6. **Compute fairness metrics** — calculate max deviation, mean deviation,
  *      and a 0–100 fairness score.
  *
  * ## Performance
@@ -175,7 +179,7 @@ export function matchDenominations(input: DenominationMatchInput): DenominationM
   // Phase 3: Mop-up — assign all remaining denominations so nothing is left over
   mopUp(distributions, pool, assignmentMap, actualMap);
 
-  // Phase 4: Safety net — ensure no working employee gets €0
+  // Phase 4: Best-effort safety net — try to avoid any working employee getting €0 where denominations allow
   ensureNonZeroPayouts(distributions, assignmentMap, actualMap);
 
   // Build payouts

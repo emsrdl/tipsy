@@ -33,8 +33,8 @@ The active threshold resets to the Settings default whenever a calculation is sa
 `matchDenominations()` in `src/hooks/useDenominationMatcher.ts`:
 - **Greedy phase:** assign denominations largest-first toward each employee's ideal
 - **Swap phase:** try swapping denominations between employees to reduce deviations
-- **Mop-up phase:** assign all remaining denominations to the most underpaid employee, guaranteeing no leftover cash
-- **Safety net:** if any working employee has €0, move the smallest denomination from the most overpaid employee to them
+- **Mop-up phase:** assign all remaining denominations to the most underpaid employee, ensuring no leftover cash
+- **Safety net (best-effort):** if any working employee has €0, try to move the smallest denomination from the most overpaid employee to them — only possible when denominations allow
 
 Output: `EmployeePayoutPlan[]` — physical bills/coins assigned per employee. All available cash is always distributed.
 
