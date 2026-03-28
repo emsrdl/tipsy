@@ -67,6 +67,7 @@
  */
 
 import { useMemo } from 'react';
+import { fairnessScoreFromMeanDev } from '@/lib/calc/calculations';
 import type { DistributionResult } from '@/types/session';
 import type {
   AvailableDenomination,
@@ -489,12 +490,8 @@ function computeFairness(payouts: EmployeePayoutPlan[], totalIdeal: number): Fai
 
   const isPerfect = maxDeviation === 0 && totalUnallocated === 0;
 
-  // Score relative to mean ideal per person — much gentler than the old total-based formula
   const meanIdeal = totalIdeal / payouts.length;
-  const score =
-    meanIdeal > 0
-      ? Math.max(0, Math.round(100 * (1 - meanDeviation / meanIdeal)))
-      : 100;
+  const score = fairnessScoreFromMeanDev(meanDeviation, meanIdeal);
 
   return {
     maxDeviationInCents: maxDeviation,

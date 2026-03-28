@@ -119,6 +119,12 @@
     overscroll-behavior: none;
   }
 
+  /* Radix scroll-lock adds margin-right to compensate for the scrollbar, but
+     scrollbar-gutter: stable already reserves that space — cancel it out. */
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+  }
+
   /* Prevent zoom on input focus (iOS Safari) */
   input[type='text'],
   input[type='number'],

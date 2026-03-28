@@ -31,8 +31,12 @@ export interface DistributionTableProps {
   personShares?: PersonShare[];
   /** Optional payout plans with denomination assignments (from smart split). */
   payoutPlans?: EmployeePayoutPlan[];
-  /** Optional slot rendered between employee groups and the summary/total card. */
+  /** Optional slot rendered directly after employee groups, before fairness/total. */
+  belowGroups?: ReactNode;
+  /** Optional slot rendered between employee groups and the total card. */
   beforeSummary?: ReactNode;
+  /** Optional slot rendered after the total card. */
+  afterSummary?: ReactNode;
 }
 
 /**
@@ -49,7 +53,9 @@ export function DistributionTable({
   totalInCents,
   personShares,
   payoutPlans,
+  belowGroups,
   beforeSummary,
+  afterSummary,
 }: DistributionTableProps) {
   const { t } = useTranslation(['common', 'screens']);
   const { locale } = useLocale();
@@ -123,7 +129,7 @@ export function DistributionTable({
                       <p className="font-mono text-xl font-bold text-text-primary">
                         {formatEurFromCents(r.amountInCents, fmtLocale)}
                       </p>
-                      {share && share.deviationInCents !== 0 && (
+                      {share && (
                         <p className="font-mono text-xs text-text-secondary">
                           {t('screens:results.idealColumn')}: {formatEurFromCents(share.idealShareInCents, fmtLocale)}
                         </p>
@@ -222,19 +228,23 @@ export function DistributionTable({
         'utensils-crossed',
       )}
 
+      {belowGroups}
+
       {beforeSummary}
 
       {/* Total card */}
-      <div className="overflow-hidden rounded-xl shadow-elevation-2">
-        <div className="flex items-center justify-between bg-accent px-4 py-4">
-          <span className="text-base font-semibold text-accent-foreground">
+      <div className="overflow-hidden rounded-xl border-2 border-accent bg-surface-raised shadow-elevation-1">
+        <div className="flex items-center justify-between px-4 py-4">
+          <span className="text-base font-semibold text-accent">
             {t('screens:results.totalLabel')}
           </span>
-          <span className="font-mono text-2xl font-bold text-accent-foreground">
+          <span className="font-mono text-2xl font-bold text-accent">
             {formatEurFromCents(totalInCents, fmtLocale)}
           </span>
         </div>
       </div>
+
+      {afterSummary}
     </div>
   );
 }

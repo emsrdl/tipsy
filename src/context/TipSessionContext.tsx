@@ -130,9 +130,18 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
     }));
   }, []);
 
-  const setSplit = useCallback((split: TipSplit) => {
-    setSession((s) => ({ ...s, results: null, split }));
-  }, []);
+  const setSplit = useCallback(
+    (split: TipSplit) => {
+      setSession((s) => {
+        if (s.results !== null) {
+          const results = calculateDistribution({ totalInCents, employees: s.employees, split });
+          return { ...s, results, split };
+        }
+        return { ...s, results: null, split };
+      });
+    },
+    [totalInCents],
+  );
 
   const setDenominationQuantity = useCallback((denominationId: string, quantity: number) => {
     setSession((s) => ({
