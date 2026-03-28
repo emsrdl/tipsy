@@ -28,7 +28,6 @@
 import { calculateDistribution } from './tipCalculator';
 import { matchDenominations } from '@/hooks/useDenominationMatcher';
 import { DENOMINATIONS } from '@/config/currency';
-import { MAX_TRANSFER_CHAINS } from '@/config/smartSplit';
 import type { DenominationQuantity } from '@/types/session';
 import type { AvailableDenomination } from '@/types/calculation';
 import type { PersonShare, DifferenceLine, SmartSplitInput, SmartSplitOutput } from '@/types/shift';
@@ -158,15 +157,19 @@ function buildSmartResult(
   });
 
   // Build person shares from match result
-  const personShares: PersonShare[] = matchResult.payouts.map((p) => ({
-    id: p.employeeId,
-    name: p.name,
-    role: idealResults.find((r) => r.employeeId === p.employeeId)?.group ?? 'service',
-    hoursWorked: idealResults.find((r) => r.employeeId === p.employeeId)?.hours ?? 0,
-    idealShareInCents: p.idealAmountInCents,
-    actualShareInCents: p.actualAmountInCents,
-    deviationInCents: p.deviationInCents,
-  }));
+  const idealMap = new Map(idealResults.map((r) => [r.employeeId, r]));
+  const personShares: PersonShare[] = matchResult.payouts.map((p) => {
+    const ideal = idealMap.get(p.employeeId);
+    return {
+      id: p.employeeId,
+      name: p.name,
+      role: ideal?.group ?? 'service',
+      hoursWorked: ideal?.hours ?? 0,
+      idealShareInCents: p.idealAmountInCents,
+      actualShareInCents: p.actualAmountInCents,
+      deviationInCents: p.deviationInCents,
+    };
+  });
 
   // Track which denominations were used
   const denomUsageMap = new Map<string, number>();
@@ -228,8 +231,8 @@ export function buildAvailablePool(denominations: DenominationQuantity[]): Avail
  * Calculates transfer suggestions between over- and under-paid employees.
  *
  * Only suggests transfers when absolute deviation exceeds the threshold.
- * Pairs overpaid people with underpaid people to minimize the number of transfers.
- * Limited to MAX_TRANSFER_CHAINS to prevent excessive complexity.
+ * Pairs overpaid people with underpaid people, concentrating surplus in as few
+ * senders as possible to minimize the number of transactions.
  *
  * @param personShares - Per-person shares with deviations
  * @param thresholdInCents - Minimum deviation to trigger a transfer suggestion
@@ -258,10 +261,9 @@ export function calculateTransfers(
 
   const differences: DifferenceLine[] = [];
 
-  // Pair overpaid with underpaid, largest first
+  // Pair overpaid with underpaid, largest overpaid first to minimize senders
   for (const over of overpaid) {
     for (const under of underpaid) {
-      if (differences.length >= MAX_TRANSFER_CHAINS) break;
       if (over.remaining <= 0 || under.remaining <= 0) continue;
 
       const transferAmount = Math.min(over.remaining, under.remaining);
@@ -278,7 +280,6 @@ export function calculateTransfers(
       over.remaining -= transferAmount;
       under.remaining -= transferAmount;
     }
-    if (differences.length >= MAX_TRANSFER_CHAINS) break;
   }
 
   return differences;
