@@ -173,14 +173,10 @@ export function ResultsScreen() {
         <Icon name="settings" size={14} className="text-text-secondary shrink-0" />
         <div className="flex flex-1 flex-wrap items-center gap-1.5 min-w-0">
           {hasBothGroups && (
-            <>
-              <span className="rounded-full bg-teal-100 px-2 py-0.5 font-mono text-xs font-semibold text-teal-800 dark:bg-teal-900/30 dark:text-teal-300">
-                {t('screens:setup.groupService')} {session.split.servicePercent}%
-              </span>
-              <span className="rounded-full bg-orange-100 px-2 py-0.5 font-mono text-xs font-semibold text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
-                {t('screens:setup.groupKitchen')} {session.split.kitchenPercent}%
-              </span>
-            </>
+            <span className="inline-flex overflow-hidden rounded-full font-mono text-xs font-semibold">
+              <span className="bg-teal-100 px-2 py-0.5 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300">{session.split.servicePercent}%</span>
+              <span className="bg-orange-100 px-2 py-0.5 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">{session.split.kitchenPercent}%</span>
+            </span>
           )}
           <span
             className={cn(
