@@ -7,10 +7,13 @@
  *
  * @see src/lib/calc/tipCalculator.ts for the main distribution algorithm
  * @see src/hooks/useDenominationMatcher.ts for the matching algorithm
+ * @see src/types/shift.ts for PersonShare and DifferenceLine types
  *
  * @example
  * import { percentageOf, roundToNearest, clampInt } from '@/lib/calc/calculations'
  */
+
+import type { PersonShare, DifferenceLine } from '@/types/shift';
 
 /**
  * Calculates a percentage of a value in integer cents.
@@ -187,4 +190,31 @@ export function rmsd(deviations: number[]): number {
 export function fairnessScoreFromMeanDev(meanAbsDev: number, meanIdeal: number): number {
   if (meanIdeal === 0) return 100;
   return Math.max(0, Math.round(100 * (1 - meanAbsDev / meanIdeal)));
+}
+
+/**
+ * Computes the fairness score after applying suggested transfers.
+ * Returns undefined when there are no differences (pre == post).
+ *
+ * @param personShares - Per-employee distribution from the smart split
+ * @param differences - Suggested transfers to reconcile deviations
+ */
+export function postTransferFairnessScore(
+  personShares: PersonShare[],
+  differences: DifferenceLine[],
+): number | undefined {
+  if (differences.length === 0) return undefined;
+
+  const effective = new Map(personShares.map((s) => [s.id, s.actualShareInCents]));
+  for (const d of differences) {
+    effective.set(d.fromPerson.id, (effective.get(d.fromPerson.id) ?? 0) - d.amountInCents);
+    effective.set(d.toPerson.id, (effective.get(d.toPerson.id) ?? 0) + d.amountInCents);
+  }
+  const meanIdeal = personShares.reduce((s, p) => s + p.idealShareInCents, 0) / personShares.length;
+  const meanAbsDev =
+    personShares.reduce(
+      (s, p) => s + Math.abs((effective.get(p.id) ?? 0) - p.idealShareInCents),
+      0,
+    ) / personShares.length;
+  return fairnessScoreFromMeanDev(meanAbsDev, meanIdeal);
 }

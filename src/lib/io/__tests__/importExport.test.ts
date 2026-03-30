@@ -9,9 +9,14 @@ import { makeShift, makePersonShare, makeSmartDistribution } from '@/test/factor
 import type { Shift } from '@/types/shift';
 
 describe('exportShiftsCsv', () => {
-  it('generates CSV with correct headers', () => {
-    const csv = exportShiftsCsv([makeShift()]);
-    expect(csv).toContain('Date;Employee;Role;Hours;Amount (€);Notes');
+  it('generates CSV with correct headers (DE)', () => {
+    const csv = exportShiftsCsv([makeShift()], 'de-DE');
+    expect(csv).toContain('Datum;Mitarbeiter;Rolle;Stunden;Ideal (€);Betrag (€);Abweichung (€);Ausgleichszahlung;Modus');
+  });
+
+  it('generates CSV with correct headers (EN)', () => {
+    const csv = exportShiftsCsv([makeShift()], 'en-US');
+    expect(csv).toContain('Date;Employee;Role;Hours;Ideal (€);Amount (€);Deviation (€);Transfer;Mode');
   });
 
   it('includes UTF-8 BOM', () => {
@@ -50,14 +55,25 @@ describe('exportShiftsCsv', () => {
     expect(csv).toContain('2026-03-21');
   });
 
-  it('labels roles correctly', () => {
+  it('labels roles correctly (DE)', () => {
     const shift = makeShift({
       distribution: makeSmartDistribution({
         personShares: [makePersonShare({ role: 'kitchen' }), makePersonShare({ role: 'service' })],
       }),
     });
-    const csv = exportShiftsCsv([shift]);
+    const csv = exportShiftsCsv([shift], 'de-DE');
     expect(csv).toContain('Küche');
+    expect(csv).toContain('Service');
+  });
+
+  it('labels roles correctly (EN)', () => {
+    const shift = makeShift({
+      distribution: makeSmartDistribution({
+        personShares: [makePersonShare({ role: 'kitchen' }), makePersonShare({ role: 'service' })],
+      }),
+    });
+    const csv = exportShiftsCsv([shift], 'en-US');
+    expect(csv).toContain('Kitchen');
     expect(csv).toContain('Service');
   });
 
@@ -75,8 +91,7 @@ describe('exportShiftsCsv', () => {
 
   it('handles empty shifts array', () => {
     const csv = exportShiftsCsv([]);
-    expect(csv).toContain('Date;Employee;Role;Hours;Amount (€);Notes');
-    // Header ends with \n, so split gives 2 entries (header + empty trailing)
+    expect(csv).toContain('Datum;Mitarbeiter;Rolle;Stunden');
     const lines = csv.split('\n').filter((l) => l.replace('\uFEFF', '').trim().length > 0);
     expect(lines).toHaveLength(1); // just header
   });
@@ -87,7 +102,7 @@ describe('exportBackupJson', () => {
     const shifts = [makeShift()];
     const json = exportBackupJson(shifts);
     const parsed = JSON.parse(json) as Record<string, unknown>;
-    expect(parsed.version).toBe(1);
+    expect(parsed.version).toBe(2);
     expect(parsed.exportedAt).toBeTruthy();
     expect(Array.isArray(parsed.shifts)).toBe(true);
     expect(parsed.shifts as Shift[]).toHaveLength(1);

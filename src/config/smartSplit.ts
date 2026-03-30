@@ -12,6 +12,9 @@ export const DEFAULT_FAIRNESS_THRESHOLD = 100;
 /** Whether smart splitting is enabled by default. */
 export const SMART_SPLIT_ENABLED = true;
 
+/** localStorage key for the smart split enabled state. */
+export const SMART_SPLIT_MODE_KEY = 'tipsy_smart_mode';
+
 /** localStorage key for the active session fairness threshold. Reset to default on calculation end. */
 export const SMART_SPLIT_THRESHOLD_KEY = 'tipsy_smart_split_threshold';
 

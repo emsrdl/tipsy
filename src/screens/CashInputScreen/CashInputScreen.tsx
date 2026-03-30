@@ -22,6 +22,7 @@ import { DENOMINATIONS } from '@/config/currency';
 import {
   DEFAULT_FAIRNESS_THRESHOLD,
   SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
+  SMART_SPLIT_MODE_KEY,
   SMART_SPLIT_THRESHOLD_KEY,
   SMART_SPLIT_ENABLED,
 } from '@/config/smartSplit';
@@ -45,7 +46,7 @@ export function CashInputScreen() {
     DEFAULT_FAIRNESS_THRESHOLD,
   );
   const [, setThreshold] = useLocalStorage<number>(SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD);
-  const [, setSmartMode] = useLocalStorage<boolean>('tipsy_smart_mode', SMART_SPLIT_ENABLED);
+  const [, setSmartMode] = useLocalStorage<boolean>(SMART_SPLIT_MODE_KEY, SMART_SPLIT_ENABLED);
 
   const hasTotal = totalInCents > 0;
 

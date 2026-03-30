@@ -129,9 +129,14 @@
     "clearConfirm": "Alle Schichten wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
     "importBackup": "Backup importieren",
     "deleteShift": "Schicht löschen",
+    "exportShift": "Schicht exportieren",
+    "idealShare": "Idealer Anteil",
+    "shiftTotal": "Schicht gesamt",
     "smartSplitTag": "Smart Split",
     "employees_one": "{{count}} Mitarbeiter",
-    "employees_other": "{{count}} Mitarbeiter"
+    "employees_other": "{{count}} Mitarbeiter",
+    "shiftsInPeriod_one": "{{count}} Schicht",
+    "shiftsInPeriod_other": "{{count}} Schichten"
   },
   "theme": {
     "tipsy": "Tipsy",
