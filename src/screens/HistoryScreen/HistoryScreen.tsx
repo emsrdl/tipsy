@@ -8,11 +8,13 @@
  * // Rendered via React Router at route "/history"
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
+import { ChartTooltip } from '@/components/molecules/ChartTooltip/ChartTooltip';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
 import { ImportDialog } from '@/components/molecules/ImportDialog/ImportDialog';
+import { ShiftDetailCard } from '@/components/organisms/ShiftDetailCard/ShiftDetailCard';
 import {
   BarChart,
   Bar,
@@ -33,6 +35,7 @@ import { useLocale } from '@/hooks/useLocale';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useToast } from '@/context/ToastContext';
 import { formatEurFromCents } from '@/config/currency';
+import { downloadShiftsCsv, exportShiftsPdf } from '@/lib/io/importExport';
 import { cn } from '@/lib/utils';
 import type { Shift } from '@/types/shift';
 
@@ -45,59 +48,77 @@ function getProfileAmount(shift: Shift, profileId: string | undefined): number {
   return myShare?.actualShareInCents ?? shift.totalTipsInCents;
 }
 
-/** Groups shifts by ISO week key (KWxx). */
-function groupByWeek(
-  shifts: Shift[],
-  getValue: (s: Shift) => number,
-): { label: string; totalCents: number }[] {
-  const map = new Map<string, number>();
+interface GraphDataPoint {
+  label: string;
+  totalCents: number;
+  shiftCount?: number;
+  totalHours?: number;
+}
+
+/**
+ * Returns the ISO 8601 week number and week-year for a date.
+ * ISO weeks start on Monday; week 1 contains the year's first Thursday.
+ */
+function getISOWeek(d: Date): { year: number; week: number } {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = date.getUTCDay() || 7; // Sunday (0) → 7
+  date.setUTCDate(date.getUTCDate() + 4 - day); // shift to nearest Thursday
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return { year: date.getUTCFullYear(), week };
+}
+
+/** Groups shifts by ISO 8601 week key (YYYY-KWxx). */
+function groupByWeek(shifts: Shift[], getValue: (s: Shift) => number): GraphDataPoint[] {
+  const map = new Map<string, { totalCents: number; shiftCount: number }>();
   for (const shift of shifts) {
-    const d = new Date(shift.date);
-    const year = d.getFullYear();
-    const jan1 = new Date(year, 0, 1);
-    const week = Math.ceil(((d.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7);
-    const key = `KW${week.toString().padStart(2, '0')}`;
-    map.set(key, (map.get(key) ?? 0) + getValue(shift));
+    const { year, week } = getISOWeek(new Date(shift.date));
+    const key = `${year}-KW${week.toString().padStart(2, '0')}`;
+    const existing = map.get(key) ?? { totalCents: 0, shiftCount: 0 };
+    map.set(key, {
+      totalCents: existing.totalCents + getValue(shift),
+      shiftCount: existing.shiftCount + 1,
+    });
   }
   return Array.from(map.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([label, totalCents]) => ({ label, totalCents }));
+    .map(([label, data]) => ({ label, totalCents: data.totalCents, shiftCount: data.shiftCount }));
 }
 
 /** Groups shifts by date (MM-DD). */
-function groupByDay(
-  shifts: Shift[],
-  getValue: (s: Shift) => number,
-): { label: string; totalCents: number }[] {
-  const map = new Map<string, number>();
+function groupByDay(shifts: Shift[], getValue: (s: Shift) => number): GraphDataPoint[] {
+  const map = new Map<string, { totalCents: number; shiftCount: number }>();
   for (const shift of shifts) {
     const label = shift.date.split('T')[0] ?? shift.date;
-    map.set(label, (map.get(label) ?? 0) + getValue(shift));
+    const existing = map.get(label) ?? { totalCents: 0, shiftCount: 0 };
+    map.set(label, {
+      totalCents: existing.totalCents + getValue(shift),
+      shiftCount: existing.shiftCount + 1,
+    });
   }
   return Array.from(map.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
     .slice(-14)
-    .map(([label, totalCents]) => ({ label: label.slice(5), totalCents }));
+    .map(([label, data]) => ({
+      label: label.slice(5),
+      totalCents: data.totalCents,
+      shiftCount: data.shiftCount,
+    }));
 }
 
 /** Average hourly rate per shift (last 10). */
-function groupByHourly(
-  shifts: Shift[],
-  getValue: (s: Shift) => number,
-): { label: string; totalCents: number }[] {
+function groupByHourly(shifts: Shift[], getValue: (s: Shift) => number): GraphDataPoint[] {
   return shifts.slice(-10).map((shift) => {
     const totalHours = shift.employees.reduce((s, e) => s + e.hours, 0);
     const ratePerHour = totalHours > 0 ? Math.round(getValue(shift) / totalHours) : 0;
     return {
       label: (shift.date.split('T')[0] ?? '').slice(5),
       totalCents: ratePerHour,
+      totalHours,
     };
   });
 }
 
-function centsToEur(cents: number): number {
-  return cents / 100;
-}
 
 /**
  * History screen with charts, profile-filtered shift list, and import/export.
@@ -116,11 +137,14 @@ export function HistoryScreen() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [singleExportShift, setSingleExportShift] = useState<Shift | null>(null);
+  const singleExportOpen = singleExportShift !== null;
 
   // Filter shifts by active profile; empty when signed out
-  const shifts = activeProfile === null
-    ? []
-    : allShifts.filter((s) => s.profileId === activeProfile.id);
+  const shifts = useMemo(
+    () => (activeProfile === null ? [] : allShifts.filter((s) => s.profileId === activeProfile.id)),
+    [activeProfile, allShifts],
+  );
 
   // Export only profile-filtered shifts; import reassigns to active profile
   const { exportCsv, exportPdf, exportJson, importJson, isProcessing } = useImportExport(shifts);
@@ -130,14 +154,20 @@ export function HistoryScreen() {
     [activeProfile?.id],
   );
 
-  const graphData =
-    graphMode === 'week'
-      ? groupByWeek(shifts, myAmount)
-      : graphMode === 'day'
-        ? groupByDay(shifts, myAmount)
-        : groupByHourly(shifts, myAmount);
+  const graphData = useMemo(() => {
+    const raw =
+      graphMode === 'week'
+        ? groupByWeek(shifts, myAmount)
+        : graphMode === 'day'
+          ? groupByDay(shifts, myAmount)
+          : groupByHourly(shifts, myAmount);
+    return raw.map((d) => ({ ...d, eur: d.totalCents / 100 }));
+  }, [graphMode, shifts, myAmount]);
 
-  const totalAllTime = shifts.reduce((s, sh) => s + myAmount(sh), 0);
+  const totalAllTime = useMemo(
+    () => shifts.reduce((s, sh) => s + myAmount(sh), 0),
+    [shifts, myAmount],
+  );
 
   const handleFileImport = useCallback(
     (file: File) => {
@@ -274,55 +304,76 @@ export function HistoryScreen() {
                   ? t('common:history.chartHourly')
                   : t('common:history.chartTips')}
               </p>
-              <div className="h-40">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-48 min-w-0">
+                <ResponsiveContainer width="100%" height="100%" debounce={50} initialDimension={{ width: 1, height: 1 }}>
                   {graphMode === 'day' ? (
                     <LineChart
-                      data={graphData.map((d) => ({ ...d, eur: centsToEur(d.totalCents) }))}
+                      data={graphData}
+                      margin={{ top: 4, right: 8, bottom: 0, left: -16 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                       <XAxis
                         dataKey="label"
                         tick={{ fontSize: 10 }}
                         stroke="var(--color-text-secondary)"
+                        tickLine={false}
+                        axisLine={false}
                       />
-                      <YAxis tick={{ fontSize: 10 }} stroke="var(--color-text-secondary)" />
+                      <YAxis
+                        tick={{ fontSize: 10 }}
+                        stroke="var(--color-text-secondary)"
+                        tickLine={false}
+                        axisLine={false}
+                      />
                       <Tooltip
-                        formatter={(value: unknown) => [`€${(value as number).toFixed(2)}`, '']}
-                        contentStyle={{
-                          background: 'var(--color-surface-raised)',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: '8px',
-                        }}
+                        content={<ChartTooltip suffix="€" />}
+                        cursor={{ stroke: 'var(--color-accent)', strokeOpacity: 0.3 }}
                       />
                       <Line
                         type="monotone"
                         dataKey="eur"
                         stroke="var(--color-accent)"
                         strokeWidth={2}
-                        dot={{ r: 3 }}
+                        dot={{ r: 3, fill: 'var(--color-accent)' }}
+                        activeDot={{ r: 5, fill: 'var(--color-accent)' }}
                       />
                     </LineChart>
                   ) : (
                     <BarChart
-                      data={graphData.map((d) => ({ ...d, eur: centsToEur(d.totalCents) }))}
+                      data={graphData}
+                      margin={{ top: 4, right: 4, bottom: 0, left: -16 }}
+                      barCategoryGap="20%"
                     >
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                       <XAxis
                         dataKey="label"
                         tick={{ fontSize: 10 }}
                         stroke="var(--color-text-secondary)"
+                        tickLine={false}
+                        axisLine={false}
+                        padding={{ left: 20, right: 20 }}
                       />
-                      <YAxis tick={{ fontSize: 10 }} stroke="var(--color-text-secondary)" />
+                      <YAxis
+                        tick={{ fontSize: 10 }}
+                        stroke="var(--color-text-secondary)"
+                        tickLine={false}
+                        axisLine={false}
+                      />
                       <Tooltip
-                        formatter={(value: unknown) => [`€${(value as number).toFixed(2)}`, '']}
-                        contentStyle={{
-                          background: 'var(--color-surface-raised)',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: '8px',
-                        }}
+                        content={
+                          <ChartTooltip suffix={graphMode === 'hourly' ? '€/h' : '€'} />
+                        }
+                        cursor={false}
+                        trigger="hover"
+                        allowEscapeViewBox={{ x: false, y: false }}
                       />
-                      <Bar dataKey="eur" fill="var(--color-accent)" radius={[4, 4, 0, 0]} />
+                      <Bar
+                        dataKey="eur"
+                        fill="var(--color-accent)"
+                        radius={[4, 4, 0, 0]}
+                        maxBarSize={80}
+                        activeBar={{ fill: 'var(--color-accent)', fillOpacity: 0.8 }}
+                      />
                     </BarChart>
                   )}
                 </ResponsiveContainer>
@@ -378,55 +429,11 @@ export function HistoryScreen() {
                   </button>
 
                   {isExpanded && (
-                    <div className="border-t border-border">
-                      <div className="divide-y divide-border">
-                        {shift.distribution.personShares.map((share) => (
-                          <div
-                            key={share.id}
-                            className="flex items-center justify-between px-4 py-2.5"
-                          >
-                            <div>
-                              <p className="text-sm font-medium text-text-primary">{share.name}</p>
-                              <p className="flex items-center gap-1 text-xs text-text-secondary">
-                                <Icon name="clock" size={10} />
-                                {share.hoursWorked}h
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-mono text-sm font-bold text-text-primary">
-                                {formatEurFromCents(share.actualShareInCents, fmtLocale)}
-                              </p>
-                              {share.deviationInCents !== 0 && (
-                                <p
-                                  className={cn(
-                                    'font-mono text-xs',
-                                    share.deviationInCents > 0
-                                      ? 'text-status-success'
-                                      : 'text-status-error',
-                                  )}
-                                >
-                                  {share.deviationInCents > 0 ? '+' : ''}
-                                  {formatEurFromCents(share.deviationInCents, fmtLocale)}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Delete shift */}
-                      <div className="border-t border-border px-4 py-3">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => setConfirmDeleteId(shift.id)}
-                          className="min-h-9 gap-1.5 text-xs text-status-error hover:text-status-error"
-                        >
-                          <Icon name="trash" size={12} />
-                          {t('common:history.deleteShift')}
-                        </Button>
-                      </div>
-                    </div>
+                    <ShiftDetailCard
+                      shift={shift}
+                      onDelete={() => setConfirmDeleteId(shift.id)}
+                      onExport={() => setSingleExportShift(shift)}
+                    />
                   )}
                 </div>
               );
@@ -511,6 +518,29 @@ export function HistoryScreen() {
           showToast(t('common:toast.backupDownloaded'), 'success');
         }}
         isProcessing={isProcessing}
+      />
+
+      {/* Single-shift export dialog */}
+      <ExportDialog
+        isOpen={singleExportOpen}
+        onClose={() => setSingleExportShift(null)}
+        context="single"
+        onExportCsv={() => {
+          if (singleExportShift) {
+            downloadShiftsCsv(
+              [singleExportShift],
+              `tipsy-shift-${singleExportShift.date.split('T')[0] ?? 'export'}`,
+              fmtLocale,
+            );
+            showToast(t('common:toast.csvDownloaded'), 'success');
+          }
+        }}
+        onExportPdf={() => {
+          if (singleExportShift) {
+            exportShiftsPdf([singleExportShift], fmtLocale);
+            showToast(t('common:toast.pdfOpened'), 'success');
+          }
+        }}
       />
 
       {/* Import dialog */}

@@ -12,12 +12,13 @@
  * const { output, isSmartMode, toggleSmartMode } = useSmartSplitter()
  */
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { smartSplit } from '@/lib/calc/smartSplitter';
 import { useLocalStorage } from './useLocalStorage';
 import {
   DEFAULT_FAIRNESS_THRESHOLD,
   SMART_SPLIT_ENABLED,
+  SMART_SPLIT_MODE_KEY,
   SMART_SPLIT_THRESHOLD_KEY,
 } from '@/config/smartSplit';
 import type { SmartSplitInput, SmartSplitOutput } from '@/types/shift';
@@ -54,7 +55,7 @@ export function useSmartSplitter(
   kitchenPercent: number,
   denominations: DenominationQuantity[],
 ): UseSmartSplitterReturn {
-  const [isSmartMode, setIsSmartMode] = useState(SMART_SPLIT_ENABLED);
+  const [isSmartMode, setIsSmartMode] = useLocalStorage<boolean>(SMART_SPLIT_MODE_KEY, SMART_SPLIT_ENABLED);
   const [thresholdInCents, setThresholdInCents] = useLocalStorage<number>(
     SMART_SPLIT_THRESHOLD_KEY,
     DEFAULT_FAIRNESS_THRESHOLD,
@@ -62,11 +63,11 @@ export function useSmartSplitter(
 
   const toggleSmartMode = useCallback(() => {
     setIsSmartMode((prev) => !prev);
-  }, []);
+  }, [setIsSmartMode]);
 
   const setSmartMode = useCallback((enabled: boolean) => {
     setIsSmartMode(enabled);
-  }, []);
+  }, [setIsSmartMode]);
 
   const setThreshold = useCallback(
     (cents: number) => {

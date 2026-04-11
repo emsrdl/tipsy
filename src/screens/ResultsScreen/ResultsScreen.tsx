@@ -29,7 +29,7 @@ import { useLocale } from '@/hooks/useLocale';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
-import { fairnessScoreFromMeanDev } from '@/lib/calc/calculations';
+import { postTransferFairnessScore } from '@/lib/calc/calculations';
 import { formatEurFromCents } from '@/config/currency';
 import { DEFAULT_FAIRNESS_THRESHOLD, SMART_SPLIT_DEFAULT_THRESHOLD_KEY } from '@/config/smartSplit';
 import { resolveEmployeeName } from '@/lib/employee';
@@ -100,8 +100,6 @@ export function ResultsScreen() {
   const thresholdInput = useThresholdInput(thresholdInCents, setThreshold);
   const thresholdInputRef = useRef<HTMLInputElement>(null);
 
-  const hasResults = results.length > 0;
-
   const hasKitchen = session.employees.some((e) => e.group === 'kitchen');
   const hasService = session.employees.some((e) => e.group === 'service');
   const hasBothGroups = hasKitchen && hasService;
@@ -119,22 +117,7 @@ export function ResultsScreen() {
       : normalizedResults;
 
   function handleSaveAndFinish() {
-    if (!hasResults || activeProfile === null) return;
-
-    const distribution = smartOutput.output?.distribution ?? {
-      personShares: normalizedResults.map((r) => ({
-        id: r.employeeId,
-        name: r.name,
-        role: r.group,
-        hoursWorked: r.hours,
-        idealShareInCents: r.amountInCents,
-        actualShareInCents: r.amountInCents,
-        deviationInCents: 0,
-      })),
-      remainingCents: 0,
-      fairnessScore: 100,
-      denominationsUsed: [],
-    };
+    if (smartOutput.output === null || activeProfile === null) return;
 
     const shift: Shift = {
       id: generateShiftId(),
@@ -144,9 +127,9 @@ export function ResultsScreen() {
       employees: normalizedEmployees,
       totalTipsInCents: totalInCents,
       denominationInput: session.denominations.filter((d) => d.quantity > 0),
-      distribution,
+      distribution: smartOutput.output.distribution,
       smartSplitting: isSmartMode,
-      differences: smartOutput.output?.differences ?? [],
+      differences: smartOutput.output.differences,
       savedAt: new Date().toISOString(),
     };
 
@@ -166,22 +149,16 @@ export function ResultsScreen() {
   const fairnessScore = smartOutput.output?.distribution.fairnessScore;
   const transfers = smartOutput.output?.differences ?? [];
 
-  const postTransferFairnessScore = useMemo(() => {
-    const shares = smartOutput.output?.distribution.personShares;
-    const diffs = smartOutput.output?.differences;
-    if (!shares || !diffs?.length) return undefined;
-
-    const effective = new Map(shares.map((s) => [s.id, s.actualShareInCents]));
-    for (const t of diffs) {
-      effective.set(t.fromPerson.id, (effective.get(t.fromPerson.id) ?? 0) - t.amountInCents);
-      effective.set(t.toPerson.id, (effective.get(t.toPerson.id) ?? 0) + t.amountInCents);
-    }
-    const meanIdeal = shares.reduce((s, p) => s + p.idealShareInCents, 0) / shares.length;
-    const meanAbsDev =
-      shares.reduce((s, p) => s + Math.abs((effective.get(p.id) ?? 0) - p.idealShareInCents), 0) /
-      shares.length;
-    return fairnessScoreFromMeanDev(meanAbsDev, meanIdeal);
-  }, [smartOutput.output?.distribution.personShares, smartOutput.output?.differences]);
+  const postScore = useMemo(
+    () =>
+      smartOutput.output
+        ? postTransferFairnessScore(
+            smartOutput.output.distribution.personShares,
+            smartOutput.output.differences,
+          )
+        : undefined,
+    [smartOutput.output],
+  );
 
   const settingsDropdown = (
     <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
@@ -382,7 +359,7 @@ export function ResultsScreen() {
                   name="star"
                   size={14}
                   className={
-                    (postTransferFairnessScore ?? fairnessScore) >= 95
+                    (postScore ?? fairnessScore) >= 95
                       ? 'text-status-success'
                       : 'text-status-warning'
                   }
@@ -390,14 +367,14 @@ export function ResultsScreen() {
                 <span className="flex-1 text-sm text-text-secondary">
                   {t('common:smartSplit.fairnessScore')}
                 </span>
-                {postTransferFairnessScore !== undefined ? (
+                {postScore !== undefined ? (
                   <span className="flex items-center gap-1.5">
                     <span className={cn('font-mono text-sm font-bold', fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
                       {fairnessScore}%
                     </span>
                     <Icon name="arrow-right" size={12} className="text-text-secondary" />
-                    <span className={cn('font-mono text-sm font-bold', postTransferFairnessScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
-                      {postTransferFairnessScore}%
+                    <span className={cn('font-mono text-sm font-bold', postScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
+                      {postScore}%
                     </span>
                   </span>
                 ) : (
@@ -414,7 +391,7 @@ export function ResultsScreen() {
 
       {/* Actions */}
       <div className="mt-8 space-y-3">
-        {hasResults && (
+        {smartOutput.output !== null && (
           <>
             {/* Save & finish */}
             {activeProfile === null ? (

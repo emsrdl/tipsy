@@ -5,7 +5,9 @@
  * Supports three formats:
  * - CSV: human-readable, semicolon-separated, one row per employee per shift
  * - PDF: print-ready HTML via browser print dialog
- * - JSON: internal backup format with full shift data and dedup on import
+ * - JSON: internal backup format (v2) with full shift data and dedup on import
+ *
+ * All labels are localized based on the `locale` parameter (de-DE or en-US).
  *
  * @see src/types/shift.ts for Shift, ImportResult types
  * @see src/lib/format/formatCurrency.ts for EUR formatting
@@ -14,21 +16,101 @@
 import { formatEurFromCents } from '@/lib/format/formatCurrency';
 import type { Shift, ImportResult } from '@/types/shift';
 
+/* ------------------------------------------------------------------ */
+/*  Localized label maps                                              */
+/* ------------------------------------------------------------------ */
+
+interface ExportLabels {
+  date: string;
+  employee: string;
+  role: string;
+  hours: string;
+  ideal: string;
+  amount: string;
+  deviation: string;
+  transfer: string;
+  mode: string;
+  kitchen: string;
+  service: string;
+  total: string;
+  group: string;
+  shifts: string;
+  fairnessScore: string;
+  transfers: string;
+  shiftOverview: string;
+  pays: string;
+  receives: string;
+}
+
+function getLabels(locale: string): ExportLabels {
+  if (locale.startsWith('de')) {
+    return {
+      date: 'Datum',
+      employee: 'Mitarbeiter',
+      role: 'Rolle',
+      hours: 'Stunden',
+      ideal: 'Ideal (€)',
+      amount: 'Betrag (€)',
+      deviation: 'Abweichung (€)',
+      transfer: 'Ausgleichszahlung',
+      mode: 'Modus',
+      kitchen: 'Küche',
+      service: 'Service',
+      total: 'Gesamt',
+      group: 'Gruppe',
+      shifts: 'Schichten',
+      fairnessScore: 'Fairness-Score',
+      transfers: 'Ausgleichszahlungen',
+      shiftOverview: 'Schichtübersicht',
+      pays: 'zahlt',
+      receives: 'bekommt',
+    };
+  }
+  return {
+    date: 'Date',
+    employee: 'Employee',
+    role: 'Role',
+    hours: 'Hours',
+    ideal: 'Ideal (€)',
+    amount: 'Amount (€)',
+    deviation: 'Deviation (€)',
+    transfer: 'Transfer',
+    mode: 'Mode',
+    kitchen: 'Kitchen',
+    service: 'Service',
+    total: 'Total',
+    group: 'Group',
+    shifts: 'Shifts',
+    fairnessScore: 'Fairness Score',
+    transfers: 'Transfers',
+    shiftOverview: 'Shift Overview',
+    pays: 'pays',
+    receives: 'receives',
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/*  CSV Export                                                        */
+/* ------------------------------------------------------------------ */
+
 /**
  * Exports shifts to a semicolon-separated CSV string.
- * Headers: Date, Employee, Role, Hours, Amount (€), Notes
+ * Columns: Date, Employee, Role, Hours, Ideal, Amount, Deviation, Transfer, Mode
+ * User-supplied fields (name, transfer note, deviation) are CSV-escaped to prevent
+ * delimiter collisions and formula injection in spreadsheet apps.
  *
  * @param shifts - Array of shifts to export
  * @param locale - BCP 47 locale for formatting. Defaults to 'de-DE'.
  * @returns CSV string with UTF-8 BOM
- *
- * @example
- * const csv = exportShiftsCsv(shifts)
- * // "Date;Employee;Role;Hours;Amount (€);Notes\n2026-03-21;Anna;Service;8;€36,40;Smart Split\n..."
  */
 export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
   const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE';
-  const header = 'Date;Employee;Role;Hours;Amount (€);Notes\n';
+  const l = getLabels(locale);
+
+  const header = [
+    l.date, l.employee, l.role, l.hours,
+    l.ideal, l.amount, l.deviation, l.transfer, l.mode,
+  ].join(';');
 
   const rows: string[] = [];
 
@@ -37,23 +119,28 @@ export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
     const mode = shift.smartSplitting ? 'Smart Split' : 'Normal';
 
     for (const share of shift.distribution.personShares) {
-      const denomNote = buildDenominationNote(shift, share.id, fmtLocale);
-      const notes = denomNote ? `${mode} [${denomNote}]` : mode;
+      const transferNote = buildTransferNote(shift, share.id, fmtLocale, l);
+      const deviation = share.deviationInCents !== 0
+        ? `${share.deviationInCents > 0 ? '+' : ''}${formatEurFromCents(share.deviationInCents, fmtLocale)}`
+        : '';
 
       rows.push(
         [
           date,
-          share.name,
-          share.role === 'kitchen' ? 'Küche' : 'Service',
+          csvEscape(share.name),
+          share.role === 'kitchen' ? l.kitchen : l.service,
           share.hoursWorked.toString(),
+          formatEurFromCents(share.idealShareInCents, fmtLocale),
           formatEurFromCents(share.actualShareInCents, fmtLocale),
-          notes,
+          csvEscape(deviation),
+          csvEscape(transferNote),
+          mode,
         ].join(';'),
       );
     }
   }
 
-  return '\uFEFF' + header + rows.join('\n');
+  return '\uFEFF' + header + '\n' + rows.join('\n');
 }
 
 /**
@@ -73,49 +160,74 @@ export function downloadShiftsCsv(
   triggerDownload(blob, `${filename}.csv`);
 }
 
+/* ------------------------------------------------------------------ */
+/*  PDF Export                                                        */
+/* ------------------------------------------------------------------ */
+
 /**
  * Opens a print-ready window with formatted shift data.
  *
  * @param shifts - Shifts to print/export as PDF
  * @param locale - BCP 47 locale
- * @param title - Document title
+ * @param title - Document title (defaults to localized "Tipsy — Shift Overview")
  */
 export function exportShiftsPdf(
   shifts: Shift[],
   locale = 'de-DE',
-  title = 'Tipsy — Schichtübersicht',
+  title?: string,
 ): void {
   const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE';
   const lang = locale.startsWith('de') ? 'de' : 'en';
+  const l = getLabels(locale);
+  const docTitle = title ?? `Tipsy — ${l.shiftOverview}`;
 
   const shiftBlocks = shifts.map((shift) => {
     const date = new Date(shift.date).toLocaleDateString(fmtLocale);
     const mode = shift.smartSplitting ? 'Smart Split' : 'Normal';
     const total = formatEurFromCents(shift.totalTipsInCents, fmtLocale);
 
-    const rows = shift.distribution.personShares
+    const tableRows = shift.distribution.personShares
       .map(
         (s) => `<tr>
           <td>${escapeHtml(s.name)}</td>
-          <td>${s.role === 'kitchen' ? 'Küche' : 'Service'}</td>
+          <td>${s.role === 'kitchen' ? l.kitchen : l.service}</td>
           <td>${s.hoursWorked}</td>
+          <td>${formatEurFromCents(s.idealShareInCents, fmtLocale)}</td>
           <td>${formatEurFromCents(s.actualShareInCents, fmtLocale)}</td>
+          <td>${s.deviationInCents !== 0 ? `${s.deviationInCents > 0 ? '+' : ''}${formatEurFromCents(s.deviationInCents, fmtLocale)}` : ''}</td>
         </tr>`,
       )
       .join('');
+
+    const transferBlock = shift.differences.length > 0
+      ? `<div class="transfers"><h3>${l.transfers}</h3><ul>${shift.differences
+          .map(
+            (d) =>
+              `<li>${escapeHtml(d.fromPerson.name)} → ${escapeHtml(d.toPerson.name)}: ${formatEurFromCents(d.amountInCents, fmtLocale)}</li>`,
+          )
+          .join('')}</ul></div>`
+      : '';
+
+    const fairnessBlock = shift.smartSplitting
+      ? `<p class="fairness">${l.fairnessScore}: ${shift.distribution.fairnessScore}%</p>`
+      : '';
 
     return `
       <div class="shift">
         <h2>${date} — ${mode}</h2>
         <table>
-          <thead><tr><th>Name</th><th>Gruppe</th><th>Stunden</th><th>Betrag</th></tr></thead>
-          <tbody>${rows}</tbody>
-          <tfoot><tr class="total"><td colspan="3">Gesamt</td><td>${total}</td></tr></tfoot>
+          <thead><tr>
+            <th>${l.employee}</th><th>${l.group}</th><th>${l.hours}</th>
+            <th>${l.ideal}</th><th>${l.amount}</th><th>${l.deviation}</th>
+          </tr></thead>
+          <tbody>${tableRows}</tbody>
+          <tfoot><tr class="total"><td colspan="5">${l.total}</td><td>${total}</td></tr></tfoot>
         </table>
+        ${fairnessBlock}
+        ${transferBlock}
       </div>`;
   });
 
-  // Summary stats
   const totalShifts = shifts.length;
   const totalTips = shifts.reduce((s, sh) => s + sh.totalTipsInCents, 0);
 
@@ -123,7 +235,7 @@ export function exportShiftsPdf(
 <html lang="${lang}">
 <head>
   <meta charset="UTF-8" />
-  <title>${escapeHtml(title)}</title>
+  <title>${escapeHtml(docTitle)}</title>
   <style>
     body { font-family: Arial, sans-serif; font-size: 12px; color: #000; margin: 20px; }
     h1 { font-size: 18px; margin-bottom: 4px; }
@@ -134,12 +246,17 @@ export function exportShiftsPdf(
     th { background: #f0f0f0; font-weight: bold; }
     .total td { font-weight: bold; border-top: 2px solid #000; }
     .shift { page-break-inside: avoid; }
+    .fairness { font-size: 11px; color: #555; margin: 8px 0 4px; }
+    .transfers { margin: 8px 0; }
+    .transfers h3 { font-size: 12px; margin: 0 0 4px; }
+    .transfers ul { margin: 0; padding-left: 18px; font-size: 11px; }
+    .transfers li { margin-bottom: 2px; }
     @media print { body { margin: 0; } }
   </style>
 </head>
 <body>
-  <h1>${escapeHtml(title)}</h1>
-  <p class="summary">${totalShifts} Schichten — Gesamt: ${formatEurFromCents(totalTips, fmtLocale)}</p>
+  <h1>${escapeHtml(docTitle)}</h1>
+  <p class="summary">${totalShifts} ${l.shifts} — ${l.total}: ${formatEurFromCents(totalTips, fmtLocale)}</p>
   ${shiftBlocks.join('')}
   <script>window.onload = () => { window.print(); window.close(); }</script>
 </body>
@@ -151,21 +268,21 @@ export function exportShiftsPdf(
   printWindow.document.close();
 }
 
+/* ------------------------------------------------------------------ */
+/*  JSON Export / Import                                               */
+/* ------------------------------------------------------------------ */
+
 /**
  * Exports shifts as a JSON backup string.
- * Includes all shift data with IDs for dedup on import.
+ * Version 2 format with full shift data for future compatibility.
  *
  * @param shifts - Shifts to export
- * @returns JSON string of the shift array
- *
- * @example
- * const json = exportBackupJson(shifts)
- * downloadFile(new Blob([json]), 'backup.json')
+ * @returns JSON string with version, timestamp, and shift array
  */
 export function exportBackupJson(shifts: Shift[]): string {
   return JSON.stringify(
     {
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
       shifts,
     },
@@ -189,14 +306,11 @@ export function downloadBackupJson(shifts: Shift[], filename = 'tipsy-backup'): 
 /**
  * Imports shifts from a JSON backup string.
  * Deduplicates by shift ID — existing shifts are skipped.
+ * Supports both v1 and v2 backup formats.
  *
  * @param json - JSON string from exportBackupJson
  * @param existingIds - Set of existing shift IDs to check for duplicates
  * @returns Import result with counts of added, skipped, and errors
- *
- * @example
- * const result = importShiftsJson(jsonStr, new Set(existingShifts.map(s => s.id)))
- * console.log(`Added: ${result.added}, Skipped: ${result.skipped}`)
  */
 export function importShiftsJson(
   json: string,
@@ -251,6 +365,10 @@ export function importShiftsJson(
   return { shifts: newShifts, result };
 }
 
+/* ------------------------------------------------------------------ */
+/*  Internal helpers                                                  */
+/* ------------------------------------------------------------------ */
+
 /**
  * Validates that an unknown value has the shape of a Shift.
  * Checks required fields and their types — not deep validation.
@@ -278,20 +396,46 @@ function isValidShift(value: unknown): value is Shift {
 }
 
 /**
- * Builds a denomination note string for CSV export.
- * Shows which denominations a person received.
+ * Builds a localized transfer note for CSV export.
+ * Shows transfers involving a specific employee.
  *
  * @internal
  */
-function buildDenominationNote(shift: Shift, employeeId: string, locale: string): string {
-  if (!shift.smartSplitting) return '';
+function buildTransferNote(
+  shift: Shift,
+  employeeId: string,
+  fmtLocale: string,
+  labels: ExportLabels,
+): string {
+  const parts: string[] = [];
+  for (const diff of shift.differences) {
+    if (diff.fromPerson.id === employeeId) {
+      parts.push(
+        `${labels.pays} ${formatEurFromCents(diff.amountInCents, fmtLocale)} → ${diff.toPerson.name}`,
+      );
+    } else if (diff.toPerson.id === employeeId) {
+      parts.push(
+        `${labels.receives} ${formatEurFromCents(diff.amountInCents, fmtLocale)} ← ${diff.fromPerson.name}`,
+      );
+    }
+  }
+  return parts.join(', ');
+}
 
-  const share = shift.distribution.personShares.find((s) => s.id === employeeId);
-  if (!share || share.deviationInCents === 0) return '';
-
-  const deviation = share.deviationInCents;
-  const sign = deviation > 0 ? '+' : '';
-  return `${sign}${formatEurFromCents(deviation, locale)} deviation`;
+/**
+ * Escapes a value for semicolon-delimited CSV output.
+ * - Neutralizes formula injection (values starting with `= + - @ \t \r`)
+ * - Wraps in double-quotes and escapes inner quotes when the value contains
+ *   the delimiter (`;`), double-quotes, or line breaks.
+ *
+ * @internal
+ */
+function csvEscape(value: string): string {
+  const sanitized = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  if (/[;"\n\r]/.test(sanitized)) {
+    return `"${sanitized.replace(/"/g, '""')}"`;
+  }
+  return sanitized;
 }
 
 function escapeHtml(str: string): string {
