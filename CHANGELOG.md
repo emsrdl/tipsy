@@ -1,3 +1,17 @@
+## [0.5.0](https://github.com/emsrdl/tipsy/compare/v0.4.0...v0.5.0) (2026-04-11)
+
+
+### Features
+
+* add smart split mode with localStorage support and enhance CSV/PDF exports ([1283f09](https://github.com/emsrdl/tipsy/commit/1283f094aff85fddfd13537aae4413b960bde19e))
+* enhance history with localStorage support and enhance CSV/PDF exports ([#13](https://github.com/emsrdl/tipsy/issues/13)) ([871755a](https://github.com/emsrdl/tipsy/commit/871755a28392a3b7cd4ca78e3210d2b83e3f9256))
+
+
+### Bug Fixes
+
+* improve CSV export to prevent formula injection and improve data safety ([477ea4f](https://github.com/emsrdl/tipsy/commit/477ea4fc554d70e23fc5205c2de280f4047ddad7))
+* update EUR denominations to reflect accurate values and counts ([eba9778](https://github.com/emsrdl/tipsy/commit/eba977870b9bb56f0b076f28a4485e809c608ea1))
+
 ## [0.4.0](https://github.com/emsrdl/tipsy/compare/v0.3.4...v0.4.0) (2026-03-28)
 
 
