@@ -96,6 +96,8 @@ function getLabels(locale: string): ExportLabels {
 /**
  * Exports shifts to a semicolon-separated CSV string.
  * Columns: Date, Employee, Role, Hours, Ideal, Amount, Deviation, Transfer, Mode
+ * User-supplied fields (name, transfer note, deviation) are CSV-escaped to prevent
+ * delimiter collisions and formula injection in spreadsheet apps.
  *
  * @param shifts - Array of shifts to export
  * @param locale - BCP 47 locale for formatting. Defaults to 'de-DE'.
@@ -125,13 +127,13 @@ export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
       rows.push(
         [
           date,
-          share.name,
+          csvEscape(share.name),
           share.role === 'kitchen' ? l.kitchen : l.service,
           share.hoursWorked.toString(),
           formatEurFromCents(share.idealShareInCents, fmtLocale),
           formatEurFromCents(share.actualShareInCents, fmtLocale),
-          deviation,
-          transferNote,
+          csvEscape(deviation),
+          csvEscape(transferNote),
           mode,
         ].join(';'),
       );
@@ -418,6 +420,22 @@ function buildTransferNote(
     }
   }
   return parts.join(', ');
+}
+
+/**
+ * Escapes a value for semicolon-delimited CSV output.
+ * - Neutralizes formula injection (values starting with `= + - @ \t \r`)
+ * - Wraps in double-quotes and escapes inner quotes when the value contains
+ *   the delimiter (`;`), double-quotes, or line breaks.
+ *
+ * @internal
+ */
+function csvEscape(value: string): string {
+  const sanitized = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  if (/[;"\n\r]/.test(sanitized)) {
+    return `"${sanitized.replace(/"/g, '""')}"`;
+  }
+  return sanitized;
 }
 
 function escapeHtml(str: string): string {

@@ -66,6 +66,7 @@ export function formatResultsForExport(
 /**
  * Builds a semicolon-separated CSV string from export rows.
  * Fields containing `;`, `"`, or newlines are quoted per RFC 4180.
+ * Values starting with formula-injection characters (`= + - @ \t \r`) are prefixed with `'`.
  *
  * @param rows - Export rows to convert
  * @param headers - Column headers (localized)
@@ -81,7 +82,10 @@ export function buildCsvString(
   rows: ExportRow[],
   headers: { name: string; group: string; hours: string; amount: string; perHour: string },
 ): string {
-  const escape = (v: string) => (/[;"'\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+  const escape = (v: string) => {
+    const s = /^[=+\-@\t\r]/.test(v) ? `'${v}` : v;
+    return /[;"'\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
   const headerLine = [
     headers.name,
     headers.group,

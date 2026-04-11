@@ -55,15 +55,25 @@ interface GraphDataPoint {
   totalHours?: number;
 }
 
-/** Groups shifts by ISO week key (KWxx). */
+/**
+ * Returns the ISO 8601 week number and week-year for a date.
+ * ISO weeks start on Monday; week 1 contains the year's first Thursday.
+ */
+function getISOWeek(d: Date): { year: number; week: number } {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = date.getUTCDay() || 7; // Sunday (0) → 7
+  date.setUTCDate(date.getUTCDate() + 4 - day); // shift to nearest Thursday
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return { year: date.getUTCFullYear(), week };
+}
+
+/** Groups shifts by ISO 8601 week key (YYYY-KWxx). */
 function groupByWeek(shifts: Shift[], getValue: (s: Shift) => number): GraphDataPoint[] {
   const map = new Map<string, { totalCents: number; shiftCount: number }>();
   for (const shift of shifts) {
-    const d = new Date(shift.date);
-    const year = d.getFullYear();
-    const jan1 = new Date(year, 0, 1);
-    const week = Math.ceil(((d.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7);
-    const key = `KW${week.toString().padStart(2, '0')}`;
+    const { year, week } = getISOWeek(new Date(shift.date));
+    const key = `${year}-KW${week.toString().padStart(2, '0')}`;
     const existing = map.get(key) ?? { totalCents: 0, shiftCount: 0 };
     map.set(key, {
       totalCents: existing.totalCents + getValue(shift),
