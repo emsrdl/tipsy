@@ -3,7 +3,7 @@
  * @description EUR denomination definitions and currency formatting.
  *
  * DENOMINATIONS is the authoritative ordered list of EUR cash denominations
- * used in the denomination grid. Order is descending by value (€500 → 1ct).
+ * used in the denomination grid. Order is descending by value (€100 → 1ct).
  *
  * @see src/lib/format/formatCurrency.ts for the formatEurFromCents implementation
  * @see src/components/organisms/DenominationGrid for the UI using this list
@@ -32,12 +32,11 @@ export interface Denomination {
 }
 
 /**
- * All 15 EUR denominations in descending order.
- * Covers banknotes (€500 down to €5) and coins (€2 down to 1ct).
+ * All 13 EUR denominations in descending order.
+ * Covers banknotes (€100 down to €5) and coins (€2 down to 1ct).
+ * Note: €200 and €500 banknotes are excluded (not accepted in this restaurant).
  */
 export const DENOMINATIONS: Denomination[] = [
-  { id: 'eur_500', valueInCents: 50000, labelKey: 'currency.denomination.500', symbol: '€500' },
-  { id: 'eur_200', valueInCents: 20000, labelKey: 'currency.denomination.200', symbol: '€200' },
   { id: 'eur_100', valueInCents: 10000, labelKey: 'currency.denomination.100', symbol: '€100' },
   { id: 'eur_50', valueInCents: 5000, labelKey: 'currency.denomination.50', symbol: '€50' },
   { id: 'eur_20', valueInCents: 2000, labelKey: 'currency.denomination.20', symbol: '€20' },

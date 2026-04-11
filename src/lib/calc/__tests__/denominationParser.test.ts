@@ -61,16 +61,16 @@ describe('sumDenominations', () => {
   });
 
   it('covers all 15 denominations', () => {
-    expect(DENOMINATIONS).toHaveLength(15);
+    expect(DENOMINATIONS).toHaveLength(13);
     const allOne = DENOMINATIONS.map((d) => ({ denominationId: d.id, quantity: 1 }));
     const total = sumDenominations(allOne, DENOMINATIONS);
     // Sum of all EUR denominations × 1:
-    // 50000+20000+10000+5000+2000+1000+500+200+100+50+20+10+5+2+1 = 88888
-    expect(total).toBe(88888);
+    // 10000+5000+2000+1000+500+200+100+50+20+10+5+2+1 = 18888
+    expect(total).toBe(18888);
   });
 
   it('handles large quantities correctly', () => {
-    const total = sumDenominations([{ denominationId: 'eur_500', quantity: 100 }], DENOMINATIONS);
-    expect(total).toBe(5000000); // 100 × €500 = €50,000
+    const total = sumDenominations([{ denominationId: 'eur_100', quantity: 100 }], DENOMINATIONS);
+    expect(total).toBe(1000000); // 100 × €100 = €10,000
   });
 });
