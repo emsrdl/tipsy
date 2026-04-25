@@ -12,6 +12,14 @@
 /dist
 /dist-ssr
 
+# vite-plugin-pwa (generated at build/dev time)
+/public/sw.js
+/public/workbox-*.js
+/public/registerSW.js
+sw.js
+workbox-*.js
+registerSW.js
+
 # production
 /build
 
