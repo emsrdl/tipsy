@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/emsrdl/tipsy/compare/v0.5.0...v0.5.1) (2026-04-26)
+
+
+### Bug Fixes
+
+* gate PWA dev service worker behind VITE_PWA_DEV env flag ([0ea7c0f](https://github.com/emsrdl/tipsy/commit/0ea7c0f82eb5daeec69cf56e35c236d492f69d12))
+* PWA support with vite-plugin-pwa and update manifest for icons ([4cf0c4a](https://github.com/emsrdl/tipsy/commit/4cf0c4aff76d95a555bdafa06ef7bb6248671b3c))
+* PWA support with vite-plugin-pwa and update manifest for icons ([#15](https://github.com/emsrdl/tipsy/issues/15)) ([8f9f92a](https://github.com/emsrdl/tipsy/commit/8f9f92aa393bc89f3074bfc18e3f8f75e8c62be2))
+
 ## [0.5.0](https://github.com/emsrdl/tipsy/compare/v0.4.0...v0.5.0) (2026-04-11)
 
 
