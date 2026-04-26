@@ -14,6 +14,9 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
+// Disable browser scroll restoration so this hook has full control.
+history.scrollRestoration = 'manual';
+
 /** Routes visited in the current flow pass. Cleared on reset. */
 const visitedRoutes = new Set<string>();
 
@@ -25,9 +28,11 @@ export function saveScrollPosition(pathname: string) {
   savedScrollPositions.set(pathname, window.scrollY);
 }
 
-/** Call in reset/save handlers to restart first-visit behaviour for the next pass. */
+/** Call in reset/save handlers to restart first-visit behaviour for the next calculate pass. */
 export function markFlowReset() {
-  visitedRoutes.clear();
+  for (const route of Array.from(visitedRoutes)) {
+    if (route.startsWith('/calculate')) visitedRoutes.delete(route);
+  }
 }
 
 /** Returns the current scroll position as a 0–1 ratio of the page's max scroll. */
