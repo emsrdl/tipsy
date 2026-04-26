@@ -112,14 +112,14 @@ export function ExportDialog({
         </div>
 
         <div className="flex gap-2 pt-1">
-          <Button type="button" variant="ghost" onClick={onClose} className="min-h-11 px-4">
+          <Button type="button" variant="ghost" onClick={onClose} className="min-h-12 px-4">
             {t('common:actions.cancel')}
           </Button>
           <Button
             type="button"
             isLoading={isProcessing}
             onClick={handleExport}
-            className="min-h-11 flex-1"
+            className="min-h-12 flex-1"
           >
             {t('common:actions.export')}
           </Button>
