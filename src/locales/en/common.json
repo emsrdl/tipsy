@@ -167,6 +167,10 @@
       "amount": "Amount"
     }
   },
+  "stepper": {
+    "decrement": "Decrease",
+    "increment": "Increase"
+  },
   "currency": {
     "denomination": {
       "500": "€500",
