@@ -53,7 +53,7 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//],
       },
       devOptions: {
-        enabled: true,
+        enabled: isDevServer && process.env.VITE_PWA_DEV === 'true',
         type: 'module',
       },
     }),
