@@ -19,6 +19,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 import { execSync } from 'node:child_process';
 import { version } from './package.json';
@@ -40,7 +41,23 @@ const isDevServer =
   process.argv.some((a) => /[/\\]vite$/.test(a)) && !process.argv.includes('build');
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: false, // use the existing public/manifest.webmanifest
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
+      },
+      devOptions: {
+        enabled: isDevServer && process.env.VITE_PWA_DEV === 'true',
+        type: 'module',
+      },
+    }),
+  ],
   base: '/',
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(
