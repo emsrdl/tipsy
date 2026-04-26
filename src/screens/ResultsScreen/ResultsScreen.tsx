@@ -68,6 +68,7 @@ export function ResultsScreen() {
   );
   const [exportOpen, setExportOpen] = useState(false);
   const [guestFinishOpen, setGuestFinishOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const [showThresholdHelp, setShowThresholdHelp] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -396,54 +397,71 @@ export function ResultsScreen() {
       {/* Actions */}
       <div className="mt-8 space-y-3">
         {smartOutput.output !== null && (
-          <>
-            {/* Save & finish */}
-            {activeProfile === null ? (
-              <Button
-                type="button"
-                onClick={() => setGuestFinishOpen(true)}
-                className="min-h-14 w-full text-base font-semibold"
-              >
-                {t('screens:results.finishGuest')}
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                onClick={handleSaveAndFinish}
-                className="min-h-14 w-full text-base font-semibold"
-              >
-                <Icon name="save" size={18} />
-                {t('screens:results.saveAndFinish')}
-              </Button>
-            )}
-
-            {/* Export button */}
+          <div className="flex gap-2">
             <Button
               type="button"
-              variant="outline"
-              className="min-h-12 w-full"
+              variant="ghost"
+              className="min-h-12 flex-1"
               isLoading={isExporting}
               onClick={() => setExportOpen(true)}
             >
               <Icon name="download" size={16} />
               {t('common:actions.export')}
             </Button>
-          </>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setCancelOpen(true)}
+              className="min-h-12 flex-1 text-status-error hover:bg-status-error/10 hover:text-status-error"
+            >
+              <Icon name="refresh-cw" size={16} />
+              {t('common:actions.reset')}
+            </Button>
+          </div>
         )}
 
-        {/* Nav row */}
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={() => void navigate('/calculate/cash', { state: { scrollRatio: getScrollRatio(), isBack: true } })}
-            className="min-h-12 flex-1"
+            className="min-h-14 flex-1"
           >
-            <Icon name="chevron-left" size={16} />
+            <Icon name="chevron-left" size={18} />
             {t('common:actions.back')}
           </Button>
+          {activeProfile === null ? (
+            <Button
+              type="button"
+              disabled={smartOutput.output === null}
+              onClick={() => setGuestFinishOpen(true)}
+              className="min-h-14 flex-[2] text-base font-semibold"
+            >
+              {t('screens:results.finishGuest')}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              disabled={smartOutput.output === null}
+              onClick={handleSaveAndFinish}
+              className="min-h-14 flex-[2] text-base font-semibold"
+            >
+              <Icon name="save" size={18} />
+              {t('screens:results.saveAndFinish')}
+            </Button>
+          )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={cancelOpen}
+        title={t('common:resetAllDialog.title')}
+        message={t('common:resetAllDialog.message')}
+        confirmLabel={t('common:resetAllDialog.trigger')}
+        onConfirm={handleResetAll}
+        onCancel={() => setCancelOpen(false)}
+        variant="danger"
+      />
 
       {/* Guest finish confirmation */}
       <ConfirmDialog

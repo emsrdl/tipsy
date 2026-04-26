@@ -100,24 +100,24 @@ export function CashInputScreen() {
       )}
 
       {/* Navigation */}
-      <div className="mt-8 space-y-3">
+      <div className="mt-8 flex gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleStepClick(1)}
+          className="min-h-14 flex-1"
+        >
+          <Icon name="chevron-left" size={18} />
+          {t('common:actions.back')}
+        </Button>
         <Button
           type="button"
           disabled={!hasTotal}
           onClick={() => handleStepClick(3)}
-          className="min-h-14 w-full text-base font-semibold"
+          className="min-h-14 flex-[2] text-base font-semibold"
         >
           {t('common:actions.calculate')}
           <Icon name="chevron-right" size={18} />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => handleStepClick(1)}
-          className="min-h-12 w-full"
-        >
-          <Icon name="chevron-left" size={16} />
-          {t('common:actions.back')}
         </Button>
       </div>
     </ScreenContainer>

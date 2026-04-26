@@ -17,6 +17,14 @@ import { useLocation } from 'react-router-dom';
 /** Routes visited in the current flow pass. Cleared on reset. */
 const visitedRoutes = new Set<string>();
 
+/** Absolute scroll positions saved on tab-switch, keyed by pathname. */
+const savedScrollPositions = new Map<string, number>();
+
+/** Call before navigating away (e.g. tab click) to persist the current scroll position. */
+export function saveScrollPosition(pathname: string) {
+  savedScrollPositions.set(pathname, window.scrollY);
+}
+
 /** Call in reset/save handlers to restart first-visit behaviour for the next pass. */
 export function markFlowReset() {
   visitedRoutes.clear();
@@ -57,6 +65,10 @@ export function usePreserveScroll() {
     }
 
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    window.scrollTo(0, state?.scrollRatio !== undefined ? Math.round(state.scrollRatio * maxScroll) : 0);
+    if (state?.scrollRatio !== undefined) {
+      window.scrollTo(0, Math.round(state.scrollRatio * maxScroll));
+    } else {
+      window.scrollTo(0, savedScrollPositions.get(location.pathname) ?? 0);
+    }
   }, []);
 }

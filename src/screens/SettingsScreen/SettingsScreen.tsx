@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePreserveScroll } from '@/hooks/usePreserveScroll';
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
 import { ImportDialog } from '@/components/molecules/ImportDialog/ImportDialog';
@@ -39,6 +40,7 @@ import type { ThemeId } from '@/types/theme';
  * Settings screen — manage profiles, appearance, data.
  */
 export function SettingsScreen() {
+  usePreserveScroll();
   const { t } = useTranslation(['common', 'screens']);
   const {
     profiles,
