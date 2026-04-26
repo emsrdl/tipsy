@@ -9,6 +9,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { usePreserveScroll, markFlowReset, getScrollRatio } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { DenominationGrid } from '@/components/organisms/DenominationGrid/DenominationGrid';
@@ -39,6 +40,7 @@ const STEP_ROUTES: Record<number, string> = {
 export function CashInputScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
+  usePreserveScroll();
   const { totalInCents, calculate, setDenominationQuantity, reset } = useTipCalculator();
   const { showToast } = useToast();
   const [defaultThreshold] = useLocalStorage<number>(
@@ -52,7 +54,7 @@ export function CashInputScreen() {
 
   function handleStepClick(s: number) {
     if (s === 3) calculate();
-    void navigate(STEP_ROUTES[s]);
+    void navigate(STEP_ROUTES[s], { state: { scrollRatio: getScrollRatio(), isBack: s < 2 } });
   }
 
   function handleReset() {
@@ -61,6 +63,7 @@ export function CashInputScreen() {
   }
 
   function handleResetAll() {
+    markFlowReset();
     reset();
     setThreshold(defaultThreshold);
     setSmartMode(SMART_SPLIT_ENABLED);

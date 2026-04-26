@@ -10,6 +10,7 @@
 
 import { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePreserveScroll, markFlowReset, getScrollRatio } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { DistributionTable } from '@/components/organisms/DistributionTable/DistributionTable';
@@ -52,6 +53,7 @@ const STEP_ROUTES: Record<number, string> = {
 export function ResultsScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
+  usePreserveScroll();
   const { session, totalInCents, reset, setSplit } = useTipCalculator();
   const { exportPdf, exportCsv, isExporting } = useExport();
   const { addShift } = useShifts();
@@ -137,10 +139,12 @@ export function ResultsScreen() {
     showToast(t('common:toast.shiftSaved'), 'success');
     setThreshold(defaultThreshold);
     reset();
+    markFlowReset();
     void navigate('/history');
   }
 
   function handleResetAll() {
+    markFlowReset();
     setThreshold(defaultThreshold);
     reset();
     void navigate('/calculate');
@@ -285,7 +289,7 @@ export function ResultsScreen() {
   );
 
   function handleStepClick(s: number) {
-    void navigate(STEP_ROUTES[s]);
+    void navigate(STEP_ROUTES[s], { state: { scrollRatio: getScrollRatio(), isBack: s < 3 } });
   }
 
   return (
@@ -432,7 +436,7 @@ export function ResultsScreen() {
           <Button
             type="button"
             variant="ghost"
-            onClick={() => void navigate('/calculate/cash')}
+            onClick={() => void navigate('/calculate/cash', { state: { scrollRatio: getScrollRatio(), isBack: true } })}
             className="min-h-12 flex-1"
           >
             <Icon name="chevron-left" size={16} />

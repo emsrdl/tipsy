@@ -12,6 +12,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePreserveScroll, markFlowReset, getScrollRatio } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { EmployeeForm } from '@/components/organisms/EmployeeForm/EmployeeForm';
@@ -37,6 +38,7 @@ const STEP_ROUTES: Record<number, string> = {
 export function SetupScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
+  usePreserveScroll();
   const { session, totalInCents, addEmployee, removeEmployee, updateEmployee, setSplit, calculate, reset, wasRestored } =
     useTipCalculator();
   const { activeProfile } = useProfiles();
@@ -121,6 +123,7 @@ export function SetupScreen() {
         isProfileOwner: true,
       });
     }
+    markFlowReset();
     showToast(t('common:toast.allReset'), 'info');
   }
 
@@ -129,14 +132,14 @@ export function SetupScreen() {
       if (!hasEmployees) showToast(t('errors:validation.noEmployees'), 'error');
       return;
     }
-    void navigate('/calculate/cash');
+    void navigate('/calculate/cash', { state: { scrollRatio: getScrollRatio() } });
   }
 
   const maxReachableStep = canContinue && step2Valid ? 3 : canContinue ? 2 : 1;
 
   function handleStepClick(s: number) {
     if (s === 3) calculate();
-    void navigate(STEP_ROUTES[s]);
+    void navigate(STEP_ROUTES[s], { state: { scrollRatio: getScrollRatio() } });
   }
 
   return (

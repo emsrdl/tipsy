@@ -75,9 +75,12 @@ export function ScreenContainer({
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 pb-8">
-      {/* Step indicator */}
       {showSteps && (
-        <nav className="mb-5 flex items-center gap-2" aria-label={t('navigation.steps')}>
+        <nav
+          className="-mx-4 mb-5 flex items-center gap-2 bg-surface px-4 py-2.5 sticky z-30 border-b border-border/40"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)' }}
+          aria-label={t('navigation.steps')}
+        >
           {Array.from({ length: totalSteps }, (_, i) => {
             const stepNum = i + 1;
             const isActive = stepNum <= step;
