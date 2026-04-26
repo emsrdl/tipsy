@@ -69,7 +69,7 @@ export function ImportDialog({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="hover:border-accent/50 flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-4 py-6 transition-colors hover:bg-surface-overlay"
+            className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-4 py-6 transition-colors hover:border-accent/50 hover:bg-surface-overlay"
           >
             <Icon name="upload" size={24} className="text-text-secondary" />
             {selectedFile ? (
