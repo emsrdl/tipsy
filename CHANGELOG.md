@@ -1,3 +1,22 @@
+## [0.6.0](https://github.com/emsrdl/tipsy/compare/v0.5.1...v0.6.0) (2026-04-27)
+
+
+### Features
+
+* implement scroll preservation for multi-step navigation and enhance navigation state management ([4778b9f](https://github.com/emsrdl/tipsy/commit/4778b9f4bf3c569fb4afda6e8530537fcd4aaf58))
+
+
+### Bug Fixes
+
+* 16 uiux misc bug fixes and polish ([#17](https://github.com/emsrdl/tipsy/issues/17)) ([ee3baff](https://github.com/emsrdl/tipsy/commit/ee3baff365b8f68cb7797ba6f639e109a40b0fc6))
+* enhance button hover styles in ImportDialog and add comment to usePreserveScroll for clarity ([31d4dd9](https://github.com/emsrdl/tipsy/commit/31d4dd937c5fc9310f0ad71c61a1e1a02a3a1de0))
+* implement last calculate route tracking and update button actions in ResultsScreen ([8973c27](https://github.com/emsrdl/tipsy/commit/8973c27f240182034845e88b2dd46521fe4d9697))
+* implement scroll preservation across multiple screens and enhance button layouts ([eaeaa29](https://github.com/emsrdl/tipsy/commit/eaeaa2950cc81de895d98d3c72befed76beeaee5))
+* improve scroll restoration handling and update last calculate route logic in AppLayout ([0b52867](https://github.com/emsrdl/tipsy/commit/0b528679daf83c40d16b1b923e770b4e9036d73c))
+* refine scroll preservation logic in usePreserveScroll and clarify reset behavior ([5cba255](https://github.com/emsrdl/tipsy/commit/5cba255ffecb77af006243fc4ee26f0b8a1aeac6))
+* update button height in ConfirmDialog and Stepper, add translations for stepper actions, enhance input focus styles in SettingsScreen ([e6971dd](https://github.com/emsrdl/tipsy/commit/e6971dd35f433c1f0be05be651ac5a8fa2ec0925))
+* update button heights in ImportDialog and ExportDialog for consistency ([6e5d84b](https://github.com/emsrdl/tipsy/commit/6e5d84b963a39915c95b4ca362bceadc7c6163c9))
+
 ## [0.5.1](https://github.com/emsrdl/tipsy/compare/v0.5.0...v0.5.1) (2026-04-26)
 
 
