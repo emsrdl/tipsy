@@ -17,7 +17,7 @@
  * <AppLayout><Outlet /></AppLayout>
  */
 
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { saveScrollPosition, getLastCalculateRoute, updateLastCalculateRoute } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
@@ -42,14 +42,13 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { t } = useTranslation('common');
   const location = useLocation();
 
-  // Updated during render — safe because AppLayout re-renders on every location change.
-  const lastCalculateRoute = useRef(getLastCalculateRoute());
-  if (location.pathname.startsWith('/calculate')) {
-    lastCalculateRoute.current = location.pathname;
-    updateLastCalculateRoute(location.pathname);
-  } else {
-    lastCalculateRoute.current = getLastCalculateRoute();
-  }
+  const isCalculateRoute = location.pathname.startsWith('/calculate');
+  const lastCalculateRoute = useRef('/calculate');
+  lastCalculateRoute.current = isCalculateRoute ? location.pathname : getLastCalculateRoute();
+
+  useEffect(() => {
+    if (isCalculateRoute) updateLastCalculateRoute(location.pathname);
+  }, [isCalculateRoute, location.pathname]);
 
   const navItems = [
     {

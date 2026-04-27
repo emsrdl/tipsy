@@ -15,7 +15,9 @@ import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 // Disable browser scroll restoration so this hook has full control.
-history.scrollRestoration = 'manual';
+if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}
 
 /** Routes visited in the current flow pass. Cleared on reset. */
 const visitedRoutes = new Set<string>();
@@ -32,7 +34,7 @@ export function getLastCalculateRoute() {
 }
 
 export function updateLastCalculateRoute(route: string) {
-  _lastCalculateRoute = route;
+  if (_lastCalculateRoute !== route) _lastCalculateRoute = route;
 }
 
 /** Call before navigating away (e.g. tab click) to persist the current scroll position. */
