@@ -19,7 +19,7 @@
 
 import { type ReactNode, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { saveScrollPosition } from '@/hooks/usePreserveScroll';
+import { saveScrollPosition, getLastCalculateRoute, updateLastCalculateRoute } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { HeaderBar } from '@/components/organisms/HeaderBar/HeaderBar';
 import { Icon } from '@/components/atoms/Icon/Icon';
@@ -43,9 +43,12 @@ export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
 
   // Updated during render — safe because AppLayout re-renders on every location change.
-  const lastCalculateRoute = useRef('/calculate');
+  const lastCalculateRoute = useRef(getLastCalculateRoute());
   if (location.pathname.startsWith('/calculate')) {
     lastCalculateRoute.current = location.pathname;
+    updateLastCalculateRoute(location.pathname);
+  } else {
+    lastCalculateRoute.current = getLastCalculateRoute();
   }
 
   const navItems = [

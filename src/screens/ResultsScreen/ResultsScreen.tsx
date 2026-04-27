@@ -401,21 +401,21 @@ export function ResultsScreen() {
             <Button
               type="button"
               variant="ghost"
+              onClick={() => setCancelOpen(true)}
+              className="min-h-12 flex-1 text-status-error hover:bg-status-error/10 hover:text-status-error"
+            >
+              <Icon name="refresh-cw" size={16} />
+              {t('common:actions.reset')}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
               className="min-h-12 flex-1"
               isLoading={isExporting}
               onClick={() => setExportOpen(true)}
             >
               <Icon name="download" size={16} />
               {t('common:actions.export')}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setCancelOpen(true)}
-              className="min-h-12 flex-1 text-status-error hover:bg-status-error/10 hover:text-status-error"
-            >
-              <Icon name="refresh-cw" size={16} />
-              {t('common:actions.reset')}
             </Button>
           </div>
         )}

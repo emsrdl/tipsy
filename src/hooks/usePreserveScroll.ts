@@ -23,6 +23,18 @@ const visitedRoutes = new Set<string>();
 /** Absolute scroll positions saved on tab-switch, keyed by pathname. */
 const savedScrollPositions = new Map<string, number>();
 
+// Persists the active calculate route across AppLayout re-renders so markFlowReset()
+// can signal "go back to step 1" without requiring an explicit navigate('/calculate').
+let _lastCalculateRoute = '/calculate';
+
+export function getLastCalculateRoute() {
+  return _lastCalculateRoute;
+}
+
+export function updateLastCalculateRoute(route: string) {
+  _lastCalculateRoute = route;
+}
+
 /** Call before navigating away (e.g. tab click) to persist the current scroll position. */
 export function saveScrollPosition(pathname: string) {
   savedScrollPositions.set(pathname, window.scrollY);
@@ -33,6 +45,7 @@ export function markFlowReset() {
   for (const route of Array.from(visitedRoutes)) {
     if (route.startsWith('/calculate')) visitedRoutes.delete(route);
   }
+  _lastCalculateRoute = '/calculate';
 }
 
 /** Returns the current scroll position as a 0–1 ratio of the page's max scroll. */
