@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePreserveScroll } from '@/hooks/usePreserveScroll';
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
 import { ImportDialog } from '@/components/molecules/ImportDialog/ImportDialog';
@@ -39,6 +40,7 @@ import type { ThemeId } from '@/types/theme';
  * Settings screen — manage profiles, appearance, data.
  */
 export function SettingsScreen() {
+  usePreserveScroll();
   const { t } = useTranslation(['common', 'screens']);
   const {
     profiles,
@@ -195,7 +197,7 @@ export function SettingsScreen() {
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
-                      className="h-10 w-full rounded-lg border border-border bg-surface-overlay px-3 text-sm text-text-primary focus:border-accent focus:outline-none"
+                      className="h-10 w-full rounded-lg border border-border bg-surface-overlay px-3 text-sm text-text-primary focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
                       autoFocus
                     />
                     <div className="flex gap-2">
@@ -329,7 +331,7 @@ export function SettingsScreen() {
                     onChange={(e) => setNewName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleCreateProfile()}
                     placeholder={t('screens:profile.namePlaceholder')}
-                    className="h-10 w-full rounded-lg border border-border bg-surface-overlay px-3 text-sm text-text-primary focus:border-accent focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-border bg-surface-overlay px-3 text-sm text-text-primary focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
                     autoFocus
                   />
                   <div className="flex gap-2">

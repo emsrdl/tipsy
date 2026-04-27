@@ -65,7 +65,7 @@ export function ConfirmDialog({
           {message && <DialogDescription>{message}</DialogDescription>}
         </DialogHeader>
         <div className="flex gap-2 pt-2">
-          <Button type="button" variant="ghost" onClick={onCancel} className="min-h-11 flex-1">
+          <Button type="button" variant="ghost" onClick={onCancel} className="min-h-12 flex-1">
             {cancelLabel ?? t('actions.cancel')}
           </Button>
           <Button
@@ -73,8 +73,8 @@ export function ConfirmDialog({
             onClick={onConfirm}
             className={
               variant === 'danger'
-                ? 'hover:bg-status-error/90 min-h-11 flex-1 border-0 bg-status-error text-white'
-                : 'min-h-11 flex-1'
+                ? 'hover:bg-status-error/90 min-h-12 flex-1 border-0 bg-status-error text-white'
+                : 'min-h-12 flex-1'
             }
           >
             {confirmLabel}

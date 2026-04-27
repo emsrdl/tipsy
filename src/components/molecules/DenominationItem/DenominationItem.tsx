@@ -16,6 +16,7 @@
  * />
  */
 
+import { useTranslation } from 'react-i18next';
 import { Stepper } from '../Stepper/Stepper';
 import { formatEurFromCents } from '@/config/currency';
 import { useLocale } from '@/hooks/useLocale';
@@ -45,6 +46,7 @@ export function DenominationItem({
   quantity,
   onQuantityChange,
 }: DenominationItemProps) {
+  const { t } = useTranslation('screens');
   const { locale } = useLocale();
   const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
   const subtotalCents = denomination.valueInCents * quantity;
@@ -78,7 +80,7 @@ export function DenominationItem({
           max={999}
           step={1}
           size="md"
-          aria-label={`${denomination.symbol} Anzahl`}
+          aria-label={`${denomination.symbol} ${t('cashInput.quantityLabel')}`}
         />
       </div>
 

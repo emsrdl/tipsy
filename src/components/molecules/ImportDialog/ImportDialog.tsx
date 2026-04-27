@@ -69,7 +69,7 @@ export function ImportDialog({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="hover:border-accent/50 flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-4 py-6 transition-colors hover:bg-surface-overlay"
+            className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-4 py-6 transition-colors hover:border-accent/50 hover:bg-surface-overlay"
           >
             <Icon name="upload" size={24} className="text-text-secondary" />
             {selectedFile ? (
@@ -89,7 +89,7 @@ export function ImportDialog({
         </div>
 
         <div className="flex gap-2 pt-1">
-          <Button type="button" variant="ghost" onClick={handleClose} className="min-h-11 px-4">
+          <Button type="button" variant="ghost" onClick={handleClose} className="min-h-12 px-4">
             {t('common:actions.cancel')}
           </Button>
           <Button
@@ -97,7 +97,7 @@ export function ImportDialog({
             disabled={!selectedFile}
             isLoading={isProcessing}
             onClick={handleImport}
-            className="min-h-11 flex-1"
+            className="min-h-12 flex-1"
           >
             {t('common:actions.import')}
           </Button>

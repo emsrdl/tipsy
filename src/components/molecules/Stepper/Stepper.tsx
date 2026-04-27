@@ -14,6 +14,7 @@
  * <Stepper value={3} onChange={setQty} min={0} aria-label="Anzahl €10" />
  */
 
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/atoms/Icon/Icon';
 
@@ -79,6 +80,7 @@ export function Stepper({
   className,
   size = 'md',
 }: StepperProps) {
+  const { t } = useTranslation('common');
   const sizes = SIZE[size];
 
   function decrement() {
@@ -102,7 +104,7 @@ export function Stepper({
       {/* Decrement */}
       <button
         type="button"
-        aria-label="Verringern"
+        aria-label={t('stepper.decrement')}
         onClick={decrement}
         disabled={disabled || value <= min}
         className={cn(
@@ -110,7 +112,7 @@ export function Stepper({
           'ripple flex items-center justify-center rounded-full',
           'border-2 border-border bg-surface transition-all',
           'text-text-primary',
-          'disabled:cursor-not-allowed disabled:opacity-40',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           'active:bg-surface-overlay',
           '[&:not(:disabled)]:hover:border-accent [&:not(:disabled)]:hover:text-accent',
         )}
@@ -134,7 +136,7 @@ export function Stepper({
       {/* Increment */}
       <button
         type="button"
-        aria-label="Erhöhen"
+        aria-label={t('stepper.increment')}
         onClick={increment}
         disabled={disabled || value >= max}
         className={cn(
@@ -142,7 +144,7 @@ export function Stepper({
           'ripple flex items-center justify-center rounded-full',
           'bg-accent text-accent-foreground transition-all',
           'shadow-elevation-1',
-          'disabled:cursor-not-allowed disabled:opacity-40',
+          'disabled:cursor-not-allowed disabled:opacity-50',
           'active:scale-95',
         )}
       >

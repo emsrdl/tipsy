@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePreserveScroll } from '@/hooks/usePreserveScroll';
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
 import { ChartTooltip } from '@/components/molecules/ChartTooltip/ChartTooltip';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
@@ -124,6 +125,7 @@ function groupByHourly(shifts: Shift[], getValue: (s: Shift) => number): GraphDa
  * History screen with charts, profile-filtered shift list, and import/export.
  */
 export function HistoryScreen() {
+  usePreserveScroll();
   const { t } = useTranslation(['common', 'screens']);
   const { shifts: allShifts, deleteShift } = useShifts();
   const { locale } = useLocale();

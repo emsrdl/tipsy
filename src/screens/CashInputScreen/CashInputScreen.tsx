@@ -9,6 +9,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { usePreserveScroll, markFlowReset, getScrollRatio } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { DenominationGrid } from '@/components/organisms/DenominationGrid/DenominationGrid';
@@ -39,6 +40,7 @@ const STEP_ROUTES: Record<number, string> = {
 export function CashInputScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
+  usePreserveScroll();
   const { totalInCents, calculate, setDenominationQuantity, reset } = useTipCalculator();
   const { showToast } = useToast();
   const [defaultThreshold] = useLocalStorage<number>(
@@ -52,7 +54,7 @@ export function CashInputScreen() {
 
   function handleStepClick(s: number) {
     if (s === 3) calculate();
-    void navigate(STEP_ROUTES[s]);
+    void navigate(STEP_ROUTES[s], { state: { scrollRatio: getScrollRatio(), isBack: s < 2 } });
   }
 
   function handleReset() {
@@ -61,6 +63,7 @@ export function CashInputScreen() {
   }
 
   function handleResetAll() {
+    markFlowReset();
     reset();
     setThreshold(defaultThreshold);
     setSmartMode(SMART_SPLIT_ENABLED);
@@ -97,24 +100,24 @@ export function CashInputScreen() {
       )}
 
       {/* Navigation */}
-      <div className="mt-8 space-y-3">
+      <div className="mt-8 flex gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleStepClick(1)}
+          className="min-h-14 flex-1"
+        >
+          <Icon name="chevron-left" size={18} />
+          {t('common:actions.back')}
+        </Button>
         <Button
           type="button"
           disabled={!hasTotal}
           onClick={() => handleStepClick(3)}
-          className="min-h-14 w-full text-base font-semibold"
+          className="min-h-14 flex-[2] text-base font-semibold"
         >
           {t('common:actions.calculate')}
           <Icon name="chevron-right" size={18} />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => handleStepClick(1)}
-          className="min-h-12 w-full"
-        >
-          <Icon name="chevron-left" size={16} />
-          {t('common:actions.back')}
         </Button>
       </div>
     </ScreenContainer>

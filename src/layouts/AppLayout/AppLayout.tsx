@@ -17,8 +17,9 @@
  * <AppLayout><Outlet /></AppLayout>
  */
 
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { saveScrollPosition, getLastCalculateRoute, updateLastCalculateRoute } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { HeaderBar } from '@/components/organisms/HeaderBar/HeaderBar';
 import { Icon } from '@/components/atoms/Icon/Icon';
@@ -41,9 +42,17 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { t } = useTranslation('common');
   const location = useLocation();
 
+  const isCalculateRoute = location.pathname.startsWith('/calculate');
+  const lastCalculateRoute = useRef('/calculate');
+  lastCalculateRoute.current = isCalculateRoute ? location.pathname : getLastCalculateRoute();
+
+  useEffect(() => {
+    if (isCalculateRoute) updateLastCalculateRoute(location.pathname);
+  }, [isCalculateRoute, location.pathname]);
+
   const navItems = [
     {
-      to: '/calculate',
+      to: lastCalculateRoute.current,
       label: t('nav.calculate'),
       icon: 'calculator' as const,
       matchPrefix: '/calculate',
@@ -75,8 +84,9 @@ export function AppLayout({ children }: AppLayoutProps) {
             const isActive = location.pathname.startsWith(matchPrefix);
             return (
               <NavLink
-                key={to}
+                key={matchPrefix}
                 to={to}
+                onClick={() => saveScrollPosition(location.pathname)}
                 className={cn(
                   'flex w-24 flex-col items-center gap-1 py-3 transition-colors',
                   isActive ? 'text-accent' : 'text-text-secondary',
