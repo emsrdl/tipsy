@@ -14,6 +14,16 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
+const SCROLL_CONTAINER_ID = 'main-scroll';
+
+function getScrollEl(): HTMLElement | null {
+  return document.getElementById(SCROLL_CONTAINER_ID);
+}
+
+function getMaxScroll(el: HTMLElement): number {
+  return Math.max(0, el.scrollHeight - el.clientHeight);
+}
+
 // Disable browser scroll restoration so this hook has full control.
 if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
@@ -39,12 +49,12 @@ export function updateLastCalculateRoute(route: string) {
 
 /** Call before navigating away (e.g. tab click) to persist the current scroll position. */
 export function saveScrollPosition(pathname: string) {
-  savedScrollPositions.set(pathname, window.scrollY);
+  savedScrollPositions.set(pathname, getScrollEl()?.scrollTop ?? 0);
 }
 
 /** Call in reset/save handlers to restart first-visit behaviour for the next calculate pass. */
 export function markFlowReset() {
-  for (const route of Array.from(visitedRoutes)) {
+  for (const route of visitedRoutes) {
     if (route.startsWith('/calculate')) visitedRoutes.delete(route);
   }
   _lastCalculateRoute = '/calculate';
@@ -52,8 +62,10 @@ export function markFlowReset() {
 
 /** Returns the current scroll position as a 0–1 ratio of the page's max scroll. */
 export function getScrollRatio(): number {
-  const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-  return maxScroll > 0 ? window.scrollY / maxScroll : 0;
+  const el = getScrollEl();
+  if (!el) return 0;
+  const maxScroll = getMaxScroll(el);
+  return maxScroll > 0 ? el.scrollTop / maxScroll : 0;
 }
 
 /**
@@ -79,16 +91,19 @@ export function usePreserveScroll() {
 
     const state = location.state as { scrollRatio?: number; isBack?: boolean } | null;
 
+    const el = getScrollEl();
+
     if (isFirstVisit && !state?.isBack) {
-      window.scrollTo(0, 0);
+      el?.scrollTo(0, 0);
       return;
     }
 
-    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    if (!el) return;
+    const maxScroll = getMaxScroll(el);
     if (state?.scrollRatio !== undefined) {
-      window.scrollTo(0, Math.round(state.scrollRatio * maxScroll));
+      el.scrollTo(0, Math.round(state.scrollRatio * maxScroll));
     } else {
-      window.scrollTo(0, savedScrollPositions.get(location.pathname) ?? 0);
+      el.scrollTo(0, savedScrollPositions.get(location.pathname) ?? 0);
     }
   // Mount-only: location is stable on first render; re-running on nav changes would defeat the hook's purpose.
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -40,13 +40,23 @@
   --animate-slide-up: slide-up 200ms ease-out;
 
   @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes slide-up {
-    from { transform: translateY(8px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 }
 
@@ -120,9 +130,13 @@
   }
 
   /* Radix scroll-lock adds margin-right to compensate for the scrollbar, but
-     scrollbar-gutter: stable already reserves that space — cancel it out. */
+     scrollbar-gutter: stable already reserves that space — cancel it out.
+     Also lock #main-scroll since body scroll is no longer used. */
   body[data-scroll-locked] {
     margin-right: 0 !important;
+  }
+  body[data-scroll-locked] #main-scroll {
+    overflow-y: hidden;
   }
 
   /* Prevent zoom on input focus (iOS Safari) */

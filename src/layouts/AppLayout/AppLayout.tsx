@@ -67,11 +67,13 @@ export function AppLayout({ children }: AppLayoutProps) {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
+    <div className="flex h-dvh flex-col bg-surface">
       <HeaderBar />
 
-      {/* Scrollable content with bottom nav clearance */}
-      <div className="flex-1 pb-20">{children}</div>
+      {/* Dedicated scroll container — keeps touch events responsive during momentum scroll */}
+      <div id="main-scroll" className="flex-1 min-h-0 overflow-y-auto overscroll-none pb-20">
+        {children}
+      </div>
 
       {/* Material Bottom Navigation Bar */}
       <nav
