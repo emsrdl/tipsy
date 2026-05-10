@@ -1,3 +1,27 @@
+## [0.6.1](https://github.com/emsrdl/tipsy/compare/v0.6.0...v0.6.1) (2026-05-10)
+
+
+### Bug Fixes
+
+* 18 uiux fixes code cleanup ([#19](https://github.com/emsrdl/tipsy/issues/19)) ([b5d61a7](https://github.com/emsrdl/tipsy/commit/b5d61a77f63fc0885fd54cf8355d61cbf46e8865))
+* add names and aria-labels to input fields for better accessibility ([709878d](https://github.com/emsrdl/tipsy/commit/709878d03dfb2ad10da33534ba94ea72c2cd2a37))
+* adjust ProfileAvatar size and improve layout spacing in ScreenContainer ([15178aa](https://github.com/emsrdl/tipsy/commit/15178aa50c804b29408513b6c56f470a0c2f67a7))
+* centralize theme color management and remove hardcoded values ([4ae573e](https://github.com/emsrdl/tipsy/commit/4ae573e3090549c9a56231fddb621342a975c3ba))
+* enhance accessibility by adding labels to SliderBadge components ([c795a4e](https://github.com/emsrdl/tipsy/commit/c795a4e98d7c39c1cfb973711890c87c23b4e92b))
+* enhance layout and styling for DistributionTable and ResultsScreen components ([2bac065](https://github.com/emsrdl/tipsy/commit/2bac0651978fe76e8f41c5305a0d7e1ea4e158fd))
+* enhance PWA support with theme and status bar synchronization ([b41a194](https://github.com/emsrdl/tipsy/commit/b41a1941c8343976832c0272cba7711643c6082a))
+* enhance theme pre-paint logic with accent support to prevent flicker ([3a886aa](https://github.com/emsrdl/tipsy/commit/3a886aafd25258b222411cf0a00716c34220184e))
+* enhance viewport meta tag for better mobile experience ([0f5cf1e](https://github.com/emsrdl/tipsy/commit/0f5cf1ed582bed529579b02d772a2deace61484b))
+* expose getScrollEl function and improve scroll handling in ResultsScreen ([d878cfb](https://github.com/emsrdl/tipsy/commit/d878cfb0df53ac20213dd391a0f9254e8c57ed1e))
+* improve layout and spacing of transfer items in ResultsScreen ([ef77fcf](https://github.com/emsrdl/tipsy/commit/ef77fcf75054b65dacf9a435e5ff66bb5b7e8cc3))
+* improve layout of transfers section in ResultsScreen for better responsiveness ([9903255](https://github.com/emsrdl/tipsy/commit/9903255adaabfade579112c8c9a2bc0201c6b6b9))
+* improve navigation behavior by scrolling to top on active tab click ([a3e1086](https://github.com/emsrdl/tipsy/commit/a3e108621b8c14f2190efc5e9045555d2cf1940f))
+* improve scroll handling and layout for better user experience ([edff447](https://github.com/emsrdl/tipsy/commit/edff447635cde2f019bd7854990ef4d355947d5d))
+* refactor Badge and Slider components to use centralized color configuration and improve accessibility ([ff6c6e5](https://github.com/emsrdl/tipsy/commit/ff6c6e5417ab7929f89552a368a0121dbb6992aa))
+* remove deprecated baseUrl ([c6a75aa](https://github.com/emsrdl/tipsy/commit/c6a75aaaa4439faecf00e6e3d63609b57a7ac42f))
+* remove unnecessary overscroll behavior from main scroll container ([3058d7b](https://github.com/emsrdl/tipsy/commit/3058d7bfd3de8c0b6be292c4550c38a0b606bbfa))
+* simplify tailwind classes ([11450d1](https://github.com/emsrdl/tipsy/commit/11450d1c608ba1d27a71edf005c4d7a2d38e5312))
+
 ## [0.6.0](https://github.com/emsrdl/tipsy/compare/v0.5.1...v0.6.0) (2026-04-27)
 
 
