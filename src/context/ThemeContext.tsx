@@ -25,12 +25,9 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { THEMES, THEME_IDS } from '@/config/themes';
+import { LS_THEME_KEY, LS_ACCENT_KEY, LS_MODE_KEY } from '@/config/storageKeys';
 import type { ThemeId, ColorMode, AccentColor, Theme } from '@/types/theme';
 import { env } from '@/config/env';
-
-const LS_THEME_KEY = 'tipsy-theme';
-const LS_ACCENT_KEY = 'tipsy-accent';
-const LS_MODE_KEY = 'tipsy-mode';
 
 export interface ThemeContextValue {
   /** Current active theme object. */
@@ -64,10 +61,8 @@ function injectAccentVars(accent: AccentColor, mode: ColorMode): void {
 }
 
 /** Sync the PWA status-bar tint with the active surface color. */
-function syncStatusBarColor(): void {
-  const surface = getComputedStyle(document.documentElement)
-    .getPropertyValue('--color-surface')
-    .trim();
+function syncStatusBarColor(theme: Theme, mode: ColorMode): void {
+  const surface = theme.palette[mode].surface;
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (meta && meta.content !== surface) meta.content = surface;
 }
@@ -75,7 +70,6 @@ function syncStatusBarColor(): void {
 function getInitialColorMode(): ColorMode {
   const stored = localStorage.getItem(LS_MODE_KEY);
   if (stored === 'light' || stored === 'dark') return stored;
-  // Fall back to OS preference
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
@@ -91,27 +85,24 @@ function getInitialThemeId(): ThemeId {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeId, setThemeId] = useState<ThemeId>(getInitialThemeId);
   const [accentId, setAccentId] = useState<string>(() => {
-    const stored = localStorage.getItem(LS_ACCENT_KEY);
-    return stored ?? THEMES[themeId]?.defaultAccentId ?? 'blue';
+    return localStorage.getItem(LS_ACCENT_KEY) ?? THEMES[themeId].defaultAccentId;
   });
   const [colorMode, setColorModeState] = useState<ColorMode>(getInitialColorMode);
 
-  const theme = THEMES[themeId]!;
+  const theme = THEMES[themeId];
   const accentColor = theme.accentColors.find((c) => c.id === accentId) ?? theme.accentColors[0]!;
 
-  // Apply theme/mode to DOM and inject accent vars
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', themeId);
     document.documentElement.setAttribute('data-mode', colorMode);
     injectAccentVars(accentColor, colorMode);
-    syncStatusBarColor();
-  }, [themeId, accentColor, colorMode]);
+    syncStatusBarColor(theme, colorMode);
+  }, [themeId, theme, accentColor, colorMode]);
 
   const setTheme = useCallback((id: ThemeId) => {
     setThemeId(id);
     localStorage.setItem(LS_THEME_KEY, id);
-    // Reset accent to this theme's default
-    const newDefault = THEMES[id]?.defaultAccentId ?? 'blue';
+    const newDefault = THEMES[id].defaultAccentId;
     setAccentId(newDefault);
     localStorage.setItem(LS_ACCENT_KEY, newDefault);
   }, []);

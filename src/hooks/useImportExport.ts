@@ -48,12 +48,11 @@ export interface UseImportExportReturn {
  */
 export function useImportExport(exportShifts?: Shift[]): UseImportExportReturn {
   const { shifts: allShifts, addShifts } = useShifts();
-  const { locale } = useLocale();
+  const { fmtLocale } = useLocale();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const shifts = exportShifts ?? allShifts;
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
 
   const exportCsv = useCallback(() => {
     try {

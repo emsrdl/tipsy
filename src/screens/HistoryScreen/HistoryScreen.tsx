@@ -127,10 +127,9 @@ export function HistoryScreen() {
   usePreserveScroll();
   const { t } = useTranslation(['common', 'screens']);
   const { shifts: allShifts, deleteShift } = useShifts();
-  const { locale } = useLocale();
+  const { fmtLocale } = useLocale();
   const { activeProfile } = useProfiles();
   const { showToast } = useToast();
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
 
   const [graphMode, setGraphMode] = useState<GraphMode>('week');
   const [expandedShiftId, setExpandedShiftId] = useState<string | null>(null);

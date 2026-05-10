@@ -13,7 +13,11 @@
  * @see src/lib/format/formatCurrency.ts for EUR formatting
  */
 
-import { formatEurFromCents } from '@/lib/format/formatCurrency';
+import {
+  formatEurFromCents,
+  formatSignedEurFromCents,
+  toFmtLocale,
+} from '@/lib/format/formatCurrency';
 import type { Shift, ImportResult } from '@/types/shift';
 
 /* ------------------------------------------------------------------ */
@@ -104,7 +108,7 @@ function getLabels(locale: string): ExportLabels {
  * @returns CSV string with UTF-8 BOM
  */
 export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
-  const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE';
+  const fmtLocale = toFmtLocale(locale);
   const l = getLabels(locale);
 
   const header = [
@@ -127,10 +131,7 @@ export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
 
     for (const share of shift.distribution.personShares) {
       const transferNote = buildTransferNote(shift, share.id, fmtLocale, l);
-      const deviation =
-        share.deviationInCents !== 0
-          ? `${share.deviationInCents > 0 ? '+' : ''}${formatEurFromCents(share.deviationInCents, fmtLocale)}`
-          : '';
+      const deviation = formatSignedEurFromCents(share.deviationInCents, fmtLocale);
 
       rows.push(
         [
@@ -180,7 +181,7 @@ export function downloadShiftsCsv(
  * @param title - Document title (defaults to localized "Tipsy — Shift Overview")
  */
 export function exportShiftsPdf(shifts: Shift[], locale = 'de-DE', title?: string): void {
-  const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE';
+  const fmtLocale = toFmtLocale(locale);
   const lang = locale.startsWith('de') ? 'de' : 'en';
   const l = getLabels(locale);
   const docTitle = title ?? `Tipsy — ${l.shiftOverview}`;
@@ -198,7 +199,7 @@ export function exportShiftsPdf(shifts: Shift[], locale = 'de-DE', title?: strin
           <td>${s.hoursWorked}</td>
           <td>${formatEurFromCents(s.idealShareInCents, fmtLocale)}</td>
           <td>${formatEurFromCents(s.actualShareInCents, fmtLocale)}</td>
-          <td>${s.deviationInCents !== 0 ? `${s.deviationInCents > 0 ? '+' : ''}${formatEurFromCents(s.deviationInCents, fmtLocale)}` : ''}</td>
+          <td>${formatSignedEurFromCents(s.deviationInCents, fmtLocale)}</td>
         </tr>`,
       )
       .join('');

@@ -18,9 +18,10 @@
       (function () {
         var SURFACES = __SURFACES__;
         var ACCENTS = __ACCENTS__;
-        var theme = localStorage.getItem('tipsy-theme');
+        var LS = __LS_KEYS__;
+        var theme = localStorage.getItem(LS.theme);
         if (!SURFACES[theme]) theme = Object.keys(SURFACES)[0];
-        var mode = localStorage.getItem('tipsy-mode');
+        var mode = localStorage.getItem(LS.mode);
         if (mode !== 'light' && mode !== 'dark') {
           mode = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
@@ -28,7 +29,7 @@
         root.setAttribute('data-theme', theme);
         root.setAttribute('data-mode', mode);
         document.querySelector('meta[name="theme-color"]').content = SURFACES[theme][mode];
-        var accent = ACCENTS[theme][localStorage.getItem('tipsy-accent')];
+        var accent = ACCENTS[theme][localStorage.getItem(LS.accent)];
         if (accent) {
           root.style.setProperty('--color-accent', accent.hex);
           root.style.setProperty('--color-accent-hover', accent.hoverHex);

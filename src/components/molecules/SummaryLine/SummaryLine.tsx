@@ -40,8 +40,7 @@ export function SummaryLine({
   prominent,
   className,
 }: SummaryLineProps) {
-  const { locale } = useLocale();
-  const formattedLocale = locale === 'en' ? 'en-US' : 'de-DE';
+  const { fmtLocale } = useLocale();
 
   return (
     <div
@@ -53,7 +52,7 @@ export function SummaryLine({
       )}
     >
       <span>{label}</span>
-      <span>{formatEurFromCents(amountInCents, formattedLocale)}</span>
+      <span>{formatEurFromCents(amountInCents, fmtLocale)}</span>
     </div>
   );
 }

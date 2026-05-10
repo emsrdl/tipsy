@@ -45,7 +45,7 @@ export function SettingsScreen() {
   const { profiles, activeProfile, createProfile, updateProfile, deleteProfile, switchProfile } =
     useProfiles();
   const { theme, accentColor, colorMode, setTheme, setAccentColor, toggleColorMode } = useTheme();
-  const { locale, setLocale } = useLocale();
+  const { locale, fmtLocale, setLocale } = useLocale();
   const { shifts, deleteShift, clearHistory } = useShifts();
   const {
     exportJson,
@@ -158,8 +158,6 @@ export function SettingsScreen() {
     setShowClearConfirm(false);
     showToast(t('common:toast.historyCleared'), 'info');
   }
-
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
 
   // Compute shift count for profile being deleted
   const deletingProfileShiftCount = deletingId

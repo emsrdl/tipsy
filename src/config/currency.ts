@@ -14,7 +14,7 @@
  * console.log(formatEurFromCents(total)) // "€12,50"
  */
 
-import { formatEurFromCents } from '@/lib/format/formatCurrency';
+import { formatEurFromCents, formatSignedEurFromCents } from '@/lib/format/formatCurrency';
 
 /**
  * A single EUR denomination with its metadata.
@@ -52,5 +52,5 @@ export const DENOMINATIONS: Denomination[] = [
   { id: 'eur_1ct', valueInCents: 1, labelKey: 'currency.denomination.1ct', symbol: '1 ct' },
 ];
 
-// Re-export for convenience — consumers can import both from this module
-export { formatEurFromCents };
+// Re-export for convenience — consumers can import currency formatters here
+export { formatEurFromCents, formatSignedEurFromCents };

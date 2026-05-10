@@ -14,13 +14,13 @@
  * @see src/types/theme.ts for the Theme, ThemePalette, and AccentColor interfaces
  */
 
-import type { Theme } from '@/types/theme';
+import type { Theme, ThemeId } from '@/types/theme';
 
 /**
  * All theme definitions keyed by ThemeId.
  * Import and use this record rather than constructing theme objects inline.
  */
-export const THEMES: Record<string, Theme> = {
+export const THEMES: Record<ThemeId, Theme> = {
   tipsy: {
     id: 'tipsy',
     labelKey: 'theme.tipsy',

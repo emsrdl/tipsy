@@ -99,7 +99,7 @@ function SliderBadge({
       type="button"
       onClick={() => onStartEdit(side)}
       disabled={disabled}
-      aria-label={`${displayValue}%, zum Bearbeiten tippen`}
+      aria-label={`${displayValue}%`}
       className={cn(
         'inline-flex h-7 w-14 items-center justify-center rounded-full text-sm font-bold tabular-nums transition-transform',
         'not-disabled:active:scale-95',
@@ -116,12 +116,6 @@ function SliderBadge({
  *
  * Badges switch to a number input on tap for precise entry.
  * Slider uses step=5 for comfortable touch control.
- *
- * @param props - SliderProps
- * @returns div with labels and range input
- *
- * @example
- * <Slider value={60} onChange={setService} label="Service" counterLabel="Kitchen" />
  */
 export function Slider({
   value,

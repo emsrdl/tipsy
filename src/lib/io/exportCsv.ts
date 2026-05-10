@@ -14,7 +14,7 @@
  */
 
 import type { DistributionResult } from '@/types/session';
-import { formatEurFromCents } from '@/lib/format/formatCurrency';
+import { formatEurFromCents, toFmtLocale } from '@/lib/format/formatCurrency';
 
 export interface ExportCsvOptions {
   /** BCP 47 locale for number formatting. Defaults to 'de-DE'. */
@@ -42,7 +42,7 @@ export interface ExportCsvOptions {
  * exportTipsCsv(results, { locale: 'de', filename: 'schicht-2024', labels: { name: 'Name', group: 'Gruppe', hours: 'Stunden', amount: 'Betrag', kitchen: 'Küche', service: 'Service' } })
  */
 export function exportTipsCsv(results: DistributionResult[], options: ExportCsvOptions): void {
-  const locale = options.locale === 'en' ? 'en-US' : 'de-DE';
+  const locale = toFmtLocale(options.locale ?? 'de');
   const filename = `${options.filename ?? 'tipsy-export'}.csv`;
   const l = options.labels;
 

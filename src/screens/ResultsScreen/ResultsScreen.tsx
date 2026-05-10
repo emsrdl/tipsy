@@ -35,7 +35,7 @@ import { useLocale } from '@/hooks/useLocale';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ExportDialog } from '@/components/molecules/ExportDialog/ExportDialog';
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog/ConfirmDialog';
-import { postTransferFairnessScore } from '@/lib/calc/calculations';
+import { postTransferFairnessScore, fairnessScoreColor } from '@/lib/calc/calculations';
 import { formatEurFromCents } from '@/config/currency';
 import { DEFAULT_FAIRNESS_THRESHOLD, SMART_SPLIT_DEFAULT_THRESHOLD_KEY } from '@/config/smartSplit';
 import { resolveEmployeeName } from '@/lib/employee';
@@ -64,8 +64,7 @@ export function ResultsScreen() {
   const { addShift } = useShifts();
   const { activeProfile } = useProfiles();
   const { showToast } = useToast();
-  const { locale } = useLocale();
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
+  const { fmtLocale } = useLocale();
 
   const [defaultThreshold] = useLocalStorage<number>(
     SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
@@ -77,7 +76,7 @@ export function ResultsScreen() {
   const [showThresholdHelp, setShowThresholdHelp] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  const results = session.results ?? [];
+  const hasResults = (session.results?.length ?? 0) > 0;
 
   const normalizedResults = useMemo(
     () =>
@@ -115,17 +114,19 @@ export function ResultsScreen() {
   const hasService = session.employees.some((e) => e.group === 'service');
   const hasBothGroups = hasKitchen && hasService;
 
-  // When smart mode is on, show actual (smart-adjusted) amounts; otherwise show proportional results.
-  const displayResults =
-    isSmartMode && smartOutput.output
-      ? smartOutput.output.distribution.personShares.map((s) => ({
-          employeeId: s.id,
-          name: s.name,
-          group: s.role,
-          hours: s.hoursWorked,
-          amountInCents: s.actualShareInCents,
-        }))
-      : normalizedResults;
+  const displayResults = useMemo(
+    () =>
+      isSmartMode && smartOutput.output
+        ? smartOutput.output.distribution.personShares.map((s) => ({
+            employeeId: s.id,
+            name: s.name,
+            group: s.role,
+            hours: s.hoursWorked,
+            amountInCents: s.actualShareInCents,
+          }))
+        : normalizedResults,
+    [isSmartMode, smartOutput.output, normalizedResults],
+  );
 
   function handleSaveAndFinish() {
     if (smartOutput.output === null || activeProfile === null) return;
@@ -162,11 +163,6 @@ export function ResultsScreen() {
   const fairnessScore = smartOutput.output?.distribution.fairnessScore;
   const transfers = smartOutput.output?.differences ?? [];
 
-  function scoreColor(score: number) {
-    return score >= 95 ? 'text-status-success' : 'text-status-warning';
-  }
-
-  // Slider lives at the bottom of the page; scroll into view when settings opens.
   useEffect(() => {
     if (showSettings && hasBothGroups) {
       sliderWrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -332,22 +328,22 @@ export function ResultsScreen() {
   const fairnessRow =
     isSmartMode && fairnessScore !== undefined ? (
       <div className="flex items-center gap-2 px-4 py-1">
-        <Icon name="star" size={14} className={scoreColor(postScore ?? fairnessScore)} />
+        <Icon name="star" size={14} className={fairnessScoreColor(postScore ?? fairnessScore)} />
         <span className="flex-1 text-sm text-text-secondary">
           {t('common:smartSplit.fairnessScore')}
         </span>
         {postScore !== undefined ? (
           <span className="flex items-center gap-1.5">
-            <span className={cn('font-mono text-sm font-bold', scoreColor(fairnessScore))}>
+            <span className={cn('font-mono text-sm font-bold', fairnessScoreColor(fairnessScore))}>
               {fairnessScore}%
             </span>
             <Icon name="arrow-right" size={12} className="text-text-secondary" />
-            <span className={cn('font-mono text-sm font-bold', scoreColor(postScore))}>
+            <span className={cn('font-mono text-sm font-bold', fairnessScoreColor(postScore))}>
               {postScore}%
             </span>
           </span>
         ) : (
-          <span className={cn('font-mono text-sm font-bold', scoreColor(fairnessScore))}>
+          <span className={cn('font-mono text-sm font-bold', fairnessScoreColor(fairnessScore))}>
             {fairnessScore}%
           </span>
         )}
@@ -418,7 +414,7 @@ export function ResultsScreen() {
       onStepClick={handleStepClick}
       onReset={handleResetAll}
     >
-      {results.length === 0 ? (
+      {!hasResults ? (
         <Alert status="info" message={t('errors:validation.noEmployees')} />
       ) : (
         <DistributionTable

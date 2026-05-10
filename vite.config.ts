@@ -23,6 +23,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 import { execSync } from 'node:child_process';
 import { THEMES, THEME_IDS } from './src/config/themes';
+import { LS_THEME_KEY, LS_ACCENT_KEY, LS_MODE_KEY } from './src/config/storageKeys';
 import { version } from './package.json';
 
 function r(path: string) {
@@ -41,14 +42,15 @@ function gitDescribe(long: boolean): string {
 const camelToKebab = (s: string) => s.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
 
 /**
- * Generate the per-theme/mode CSS variable blocks from THEMES.
- * Accent vars are emitted as fallbacks (the active accent is overridden at
- * runtime by ThemeContext for themes with `hasAccentPicker`).
+ * Per-theme/mode CSS variable blocks. Accent vars are emitted as fallbacks
+ * (the active accent is overridden at runtime by ThemeContext for themes
+ * with `hasAccentPicker`).
  */
-function generatePaletteCss(): string {
+const PALETTE_CSS = (() => {
   const blocks: string[] = [];
   for (const theme of Object.values(THEMES)) {
-    const accent = theme.accentColors.find((a) => a.id === theme.defaultAccentId)!;
+    const accent =
+      theme.accentColors.find((a) => a.id === theme.defaultAccentId) ?? theme.accentColors[0]!;
     for (const isDark of [false, true]) {
       const selector = `[data-theme='${theme.id}']${isDark ? `[data-mode='dark']` : ''}`;
       const tokens: Record<string, string> = {
@@ -65,16 +67,17 @@ function generatePaletteCss(): string {
     }
   }
   return blocks.join('\n');
-}
+})();
 
 /** Surface-only subset for the pre-paint boot script in index.html. */
-function generateSurfacePaletteJson(): string {
-  const out: Record<string, Record<string, string>> = {};
-  for (const t of Object.values(THEMES)) {
-    out[t.id] = { light: t.palette.light.surface, dark: t.palette.dark.surface };
-  }
-  return JSON.stringify(out);
-}
+const SURFACE_PALETTE_JSON = JSON.stringify(
+  Object.fromEntries(
+    Object.values(THEMES).map((t) => [
+      t.id,
+      { light: t.palette.light.surface, dark: t.palette.dark.surface },
+    ]),
+  ),
+);
 
 /**
  * Per-theme accent map for the pre-paint boot script — lets it apply the
@@ -82,27 +85,37 @@ function generateSurfacePaletteJson(): string {
  * flicker on initial load. Mirrors the AccentColor shape so the boot script
  * reads the same field names ThemeContext.injectAccentVars uses.
  */
-function generateAccentMapJson(): string {
-  const out: Record<string, Record<string, Record<string, string>>> = {};
-  for (const t of Object.values(THEMES)) {
-    out[t.id] = Object.fromEntries(
-      t.accentColors.map((a) => [
-        a.id,
-        { hex: a.hex, hoverHex: a.hoverHex, subtleHex: a.subtleHex, subtleDarkHex: a.subtleDarkHex },
-      ]),
-    );
-  }
-  return JSON.stringify(out);
-}
+const ACCENT_MAP_JSON = JSON.stringify(
+  Object.fromEntries(
+    Object.values(THEMES).map((t) => [
+      t.id,
+      Object.fromEntries(
+        t.accentColors.map((a) => [
+          a.id,
+          {
+            hex: a.hex,
+            hoverHex: a.hoverHex,
+            subtleHex: a.subtleHex,
+            subtleDarkHex: a.subtleDarkHex,
+          },
+        ]),
+      ),
+    ]),
+  ),
+);
 
 /**
  * Static `theme-color` for the meta tag in index.html — covers the
  * pre-paint window before the boot script runs, plus the no-JS case.
  * Uses the first theme's dark surface as a sensible default.
  */
-function generateBootSurface(): string {
-  return THEMES[THEME_IDS[0]]!.palette.dark.surface;
-}
+const BOOT_SURFACE = THEMES[THEME_IDS[0]].palette.dark.surface;
+
+const LS_KEYS_JSON = JSON.stringify({
+  theme: LS_THEME_KEY,
+  mode: LS_MODE_KEY,
+  accent: LS_ACCENT_KEY,
+});
 
 const isDevServer =
   process.argv.some((a) => /[/\\]vite$/.test(a)) && !process.argv.includes('build');
@@ -115,10 +128,11 @@ export default defineConfig({
         order: 'pre',
         handler: (html) =>
           html
-            .replace('__SURFACES__', generateSurfacePaletteJson())
-            .replace('__ACCENTS__', generateAccentMapJson())
-            .replace('__BOOT_SURFACE__', generateBootSurface())
-            .replace('/*__PALETTE_CSS__*/', generatePaletteCss()),
+            .replace('__SURFACES__', SURFACE_PALETTE_JSON)
+            .replace('__ACCENTS__', ACCENT_MAP_JSON)
+            .replace('__LS_KEYS__', LS_KEYS_JSON)
+            .replace('__BOOT_SURFACE__', BOOT_SURFACE)
+            .replace('/*__PALETTE_CSS__*/', PALETTE_CSS),
       },
     },
     react(),

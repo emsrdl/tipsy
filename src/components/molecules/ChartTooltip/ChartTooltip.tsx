@@ -30,8 +30,7 @@ export interface ChartTooltipProps {
  */
 export function ChartTooltip({ active, payload, label, suffix = '€' }: ChartTooltipProps) {
   const { t } = useTranslation('common');
-  const { locale } = useLocale();
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
+  const { fmtLocale } = useLocale();
 
   if (!active || !payload || payload.length === 0) return null;
 
