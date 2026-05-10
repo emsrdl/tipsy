@@ -128,7 +128,6 @@
     -moz-osx-font-smoothing: grayscale;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    overscroll-behavior: none;
   }
 
   /* Radix scroll-lock adds margin-right to compensate for the scrollbar, but
