@@ -47,6 +47,7 @@ const BADGE_COLOR = {
 
 interface SliderBadgeProps {
   side: 'left' | 'right';
+  label?: string;
   displayValue: number;
   editing: 'left' | 'right' | null;
   inputVal: string;
@@ -61,6 +62,7 @@ interface SliderBadgeProps {
 
 function SliderBadge({
   side,
+  label,
   displayValue,
   editing,
   inputVal,
@@ -86,7 +88,7 @@ function SliderBadge({
         onChange={(e) => onInputChange(e.target.value)}
         onBlur={onCommit}
         onKeyDown={onKey}
-        aria-label={side}
+        aria-label={label ?? side}
         autoFocus
         className={cn(
           'h-7 w-14 rounded-full px-2 text-center text-sm font-bold tabular-nums focus:outline-none',
@@ -101,7 +103,7 @@ function SliderBadge({
       type="button"
       onClick={() => onStartEdit(side)}
       disabled={disabled}
-      aria-label={`${displayValue}%`}
+      aria-label={label ? `${label}: ${displayValue}%` : `${displayValue}%`}
       className={cn(
         'inline-flex h-7 w-14 items-center justify-center rounded-full text-sm font-bold tabular-nums transition-transform',
         'not-disabled:active:scale-95',
@@ -181,12 +183,12 @@ export function Slider({
           {label && (
             <div className="flex shrink-0 items-center gap-1.5">
               <span className="text-sm font-medium text-text-primary">{label}</span>
-              <SliderBadge side="left" displayValue={value} {...badgeProps} />
+              <SliderBadge side="left" label={label} displayValue={value} {...badgeProps} />
             </div>
           )}
           {counterLabel && (
             <div className="flex shrink-0 items-center gap-1.5">
-              <SliderBadge side="right" displayValue={counterValue} {...badgeProps} />
+              <SliderBadge side="right" label={counterLabel} displayValue={counterValue} {...badgeProps} />
               <span className="text-sm font-medium text-text-primary">{counterLabel}</span>
             </div>
           )}
