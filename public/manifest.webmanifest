@@ -4,8 +4,8 @@
   "description": "Trinkgeld fair verteilen — Fair tip distribution for restaurant staff",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3B82F6",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait-primary",
   "icons": [
     {

@@ -1,9 +1,31 @@
 <!doctype html>
-<html lang="de" data-theme="tipsy" data-mode="light">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#3B82F6" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Tipsy" />
+    <script>
+      // Pre-paint theme bootstrap — resolves stored/OS preference and tints the
+      // status bar before React mounts. SURFACES is injected at build time from
+      // src/styles/themes.css (see vite.config.ts → readSurfacePalette).
+      (function () {
+        var SURFACES = __SURFACES__;
+        var theme = localStorage.getItem('tipsy-theme');
+        if (!SURFACES[theme]) theme = Object.keys(SURFACES)[0];
+        var mode = localStorage.getItem('tipsy-mode');
+        if (mode !== 'light' && mode !== 'dark') {
+          mode = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        var root = document.documentElement;
+        root.setAttribute('data-theme', theme);
+        root.setAttribute('data-mode', mode);
+        document.querySelector('meta[name="theme-color"]').content = SURFACES[theme][mode];
+      })();
+    </script>
     <meta
       name="description"
       content="Trinkgeld fair verteilen — Tip splitting for restaurant staff"

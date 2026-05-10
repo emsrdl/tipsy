@@ -63,6 +63,15 @@ function injectAccentVars(accent: AccentColor, mode: ColorMode): void {
   document.documentElement.style.setProperty('--color-accent-subtle', subtle);
 }
 
+/** Sync the PWA status-bar tint with the active surface color. */
+function syncStatusBarColor(): void {
+  const surface = getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-surface')
+    .trim();
+  const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (meta && meta.content !== surface) meta.content = surface;
+}
+
 function getInitialColorMode(): ColorMode {
   const stored = localStorage.getItem(LS_MODE_KEY);
   if (stored === 'light' || stored === 'dark') return stored;
@@ -96,6 +105,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     document.documentElement.setAttribute('data-theme', themeId);
     document.documentElement.setAttribute('data-mode', colorMode);
     injectAccentVars(accentColor, colorMode);
+    syncStatusBarColor();
   }, [themeId, accentColor, colorMode]);
 
   const setTheme = useCallback((id: ThemeId) => {
