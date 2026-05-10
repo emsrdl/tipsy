@@ -2,14 +2,16 @@
  * @file src/styles/globals.css
  * @description Tailwind v4 entry point — imports, theme tokens, base styles, and utilities.
  *
- * @see src/styles/themes.css for per-theme color variables
+ * @see src/config/themes.ts for per-theme color values (injected at build time)
  * @see src/context/ThemeContext.tsx for runtime accent injection
  * @see src/config/themes.ts for accent color definitions
  */
 
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import './themes.css';
+
+/* Per-theme CSS variables are injected as an inline <style> in index.html
+   from src/config/themes.ts (see vite.config.ts → tipsy:theme-palette). */
 
 /* Dark mode via data-mode attribute */
 @custom-variant dark (&:where([data-mode='dark'], [data-mode='dark'] *));

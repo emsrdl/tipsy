@@ -2,22 +2,16 @@
  * @file src/config/themes.ts
  * @description Theme definitions for Tipsy and Katzentempel.
  *
- * This is the single source of truth for theme colors. All hex values
- * live here — never hardcoded in components or CSS.
+ * Single source of truth for all theme colors — surfaces, text, borders,
+ * status, and accents. No hex value lives in CSS or components; CSS variables
+ * are generated from this module at build time and injected into index.html.
  *
- * ThemeContext reads this config and injects CSS custom properties onto
- * document.documentElement at runtime for the selected accent color.
- * The base theme palettes (surfaces, borders, text) are applied via
- * CSS selectors in globals.css.
+ * ThemeContext additionally overrides accent vars at runtime when the user
+ * picks a different accent color (Tipsy theme only).
  *
- * @see src/styles/globals.css for CSS custom property definitions
- * @see src/context/ThemeContext.tsx for runtime injection logic
- * @see src/types/theme.ts for the Theme and AccentColor interfaces
- *
- * @example
- * import { THEMES } from '@/config/themes'
- * const tipsy = THEMES.tipsy
- * const defaultAccent = tipsy.accentColors.find(c => c.id === tipsy.defaultAccentId)
+ * @see vite.config.ts → tipsy:theme-palette plugin for CSS generation
+ * @see src/context/ThemeContext.tsx for runtime accent injection
+ * @see src/types/theme.ts for the Theme, ThemePalette, and AccentColor interfaces
  */
 
 import type { Theme } from '@/types/theme';
@@ -34,6 +28,34 @@ export const THEMES: Record<string, Theme> = {
     supportsDarkMode: true,
     hasAccentPicker: true,
     defaultAccentId: 'blue',
+    palette: {
+      light: {
+        surface: '#ffffff',
+        surfaceRaised: '#f8fafc',
+        surfaceOverlay: '#f1f5f9',
+        textPrimary: '#0f172a',
+        textSecondary: '#64748b',
+        textInverse: '#ffffff',
+        border: '#e2e8f0',
+        borderStrong: '#cbd5e1',
+        statusError: '#ef4444',
+        statusSuccess: '#22c55e',
+        statusWarning: '#f59e0b',
+      },
+      dark: {
+        surface: '#0f172a',
+        surfaceRaised: '#1e293b',
+        surfaceOverlay: '#334155',
+        textPrimary: '#f8fafc',
+        textSecondary: '#94a3b8',
+        textInverse: '#0f172a',
+        border: '#334155',
+        borderStrong: '#475569',
+        statusError: '#f87171',
+        statusSuccess: '#4ade80',
+        statusWarning: '#fbbf24',
+      },
+    },
     accentColors: [
       {
         id: 'blue',
@@ -85,6 +107,34 @@ export const THEMES: Record<string, Theme> = {
     supportsDarkMode: true,
     hasAccentPicker: false,
     defaultAccentId: 'green',
+    palette: {
+      light: {
+        surface: '#f9fafb',
+        surfaceRaised: '#f3f4f6',
+        surfaceOverlay: '#e5e7eb',
+        textPrimary: '#1b2415',
+        textSecondary: '#4a6340',
+        textInverse: '#ffffff',
+        border: '#d1d5db',
+        borderStrong: '#9ca3af',
+        statusError: '#dc2626',
+        statusSuccess: '#16a34a',
+        statusWarning: '#d97706',
+      },
+      dark: {
+        surface: '#111827',
+        surfaceRaised: '#1f2937',
+        surfaceOverlay: '#374151',
+        textPrimary: '#f3f4f6',
+        textSecondary: '#d1d5db',
+        textInverse: '#111827',
+        border: '#4b5563',
+        borderStrong: '#6b7280',
+        statusError: '#f87171',
+        statusSuccess: '#4ade80',
+        statusWarning: '#fbbf24',
+      },
+    },
     accentColors: [
       {
         id: 'green',

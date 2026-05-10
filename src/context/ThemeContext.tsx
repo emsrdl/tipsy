@@ -24,7 +24,7 @@
  */
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
-import { THEMES } from '@/config/themes';
+import { THEMES, THEME_IDS } from '@/config/themes';
 import type { ThemeId, ColorMode, AccentColor, Theme } from '@/types/theme';
 import { env } from '@/config/env';
 
@@ -80,9 +80,8 @@ function getInitialColorMode(): ColorMode {
 }
 
 function getInitialThemeId(): ThemeId {
-  const stored = localStorage.getItem(LS_THEME_KEY);
-  if (stored === 'tipsy' || stored === 'katzentempel') return stored;
-  return env.DEFAULT_THEME;
+  const stored = localStorage.getItem(LS_THEME_KEY) as ThemeId | null;
+  return stored && THEME_IDS.includes(stored) ? stored : env.DEFAULT_THEME;
 }
 
 /**

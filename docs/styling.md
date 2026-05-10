@@ -16,7 +16,7 @@ Cards always: `rounded-xl bg-surface-raised shadow-elevation-1`
 
 ## Colors
 
-All colors are CSS custom properties in `src/styles/globals.css`. **Never hardcode hex values.**
+All colors are defined in `src/config/themes.ts` (single source of truth). The Vite plugin `tipsy:theme-palette` generates the CSS variables from that module and injects them as an inline `<style>` in `index.html` at build time. **Never hardcode hex values** — add them to `themes.ts` instead.
 
 | Token | Usage |
 |---|---|

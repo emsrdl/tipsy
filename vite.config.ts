@@ -22,7 +22,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { THEMES, THEME_IDS } from './src/config/themes';
 import { version } from './package.json';
 
 function r(path: string) {
@@ -38,25 +38,52 @@ function gitDescribe(long: boolean): string {
   }
 }
 
+const camelToKebab = (s: string) => s.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
+
 /**
- * Extract per-theme/mode `--color-surface` values from themes.css so the
- * pre-paint boot script in index.html can tint the status bar without
- * duplicating the palette. Skips non-`#hex` values (e.g. `var()`, `rgb()`).
+ * Generate the per-theme/mode CSS variable blocks from THEMES.
+ * Accent vars are emitted as fallbacks (the active accent is overridden at
+ * runtime by ThemeContext for themes with `hasAccentPicker`).
  */
-function readSurfacePalette(): string {
-  const css = readFileSync(r('src/styles/themes.css'), 'utf8');
-  const blockRe = /\[data-theme='([^']+)'\](?:\[data-mode='([^']+)'\])?\s*\{([^}]+)\}/g;
-  const palette: Record<string, Record<string, string>> = {};
-  for (const [, theme, modeRaw, body] of css.matchAll(blockRe)) {
-    const surface = body.match(/--color-surface:\s*(#[0-9a-fA-F]+)/)?.[1];
-    if (!surface) continue;
-    (palette[theme] ??= {})[modeRaw ?? 'light'] = surface;
+function generatePaletteCss(): string {
+  const blocks: string[] = [];
+  for (const theme of Object.values(THEMES)) {
+    const accent = theme.accentColors.find((a) => a.id === theme.defaultAccentId)!;
+    for (const isDark of [false, true]) {
+      const selector = `[data-theme='${theme.id}']${isDark ? `[data-mode='dark']` : ''}`;
+      const tokens: Record<string, string> = {
+        ...theme.palette[isDark ? 'dark' : 'light'],
+        accent: accent.hex,
+        accentHover: accent.hoverHex,
+        accentSubtle: isDark ? accent.subtleDarkHex : accent.subtleHex,
+        accentForeground: '#ffffff',
+      };
+      const lines = Object.entries(tokens).map(
+        ([key, value]) => `  --color-${camelToKebab(key)}: ${value};`,
+      );
+      blocks.push(`${selector} {\n${lines.join('\n')}\n}`);
+    }
   }
-  return JSON.stringify(palette);
+  return blocks.join('\n');
 }
 
-let cachedPalette: string | undefined;
-const getSurfacePalette = () => (cachedPalette ??= readSurfacePalette());
+/** Surface-only subset for the pre-paint boot script in index.html. */
+function generateSurfacePaletteJson(): string {
+  const out: Record<string, Record<string, string>> = {};
+  for (const t of Object.values(THEMES)) {
+    out[t.id] = { light: t.palette.light.surface, dark: t.palette.dark.surface };
+  }
+  return JSON.stringify(out);
+}
+
+/**
+ * Static `theme-color` for the meta tag in index.html — covers the
+ * pre-paint window before the boot script runs, plus the no-JS case.
+ * Uses the first theme's dark surface as a sensible default.
+ */
+function generateBootSurface(): string {
+  return THEMES[THEME_IDS[0]]!.palette.dark.surface;
+}
 
 const isDevServer =
   process.argv.some((a) => /[/\\]vite$/.test(a)) && !process.argv.includes('build');
@@ -64,18 +91,14 @@ const isDevServer =
 export default defineConfig({
   plugins: [
     {
-      name: 'tipsy:inject-surface-palette',
-      configureServer(server) {
-        server.watcher.add(r('src/styles/themes.css')).on('change', (file) => {
-          if (file.endsWith('themes.css')) {
-            cachedPalette = undefined;
-            server.ws.send({ type: 'full-reload' });
-          }
-        });
-      },
+      name: 'tipsy:theme-palette',
       transformIndexHtml: {
         order: 'pre',
-        handler: (html) => html.replace('__SURFACES__', getSurfacePalette()),
+        handler: (html) =>
+          html
+            .replace('__SURFACES__', generateSurfacePaletteJson())
+            .replace('__BOOT_SURFACE__', generateBootSurface())
+            .replace('/*__PALETTE_CSS__*/', generatePaletteCss()),
       },
     },
     react(),
