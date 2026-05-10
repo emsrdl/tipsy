@@ -23,6 +23,7 @@ import {
   saveScrollPosition,
   getLastCalculateRoute,
   updateLastCalculateRoute,
+  getScrollEl,
 } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { HeaderBar } from '@/components/organisms/HeaderBar/HeaderBar';
@@ -92,7 +93,14 @@ export function AppLayout({ children }: AppLayoutProps) {
               <NavLink
                 key={matchPrefix}
                 to={to}
-                onClick={() => saveScrollPosition(location.pathname)}
+                onClick={(e) => {
+                  if (isActive) {
+                    e.preventDefault();
+                    getScrollEl()?.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                  }
+                  saveScrollPosition(location.pathname);
+                }}
                 className={cn(
                   'flex w-24 flex-col items-center gap-1 pt-3 pb-4 transition-colors',
                   isActive ? 'text-accent' : 'text-text-secondary',
