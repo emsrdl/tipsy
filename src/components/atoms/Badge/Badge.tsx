@@ -11,6 +11,7 @@
  */
 
 import { type ReactNode } from 'react';
+import { GROUP_COLORS } from '@/config/groups';
 import { cn } from '@/lib/utils';
 
 export interface BadgeProps {
@@ -22,8 +23,8 @@ export interface BadgeProps {
 
 const VARIANT_CLASSES: Record<NonNullable<BadgeProps['variant']>, string> = {
   default: 'bg-surface-overlay text-text-secondary',
-  kitchen: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-  service: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
+  kitchen: GROUP_COLORS.kitchen,
+  service: GROUP_COLORS.service,
   accent: 'bg-accent text-accent-foreground',
   'signed-out': 'bg-status-error/15 text-status-error',
 };

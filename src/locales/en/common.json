@@ -91,7 +91,8 @@
     "helpWhat": "What is this?",
     "helpText": "Balance transfers are suggested when the deviation exceeds this amount.",
     "aboveThreshold": "above {{amount}} threshold",
-    "thresholdLabel": "Fairness threshold"
+    "thresholdLabel": "Fairness threshold",
+    "noTransfers": "No transfers needed"
   },
   "toast": {
     "dismiss": "Dismiss",

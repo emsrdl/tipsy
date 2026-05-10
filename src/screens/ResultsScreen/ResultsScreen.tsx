@@ -8,7 +8,7 @@
  * // Rendered via React Router at route "/calculate/results"
  */
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePreserveScroll, markFlowReset, getScrollRatio } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
@@ -102,6 +102,7 @@ export function ResultsScreen() {
   const { isSmartMode, toggleSmartMode, thresholdInCents, setThreshold } = smartOutput;
   const thresholdInput = useThresholdInput(thresholdInCents, setThreshold);
   const thresholdInputRef = useRef<HTMLInputElement>(null);
+  const sliderWrapperRef = useRef<HTMLDivElement>(null);
 
   const hasKitchen = session.employees.some((e) => e.group === 'kitchen');
   const hasService = session.employees.some((e) => e.group === 'service');
@@ -154,6 +155,10 @@ export function ResultsScreen() {
   const fairnessScore = smartOutput.output?.distribution.fairnessScore;
   const transfers = smartOutput.output?.differences ?? [];
 
+  function scoreColor(score: number) {
+    return score >= 95 ? 'text-status-success' : 'text-status-warning';
+  }
+
   const postScore = useMemo(
     () =>
       smartOutput.output
@@ -164,6 +169,15 @@ export function ResultsScreen() {
         : undefined,
     [smartOutput.output],
   );
+
+  useEffect(() => {
+    if (showSettings && hasBothGroups) {
+      sliderWrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    // hasBothGroups intentionally not a dep — only scroll when the panel opens/closes,
+    // not when employee count changes while the panel is already open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSettings]);
 
   const settingsDropdown = (
     <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
@@ -208,7 +222,7 @@ export function ResultsScreen() {
       {showSettings && (
         <div className="divide-y divide-border border-t border-border">
           {hasBothGroups && (
-            <div className="px-4 pt-3 pb-3">
+            <div ref={sliderWrapperRef} className="px-4 pt-3 pb-3">
               <Slider
                 value={session.split.servicePercent}
                 onChange={(s) => setSplit({ kitchenPercent: 100 - s, servicePercent: s })}
@@ -316,44 +330,53 @@ export function ResultsScreen() {
               }
             : {})}
           belowGroups={
-            isSmartMode && transfers.length > 0 ? (
-              <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
+            isSmartMode ? (
+              <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1 [overflow-anchor:none]">
                 <div className="flex items-center gap-2 border-b border-border px-4 py-3">
                   <Icon name="arrow-right" size={14} className="text-status-warning" />
                   <span className="text-sm font-semibold text-text-primary">
                     {t('common:smartSplit.transfers')}
                   </span>
-                  <Badge
-                    variant="default"
-                    className="ml-auto border-0 bg-status-warning/15 text-xs text-status-warning"
-                  >
-                    {t('common:smartSplit.aboveThreshold', {
-                      amount: formatEurFromCents(thresholdInCents, fmtLocale),
-                    })}
-                  </Badge>
+                  {transfers.length > 0 && (
+                    <Badge
+                      variant="default"
+                      className="ml-auto border-0 bg-status-warning/15 text-xs text-status-warning"
+                    >
+                      {t('common:smartSplit.aboveThreshold', {
+                        amount: formatEurFromCents(thresholdInCents, fmtLocale),
+                      })}
+                    </Badge>
+                  )}
                 </div>
-                <div className="divide-y divide-border">
-                  {transfers.map((diff, i) => (
-                    <div key={i} className="flex items-center justify-between gap-3 px-4 py-3.5">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <span className="truncate text-sm font-semibold text-text-primary">
-                          {diff.fromPerson.name}
-                        </span>
-                        <Icon
-                          name="arrow-right"
-                          size={14}
-                          className="shrink-0 text-status-warning"
-                        />
-                        <span className="truncate text-sm font-semibold text-text-primary">
-                          {diff.toPerson.name}
+                {transfers.length > 0 ? (
+                  <div className="divide-y divide-border">
+                    {transfers.map((diff, i) => (
+                      <div key={i} className="flex items-center justify-between gap-3 px-4 py-3.5">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="truncate text-sm font-semibold text-text-primary">
+                            {diff.fromPerson.name}
+                          </span>
+                          <Icon
+                            name="arrow-right"
+                            size={14}
+                            className="shrink-0 text-status-warning"
+                          />
+                          <span className="truncate text-sm font-semibold text-text-primary">
+                            {diff.toPerson.name}
+                          </span>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-status-warning/15 px-2.5 py-0.5 font-mono text-sm font-bold text-status-warning">
+                          {formatEurFromCents(diff.amountInCents, fmtLocale)}
                         </span>
                       </div>
-                      <span className="shrink-0 rounded-full bg-status-warning/15 px-2.5 py-0.5 font-mono text-sm font-bold text-status-warning">
-                        {formatEurFromCents(diff.amountInCents, fmtLocale)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-4 py-3.5 text-sm text-text-secondary">
+                    <Icon name="check" size={14} className="text-status-success" />
+                    {t('common:smartSplit.noTransfers')}
+                  </div>
+                )}
               </div>
             ) : undefined
           }
@@ -374,16 +397,16 @@ export function ResultsScreen() {
                 </span>
                 {postScore !== undefined ? (
                   <span className="flex items-center gap-1.5">
-                    <span className={cn('font-mono text-sm font-bold', fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
+                    <span className={cn('font-mono text-sm font-bold', scoreColor(fairnessScore))}>
                       {fairnessScore}%
                     </span>
                     <Icon name="arrow-right" size={12} className="text-text-secondary" />
-                    <span className={cn('font-mono text-sm font-bold', postScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
+                    <span className={cn('font-mono text-sm font-bold', scoreColor(postScore))}>
                       {postScore}%
                     </span>
                   </span>
                 ) : (
-                  <span className={cn('font-mono text-sm font-bold', fairnessScore >= 95 ? 'text-status-success' : 'text-status-warning')}>
+                  <span className={cn('font-mono text-sm font-bold', scoreColor(fairnessScore))}>
                     {fairnessScore}%
                   </span>
                 )}
@@ -424,7 +447,11 @@ export function ResultsScreen() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => void navigate('/calculate/cash', { state: { scrollRatio: getScrollRatio(), isBack: true } })}
+            onClick={() =>
+              void navigate('/calculate/cash', {
+                state: { scrollRatio: getScrollRatio(), isBack: true },
+              })
+            }
             className="min-h-14 flex-1"
           >
             <Icon name="chevron-left" size={18} />
