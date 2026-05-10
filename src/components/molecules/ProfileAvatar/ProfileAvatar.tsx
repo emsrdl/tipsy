@@ -68,12 +68,11 @@ export function ProfileAvatar() {
         aria-expanded={isOpen}
         aria-label={displayName}
         className={cn(
-          'flex h-10 w-10 items-center justify-center rounded-full',
+          'flex h-9 w-9 items-center justify-center rounded-full',
           'text-xs font-bold transition-all',
-          'ring-2 ring-offset-2 ring-offset-surface',
           activeProfile === null
-            ? 'bg-surface-overlay text-text-secondary ring-border'
-            : 'bg-accent text-accent-foreground ring-accent/40',
+            ? 'bg-surface-overlay text-text-secondary'
+            : 'bg-accent text-accent-foreground',
           isOpen && 'scale-95',
         )}
       >
