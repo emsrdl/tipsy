@@ -356,7 +356,7 @@ export function ResultsScreen() {
       className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1 [overflow-anchor:none]"
     >
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-        <Icon name="arrow-right" size={14} className="text-status-warning" />
+        <Icon name="arrow-right" size={14} className="shrink-0 text-status-warning" />
         <span className="flex-1 text-sm font-semibold text-text-primary">
           {t('common:smartSplit.transfers')}
         </span>
@@ -375,13 +375,16 @@ export function ResultsScreen() {
       {transfers.length > 0 ? (
         <div className="divide-y divide-border">
           {transfers.map((diff, i) => (
-            <div key={i} className="flex items-center justify-between gap-3 px-4 py-3">
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="truncate text-sm font-semibold text-text-primary">
+            <div
+              key={i}
+              className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-3"
+            >
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
+                <span className="text-sm font-semibold wrap-break-word text-text-primary">
                   {diff.fromPerson.name}
                 </span>
                 <Icon name="arrow-right" size={14} className="shrink-0 text-status-warning" />
-                <span className="truncate text-sm font-semibold text-text-primary">
+                <span className="text-sm font-semibold wrap-break-word text-text-primary">
                   {diff.toPerson.name}
                 </span>
               </div>
