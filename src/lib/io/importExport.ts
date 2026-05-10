@@ -108,8 +108,15 @@ export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
   const l = getLabels(locale);
 
   const header = [
-    l.date, l.employee, l.role, l.hours,
-    l.ideal, l.amount, l.deviation, l.transfer, l.mode,
+    l.date,
+    l.employee,
+    l.role,
+    l.hours,
+    l.ideal,
+    l.amount,
+    l.deviation,
+    l.transfer,
+    l.mode,
   ].join(';');
 
   const rows: string[] = [];
@@ -120,9 +127,10 @@ export function exportShiftsCsv(shifts: Shift[], locale = 'de-DE'): string {
 
     for (const share of shift.distribution.personShares) {
       const transferNote = buildTransferNote(shift, share.id, fmtLocale, l);
-      const deviation = share.deviationInCents !== 0
-        ? `${share.deviationInCents > 0 ? '+' : ''}${formatEurFromCents(share.deviationInCents, fmtLocale)}`
-        : '';
+      const deviation =
+        share.deviationInCents !== 0
+          ? `${share.deviationInCents > 0 ? '+' : ''}${formatEurFromCents(share.deviationInCents, fmtLocale)}`
+          : '';
 
       rows.push(
         [
@@ -171,11 +179,7 @@ export function downloadShiftsCsv(
  * @param locale - BCP 47 locale
  * @param title - Document title (defaults to localized "Tipsy — Shift Overview")
  */
-export function exportShiftsPdf(
-  shifts: Shift[],
-  locale = 'de-DE',
-  title?: string,
-): void {
+export function exportShiftsPdf(shifts: Shift[], locale = 'de-DE', title?: string): void {
   const fmtLocale = locale.startsWith('en') ? 'en-US' : 'de-DE';
   const lang = locale.startsWith('de') ? 'de' : 'en';
   const l = getLabels(locale);
@@ -199,14 +203,15 @@ export function exportShiftsPdf(
       )
       .join('');
 
-    const transferBlock = shift.differences.length > 0
-      ? `<div class="transfers"><h3>${l.transfers}</h3><ul>${shift.differences
-          .map(
-            (d) =>
-              `<li>${escapeHtml(d.fromPerson.name)} → ${escapeHtml(d.toPerson.name)}: ${formatEurFromCents(d.amountInCents, fmtLocale)}</li>`,
-          )
-          .join('')}</ul></div>`
-      : '';
+    const transferBlock =
+      shift.differences.length > 0
+        ? `<div class="transfers"><h3>${l.transfers}</h3><ul>${shift.differences
+            .map(
+              (d) =>
+                `<li>${escapeHtml(d.fromPerson.name)} → ${escapeHtml(d.toPerson.name)}: ${formatEurFromCents(d.amountInCents, fmtLocale)}</li>`,
+            )
+            .join('')}</ul></div>`
+        : '';
 
     const fairnessBlock = shift.smartSplitting
       ? `<p class="fairness">${l.fairnessScore}: ${shift.distribution.fairnessScore}%</p>`

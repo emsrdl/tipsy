@@ -64,7 +64,10 @@ export function ShiftDetailCard({ shift, onDelete, onExport }: ShiftDetailCardPr
                 <Icon name="clock" size={10} />
                 {share.hoursWorked}h
                 <span className="ml-1">
-                  · {share.role === 'kitchen' ? t('common:profile.role.kitchen') : t('common:profile.role.service')}
+                  ·{' '}
+                  {share.role === 'kitchen'
+                    ? t('common:profile.role.kitchen')
+                    : t('common:profile.role.service')}
                 </span>
               </p>
             </div>

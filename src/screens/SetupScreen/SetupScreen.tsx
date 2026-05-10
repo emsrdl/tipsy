@@ -39,8 +39,17 @@ export function SetupScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
   usePreserveScroll();
-  const { session, totalInCents, addEmployee, removeEmployee, updateEmployee, setSplit, calculate, reset, wasRestored } =
-    useTipCalculator();
+  const {
+    session,
+    totalInCents,
+    addEmployee,
+    removeEmployee,
+    updateEmployee,
+    setSplit,
+    calculate,
+    reset,
+    wasRestored,
+  } = useTipCalculator();
   const { activeProfile } = useProfiles();
   const { showToast } = useToast();
 

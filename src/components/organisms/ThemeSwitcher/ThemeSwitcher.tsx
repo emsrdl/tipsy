@@ -72,9 +72,7 @@ export function ThemeSwitcher() {
         {/* Accent color picker — only for Tipsy */}
         {theme.hasAccentPicker && (
           <div>
-            <p className="mb-2 text-sm text-text-secondary">
-              {t('theme.accentColor')}
-            </p>
+            <p className="mb-2 text-sm text-text-secondary">{t('theme.accentColor')}</p>
             <div className="flex gap-3">
               {theme.accentColors.map((color) => (
                 <ColorSwatch

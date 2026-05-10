@@ -55,7 +55,10 @@ export function useSmartSplitter(
   kitchenPercent: number,
   denominations: DenominationQuantity[],
 ): UseSmartSplitterReturn {
-  const [isSmartMode, setIsSmartMode] = useLocalStorage<boolean>(SMART_SPLIT_MODE_KEY, SMART_SPLIT_ENABLED);
+  const [isSmartMode, setIsSmartMode] = useLocalStorage<boolean>(
+    SMART_SPLIT_MODE_KEY,
+    SMART_SPLIT_ENABLED,
+  );
   const [thresholdInCents, setThresholdInCents] = useLocalStorage<number>(
     SMART_SPLIT_THRESHOLD_KEY,
     DEFAULT_FAIRNESS_THRESHOLD,
@@ -65,9 +68,12 @@ export function useSmartSplitter(
     setIsSmartMode((prev) => !prev);
   }, [setIsSmartMode]);
 
-  const setSmartMode = useCallback((enabled: boolean) => {
-    setIsSmartMode(enabled);
-  }, [setIsSmartMode]);
+  const setSmartMode = useCallback(
+    (enabled: boolean) => {
+      setIsSmartMode(enabled);
+    },
+    [setIsSmartMode],
+  );
 
   const setThreshold = useCallback(
     (cents: number) => {

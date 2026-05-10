@@ -93,8 +93,8 @@ export function ExportDialog({
               className={cn(
                 'flex w-full items-center gap-3 rounded-xl border px-4 py-3 transition-colors',
                 selected === fmt.id
-                  ? 'bg-accent/5 border-accent text-text-primary'
-                  : 'hover:border-accent/50 border-border bg-surface-overlay text-text-secondary',
+                  ? 'border-accent bg-accent/5 text-text-primary'
+                  : 'border-border bg-surface-overlay text-text-secondary hover:border-accent/50',
               )}
             >
               <Icon name={fmt.icon} size={16} />

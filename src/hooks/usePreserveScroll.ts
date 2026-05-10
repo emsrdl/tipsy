@@ -105,7 +105,7 @@ export function usePreserveScroll() {
     } else {
       el.scrollTo(0, savedScrollPositions.get(location.pathname) ?? 0);
     }
-  // Mount-only: location is stable on first render; re-running on nav changes would defeat the hook's purpose.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Mount-only: location is stable on first render; re-running on nav changes would defeat the hook's purpose.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

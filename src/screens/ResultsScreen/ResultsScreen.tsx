@@ -166,8 +166,7 @@ export function ResultsScreen() {
     return score >= 95 ? 'text-status-success' : 'text-status-warning';
   }
 
-  // When the user expands the settings panel, scroll the slider into view —
-  // it lives at the bottom of the page so it might otherwise be off-screen.
+  // Slider lives at the bottom of the page; scroll into view when settings opens.
   useEffect(() => {
     if (showSettings && hasBothGroups) {
       sliderWrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -192,7 +191,7 @@ export function ResultsScreen() {
       }
     }
     lastTransferHeightRef.current = h;
-  }, [transfers.length, isSmartMode, showSettings]);
+  }, [transfers.length, showSettings]);
 
   const postScore = useMemo(
     () =>
@@ -205,10 +204,6 @@ export function ResultsScreen() {
     [smartOutput.output],
   );
 
-  // Settings card — collapsible. Header always shows the active state
-  // (split %, mode + threshold). Body holds the slider, smart-mode toggle,
-  // and threshold controls. Lives at the bottom of the page since these are
-  // adjustments people only occasionally need to make.
   const settingsCard = (
     <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
       <button
@@ -334,18 +329,10 @@ export function ResultsScreen() {
     </div>
   );
 
-  // Fairness row — inline summary metric (no card surface) since it's a single
-  // status line and shouldn't compete visually with the surrounding cards.
   const fairnessRow =
     isSmartMode && fairnessScore !== undefined ? (
       <div className="flex items-center gap-2 px-4 py-1">
-        <Icon
-          name="star"
-          size={14}
-          className={
-            (postScore ?? fairnessScore) >= 95 ? 'text-status-success' : 'text-status-warning'
-          }
-        />
+        <Icon name="star" size={14} className={scoreColor(postScore ?? fairnessScore)} />
         <span className="flex-1 text-sm text-text-secondary">
           {t('common:smartSplit.fairnessScore')}
         </span>
@@ -367,7 +354,6 @@ export function ResultsScreen() {
       </div>
     ) : null;
 
-  // Transfers card: header + payout list. Rendered above the total.
   const transfersCard = isSmartMode ? (
     <div
       ref={transfersCardRef}

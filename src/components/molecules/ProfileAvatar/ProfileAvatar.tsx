@@ -73,7 +73,7 @@ export function ProfileAvatar() {
           'ring-2 ring-offset-2 ring-offset-surface',
           activeProfile === null
             ? 'bg-surface-overlay text-text-secondary ring-border'
-            : 'ring-accent/40 bg-accent text-accent-foreground',
+            : 'bg-accent text-accent-foreground ring-accent/40',
           isOpen && 'scale-95',
         )}
       >
@@ -81,17 +81,14 @@ export function ProfileAvatar() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-surface-raised shadow-elevation-4">
+        <div className="absolute top-full right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-surface-raised shadow-elevation-4">
           {/* Profile info header */}
           <div className="border-b border-border px-4 py-3">
             <div className="flex items-center gap-2">
               <p className="flex-1 truncate text-sm font-semibold text-text-primary">
                 {displayName}
               </p>
-              <ProfileRoleBadge
-                role={activeProfile?.role ?? null}
-                className="shrink-0"
-              />
+              <ProfileRoleBadge role={activeProfile?.role ?? null} className="shrink-0" />
             </div>
           </div>
 
@@ -118,9 +115,7 @@ export function ProfileAvatar() {
                     className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-text-primary transition-colors hover:bg-surface-overlay"
                   >
                     <span className="flex-1 truncate">{profile.name}</span>
-                    {isActive && (
-                      <Icon name="check" size={14} className="text-accent shrink-0" />
-                    )}
+                    {isActive && <Icon name="check" size={14} className="shrink-0 text-accent" />}
                   </button>
                 );
               })}

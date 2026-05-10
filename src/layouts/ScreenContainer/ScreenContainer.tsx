@@ -77,7 +77,7 @@ export function ScreenContainer({
     <main className="mx-auto max-w-2xl px-4 py-6 pb-8">
       {showSteps && (
         <nav
-          className="-mx-4 mb-5 flex items-center gap-2 bg-surface px-4 py-2.5 sticky z-30"
+          className="sticky z-30 -mx-4 mb-5 flex items-center gap-2 bg-surface px-4 py-2.5"
           style={{ top: 0 }}
           aria-label={t('navigation.steps')}
         >

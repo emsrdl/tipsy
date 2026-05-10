@@ -445,9 +445,7 @@ function ensureNonZeroPayouts(
     if (activeAssignments.length === 0) continue;
 
     // Sort by value ascending to find smallest
-    activeAssignments.sort(
-      (a, b) => a.totalCents / a.count - b.totalCents / b.count,
-    );
+    activeAssignments.sort((a, b) => a.totalCents / a.count - b.totalCents / b.count);
     const smallest = activeAssignments[0]!;
     const denomValue = smallest.totalCents / smallest.count;
 

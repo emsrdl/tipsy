@@ -47,7 +47,10 @@ export function CashInputScreen() {
     SMART_SPLIT_DEFAULT_THRESHOLD_KEY,
     DEFAULT_FAIRNESS_THRESHOLD,
   );
-  const [, setThreshold] = useLocalStorage<number>(SMART_SPLIT_THRESHOLD_KEY, DEFAULT_FAIRNESS_THRESHOLD);
+  const [, setThreshold] = useLocalStorage<number>(
+    SMART_SPLIT_THRESHOLD_KEY,
+    DEFAULT_FAIRNESS_THRESHOLD,
+  );
   const [, setSmartMode] = useLocalStorage<boolean>(SMART_SPLIT_MODE_KEY, SMART_SPLIT_ENABLED);
 
   const hasTotal = totalInCents > 0;

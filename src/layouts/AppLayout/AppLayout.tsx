@@ -19,7 +19,11 @@
 
 import { type ReactNode, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { saveScrollPosition, getLastCalculateRoute, updateLastCalculateRoute } from '@/hooks/usePreserveScroll';
+import {
+  saveScrollPosition,
+  getLastCalculateRoute,
+  updateLastCalculateRoute,
+} from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { HeaderBar } from '@/components/organisms/HeaderBar/HeaderBar';
 import { Icon } from '@/components/atoms/Icon/Icon';
@@ -71,13 +75,13 @@ export function AppLayout({ children }: AppLayoutProps) {
       <HeaderBar />
 
       {/* Dedicated scroll container — keeps touch events responsive during momentum scroll */}
-      <div id="main-scroll" className="flex-1 min-h-0 overflow-y-auto overscroll-none pb-20">
+      <div id="main-scroll" className="min-h-0 flex-1 overflow-y-auto overscroll-none pb-20">
         {children}
       </div>
 
       {/* Material Bottom Navigation Bar */}
       <nav
-        className="bg-surface/95 pb-safe fixed bottom-0 left-0 right-0 z-40 shadow-elevation-4 backdrop-blur-md"
+        className="pb-safe fixed right-0 bottom-0 left-0 z-40 bg-surface/95 shadow-elevation-4 backdrop-blur-md"
         role="navigation"
         aria-label={t('nav.main')}
       >

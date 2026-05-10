@@ -11,12 +11,16 @@ import type { Shift } from '@/types/shift';
 describe('exportShiftsCsv', () => {
   it('generates CSV with correct headers (DE)', () => {
     const csv = exportShiftsCsv([makeShift()], 'de-DE');
-    expect(csv).toContain('Datum;Mitarbeiter;Rolle;Stunden;Ideal (€);Betrag (€);Abweichung (€);Ausgleichszahlung;Modus');
+    expect(csv).toContain(
+      'Datum;Mitarbeiter;Rolle;Stunden;Ideal (€);Betrag (€);Abweichung (€);Ausgleichszahlung;Modus',
+    );
   });
 
   it('generates CSV with correct headers (EN)', () => {
     const csv = exportShiftsCsv([makeShift()], 'en-US');
-    expect(csv).toContain('Date;Employee;Role;Hours;Ideal (€);Amount (€);Deviation (€);Transfer;Mode');
+    expect(csv).toContain(
+      'Date;Employee;Role;Hours;Ideal (€);Amount (€);Deviation (€);Transfer;Mode',
+    );
   });
 
   it('includes UTF-8 BOM', () => {

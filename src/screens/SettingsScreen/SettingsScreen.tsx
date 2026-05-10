@@ -42,14 +42,8 @@ import type { ThemeId } from '@/types/theme';
 export function SettingsScreen() {
   usePreserveScroll();
   const { t } = useTranslation(['common', 'screens']);
-  const {
-    profiles,
-    activeProfile,
-    createProfile,
-    updateProfile,
-    deleteProfile,
-    switchProfile,
-  } = useProfiles();
+  const { profiles, activeProfile, createProfile, updateProfile, deleteProfile, switchProfile } =
+    useProfiles();
   const { theme, accentColor, colorMode, setTheme, setAccentColor, toggleColorMode } = useTheme();
   const { locale, setLocale } = useLocale();
   const { shifts, deleteShift, clearHistory } = useShifts();
@@ -175,14 +169,14 @@ export function SettingsScreen() {
   return (
     <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 pb-24">
       {/* Header */}
-      <div className="pb-4 pt-6">
+      <div className="pt-6 pb-4">
         <h1 className="text-2xl font-bold text-text-primary">{t('common:nav.settings')}</h1>
       </div>
 
       <div className="space-y-6">
         {/* ── Profiles ── */}
         <section>
-          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <h2 className="mb-3 px-1 text-xs font-semibold tracking-wider text-text-secondary uppercase">
             {t('screens:settings.sectionProfiles')}
           </h2>
 
@@ -300,7 +294,7 @@ export function SettingsScreen() {
                           setDeletingId(profile.id);
                           setEditingId(null);
                         }}
-                        className="text-status-error/70 hover:bg-status-error/10 flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-status-error/70 transition-colors hover:bg-status-error/10"
                         title={t('common:actions.deleteProfile')}
                       >
                         <Icon name="trash" size={14} />
@@ -391,7 +385,7 @@ export function SettingsScreen() {
 
         {/* ── Appearance ── */}
         <section>
-          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <h2 className="mb-3 px-1 text-xs font-semibold tracking-wider text-text-secondary uppercase">
             {t('screens:settings.sectionAppearance')}
           </h2>
 
@@ -441,7 +435,7 @@ export function SettingsScreen() {
                         'flex-1 rounded-xl border py-2.5 text-xs font-semibold transition-all',
                         theme.id === id
                           ? 'border-accent bg-accent text-accent-foreground'
-                          : 'hover:border-accent/50 border-border bg-surface-overlay text-text-secondary',
+                          : 'border-border bg-surface-overlay text-text-secondary hover:border-accent/50',
                       )}
                     >
                       {t(themeObj.labelKey as Parameters<typeof t>[0])}
@@ -481,7 +475,7 @@ export function SettingsScreen() {
 
         {/* ── Language ── */}
         <section>
-          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <h2 className="mb-3 px-1 text-xs font-semibold tracking-wider text-text-secondary uppercase">
             {t('common:language.switch')}
           </h2>
 
@@ -497,7 +491,7 @@ export function SettingsScreen() {
                       'flex-1 rounded-xl border py-2.5 text-xs font-semibold transition-all',
                       locale === lang
                         ? 'border-accent bg-accent text-accent-foreground'
-                        : 'hover:border-accent/50 border-border bg-surface-overlay text-text-secondary',
+                        : 'border-border bg-surface-overlay text-text-secondary hover:border-accent/50',
                     )}
                   >
                     {t(`common:language.${lang}`)}
@@ -510,7 +504,7 @@ export function SettingsScreen() {
 
         {/* ── Defaults ── */}
         <section>
-          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <h2 className="mb-3 px-1 text-xs font-semibold tracking-wider text-text-secondary uppercase">
             {t('screens:settings.sectionDefaults')}
           </h2>
 
@@ -560,7 +554,7 @@ export function SettingsScreen() {
 
         {/* ── Data Management ── */}
         <section>
-          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <h2 className="mb-3 px-1 text-xs font-semibold tracking-wider text-text-secondary uppercase">
             {t('screens:settings.sectionData')}
           </h2>
 
@@ -614,7 +608,7 @@ export function SettingsScreen() {
 
         {/* ── About ── */}
         <section>
-          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <h2 className="mb-3 px-1 text-xs font-semibold tracking-wider text-text-secondary uppercase">
             {t('screens:settings.sectionAbout')}
           </h2>
           <div className="divide-y divide-border overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">

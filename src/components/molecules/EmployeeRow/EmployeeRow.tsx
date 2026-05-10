@@ -66,7 +66,7 @@ export function EmployeeRow({
             <Icon name="user" size={11} />
             {t('common:profile.thisIsYou')}
           </div>
-          <div className="flex items-center gap-3 px-4 pb-3 pt-1.5">
+          <div className="flex items-center gap-3 px-4 pt-1.5 pb-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
               {getInitials(employee.name) || '?'}
             </div>
@@ -85,7 +85,7 @@ export function EmployeeRow({
         </>
       ) : (
         /* Regular employee: name input + delete button */
-        <div className="flex items-center gap-2 px-4 pb-2 pt-4">
+        <div className="flex items-center gap-2 px-4 pt-4 pb-2">
           <Input
             value={employee.name}
             onChange={(e) => onNameChange(employee.id, e.target.value)}
@@ -122,7 +122,7 @@ export function EmployeeRow({
             'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
             employee.group === 'service'
               ? 'bg-teal-100 text-teal-800 shadow-elevation-1 dark:bg-teal-900/40 dark:text-teal-300'
-              : 'hover:bg-surface-overlay/80 bg-surface-overlay text-text-secondary',
+              : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
           )}
         >
           <Icon name="users" size={16} />
@@ -136,7 +136,7 @@ export function EmployeeRow({
             'ripple flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-medium transition-all',
             employee.group === 'kitchen'
               ? 'bg-orange-100 text-orange-800 shadow-elevation-1 dark:bg-orange-900/40 dark:text-orange-300'
-              : 'hover:bg-surface-overlay/80 bg-surface-overlay text-text-secondary',
+              : 'bg-surface-overlay text-text-secondary hover:bg-surface-overlay/80',
           )}
         >
           <Icon name="utensils-crossed" size={16} />
@@ -145,7 +145,7 @@ export function EmployeeRow({
       </div>
 
       {/* Hours stepper */}
-      <div className="flex items-center justify-between border-t border-border px-4 pb-4 pt-1">
+      <div className="flex items-center justify-between border-t border-border px-4 pt-1 pb-4">
         <div className="flex items-center gap-2">
           <Icon name="clock" size={15} className="text-text-secondary" />
           <span className="text-sm text-text-secondary">{t('screens:setup.hoursLabel')}</span>

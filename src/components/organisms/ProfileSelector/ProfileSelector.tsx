@@ -23,8 +23,7 @@ import { cn } from '@/lib/utils';
  */
 export function ProfileSelector() {
   const { t } = useTranslation(['common', 'screens']);
-  const { profiles, activeProfile, switchProfile, createProfile, signOut } =
-    useProfiles();
+  const { profiles, activeProfile, switchProfile, createProfile, signOut } = useProfiles();
   const { shifts } = useShifts();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -51,8 +50,7 @@ export function ProfileSelector() {
     setIsOpen(false);
   }
 
-  const displayName =
-    activeProfile === null ? t('common:profile.guest') : activeProfile.name;
+  const displayName = activeProfile === null ? t('common:profile.guest') : activeProfile.name;
 
   const displayRole = activeProfile?.role ?? null;
 
@@ -87,9 +85,7 @@ export function ProfileSelector() {
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-text-primary">{displayName}</span>
             {activeProfile === null && (
-              <Badge variant="signed-out">
-                {t('common:profile.signedOut')}
-              </Badge>
+              <Badge variant="signed-out">{t('common:profile.signedOut')}</Badge>
             )}
             {displayRole && activeProfile !== null && (
               <Badge variant={displayRole === 'kitchen' ? 'kitchen' : 'service'}>
@@ -111,7 +107,7 @@ export function ProfileSelector() {
 
       {/* Dropdown panel */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-border bg-surface-raised shadow-elevation-4">
+        <div className="absolute top-full right-0 left-0 z-30 mt-2 overflow-hidden rounded-xl border border-border bg-surface-raised shadow-elevation-4">
           {/* Existing profiles */}
           {profiles.map((profile) => (
             <button

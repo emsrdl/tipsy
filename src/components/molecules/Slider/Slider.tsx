@@ -198,7 +198,10 @@ export function Slider({
       )}
 
       <div className="relative flex items-center py-2">
-        <div className="absolute left-0 h-1 rounded-full bg-accent" style={{ width: `${percent}%` }} />
+        <div
+          className="absolute left-0 h-1 rounded-full bg-accent"
+          style={{ width: `${percent}%` }}
+        />
         <div
           className="absolute right-0 h-1 rounded-full bg-surface-overlay"
           style={{ width: `${100 - percent}%` }}

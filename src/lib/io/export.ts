@@ -86,13 +86,7 @@ export function buildCsvString(
     const s = /^[=+\-@\t\r]/.test(v) ? `'${v}` : v;
     return /[;"'\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
-  const headerLine = [
-    headers.name,
-    headers.group,
-    headers.hours,
-    headers.amount,
-    headers.perHour,
-  ]
+  const headerLine = [headers.name, headers.group, headers.hours, headers.amount, headers.perHour]
     .map(escape)
     .join(';');
   const dataLines = rows.map((r) =>

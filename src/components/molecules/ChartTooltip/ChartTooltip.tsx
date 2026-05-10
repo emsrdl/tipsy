@@ -37,7 +37,10 @@ export function ChartTooltip({ active, payload, label, suffix = '€' }: ChartTo
 
   const entry = payload[0]!;
   const extra = entry.payload as Record<string, unknown>;
-  const cents = typeof extra.totalCents === 'number' ? extra.totalCents : Math.round((entry.value as number) * 100);
+  const cents =
+    typeof extra.totalCents === 'number'
+      ? extra.totalCents
+      : Math.round((entry.value as number) * 100);
 
   const shiftCount = typeof extra.shiftCount === 'number' ? extra.shiftCount : undefined;
   const totalHours = typeof extra.totalHours === 'number' ? extra.totalHours : undefined;

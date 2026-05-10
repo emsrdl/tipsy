@@ -94,7 +94,9 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
       const now = new Date().toISOString();
       setProfiles((prev) =>
         prev.map((p) =>
-          p.id === profileId ? { ...p, isActive: true, lastUsedAt: now } : { ...p, isActive: false },
+          p.id === profileId
+            ? { ...p, isActive: true, lastUsedAt: now }
+            : { ...p, isActive: false },
         ),
       );
       setActiveProfileId(profileId);

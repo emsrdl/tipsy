@@ -73,7 +73,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             className={
               variant === 'danger'
-                ? 'hover:bg-status-error/90 min-h-12 flex-1 border-0 bg-status-error text-white'
+                ? 'min-h-12 flex-1 border-0 bg-status-error text-white hover:bg-status-error/90'
                 : 'min-h-12 flex-1'
             }
           >
