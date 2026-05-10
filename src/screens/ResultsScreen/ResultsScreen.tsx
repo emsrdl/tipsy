@@ -23,7 +23,6 @@ import { Slider } from '@/components/molecules/Slider/Slider';
 import { Button } from '@/components/atoms/Button/Button';
 import { Alert } from '@/components/molecules/Alert/Alert';
 import { Icon } from '@/components/atoms/Icon/Icon';
-import { Badge } from '@/components/atoms/Badge/Badge';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
 import { useExport } from '@/hooks/useExport';
 import { useShifts } from '@/hooks/useShifts';
@@ -358,16 +357,13 @@ export function ResultsScreen() {
       ref={transfersCardRef}
       className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1 [overflow-anchor:none]"
     >
-      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-border px-4 py-3">
         <Icon name="arrow-right" size={14} className="shrink-0 text-status-warning" />
-        <span className="flex-1 text-sm font-semibold text-text-primary">
+        <span className="text-sm font-semibold text-text-primary">
           {t('common:smartSplit.transfers')}
         </span>
         {transfers.length > 0 && (
-          <span
-            style={{ display: 'inline-block', textAlign: 'right' }}
-            className="rounded-full bg-status-warning/15 px-2 py-0.5 text-xs font-medium text-status-warning"
-          >
+          <span className="ml-auto rounded-full bg-status-warning/15 px-2 py-0.5 text-xs font-medium whitespace-nowrap text-status-warning">
             {t('common:smartSplit.aboveThreshold', {
               amount: formatEurFromCents(thresholdInCents, fmtLocale),
             })}
