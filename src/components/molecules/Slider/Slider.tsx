@@ -77,6 +77,7 @@ function SliderBadge({
   if (editing === side) {
     return (
       <input
+        name={`slider-${side}`}
         type="number"
         inputMode="numeric"
         min={min}
@@ -85,6 +86,7 @@ function SliderBadge({
         onChange={(e) => onInputChange(e.target.value)}
         onBlur={onCommit}
         onKeyDown={onKey}
+        aria-label={side}
         autoFocus
         className={cn(
           'h-7 w-14 rounded-full px-2 text-center text-sm font-bold tabular-nums focus:outline-none',
@@ -202,6 +204,7 @@ export function Slider({
         />
 
         <input
+          name="split-ratio"
           type="range"
           min={min}
           max={max}

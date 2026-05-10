@@ -177,11 +177,13 @@ export function ProfileSelector() {
             ) : (
               <div className="flex gap-2">
                 <input
+                  name="profile-selector-new-name"
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                   placeholder={t('screens:profile.namePlaceholder')}
+                  aria-label={t('screens:profile.namePlaceholder')}
                   className="h-10 flex-1 rounded-lg border border-border bg-surface-overlay px-3 text-sm text-text-primary focus:border-accent focus:outline-none"
                   autoFocus
                 />

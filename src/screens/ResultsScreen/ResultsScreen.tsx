@@ -291,6 +291,8 @@ export function ResultsScreen() {
                   </span>
                   <input
                     ref={thresholdInputRef}
+                    id="results-threshold"
+                    name="threshold"
                     type="number"
                     inputMode="decimal"
                     min="0.50"
@@ -299,6 +301,7 @@ export function ResultsScreen() {
                     value={thresholdInput.value}
                     onChange={(e) => thresholdInput.onChange(e.target.value)}
                     onBlur={thresholdInput.onBlur}
+                    aria-label={t('common:smartSplit.threshold')}
                     className="h-7 w-16 rounded-full bg-surface-overlay px-2 text-center font-mono text-sm font-bold text-text-primary focus:outline-none"
                   />
                   <span className="text-sm text-text-secondary">€</span>
@@ -361,14 +364,14 @@ export function ResultsScreen() {
           {t('common:smartSplit.transfers')}
         </span>
         {transfers.length > 0 && (
-          <Badge
-            variant="default"
-            className="border-0 bg-status-warning/15 text-xs text-status-warning"
+          <span
+            style={{ display: 'inline-block', textAlign: 'right' }}
+            className="rounded-full bg-status-warning/15 px-2 py-0.5 text-xs font-medium text-status-warning"
           >
             {t('common:smartSplit.aboveThreshold', {
               amount: formatEurFromCents(thresholdInCents, fmtLocale),
             })}
-          </Badge>
+          </span>
         )}
       </div>
 

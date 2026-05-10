@@ -87,6 +87,7 @@ export function EmployeeRow({
         /* Regular employee: name input + delete button */
         <div className="flex items-center gap-2 px-4 pt-4 pb-2">
           <Input
+            name={`employee-name-${employee.id}`}
             value={employee.name}
             onChange={(e) => onNameChange(employee.id, e.target.value)}
             placeholder={fallbackName}

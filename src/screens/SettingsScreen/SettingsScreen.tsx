@@ -185,10 +185,12 @@ export function SettingsScreen() {
                   /* Edit mode */
                   <div className="space-y-3 p-4">
                     <input
+                      name="profile-edit-name"
                       type="text"
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
+                      aria-label={t('screens:profile.namePlaceholder')}
                       className="h-10 w-full rounded-lg border border-border bg-surface-overlay px-3 text-sm text-text-primary focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
                       autoFocus
                     />
@@ -318,11 +320,13 @@ export function SettingsScreen() {
               ) : (
                 <div className="space-y-3">
                   <input
+                    name="profile-new-name"
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleCreateProfile()}
                     placeholder={t('screens:profile.namePlaceholder')}
+                    aria-label={t('screens:profile.namePlaceholder')}
                     className="h-10 w-full rounded-lg border border-border bg-surface-overlay px-3 text-sm text-text-primary focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
                     autoFocus
                   />
@@ -531,6 +535,8 @@ export function SettingsScreen() {
               <p className="text-xs text-text-secondary">{t('screens:settings.smartSplitDesc')}</p>
               <div className="flex items-center gap-2 pt-1">
                 <input
+                  id="settings-threshold"
+                  name="threshold"
                   type="number"
                   inputMode="decimal"
                   min="0.50"
@@ -539,6 +545,7 @@ export function SettingsScreen() {
                   value={thresholdInput.value}
                   onChange={(e) => thresholdInput.onChange(e.target.value)}
                   onBlur={thresholdInput.onBlur}
+                  aria-label={t('common:smartSplit.thresholdDefault')}
                   className="h-7 w-20 rounded-full bg-surface-overlay px-2 text-center font-mono text-sm font-bold text-text-primary focus:outline-none"
                 />
                 <span className="text-sm text-text-secondary">€</span>
