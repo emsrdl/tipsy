@@ -10,11 +10,14 @@
     <meta name="apple-mobile-web-app-title" content="Tipsy" />
     <style>/*__PALETTE_CSS__*/</style>
     <script>
-      // Pre-paint theme bootstrap — resolves stored/OS preference and tints the
-      // status bar before React mounts. SURFACES is injected at build time from
-      // src/config/themes.ts (see vite.config.ts → tipsy:theme-palette).
+      // Pre-paint theme bootstrap — resolves stored theme/mode/accent and
+      // applies them before React mounts, so the first paint already shows
+      // the user's chosen theme (no FOUC, no accent flicker).
+      // SURFACES + ACCENTS injected at build time from src/config/themes.ts
+      // (see vite.config.ts → tipsy:theme-palette).
       (function () {
         var SURFACES = __SURFACES__;
+        var ACCENTS = __ACCENTS__;
         var theme = localStorage.getItem('tipsy-theme');
         if (!SURFACES[theme]) theme = Object.keys(SURFACES)[0];
         var mode = localStorage.getItem('tipsy-mode');
@@ -25,6 +28,15 @@
         root.setAttribute('data-theme', theme);
         root.setAttribute('data-mode', mode);
         document.querySelector('meta[name="theme-color"]').content = SURFACES[theme][mode];
+        var accent = ACCENTS[theme][localStorage.getItem('tipsy-accent')];
+        if (accent) {
+          root.style.setProperty('--color-accent', accent.hex);
+          root.style.setProperty('--color-accent-hover', accent.hoverHex);
+          root.style.setProperty(
+            '--color-accent-subtle',
+            mode === 'dark' ? accent.subtleDarkHex : accent.subtleHex,
+          );
+        }
       })();
     </script>
     <meta

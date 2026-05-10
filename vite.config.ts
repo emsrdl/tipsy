@@ -77,6 +77,25 @@ function generateSurfacePaletteJson(): string {
 }
 
 /**
+ * Per-theme accent map for the pre-paint boot script — lets it apply the
+ * user's stored accent before React mounts, eliminating the default-accent
+ * flicker on initial load. Mirrors the AccentColor shape so the boot script
+ * reads the same field names ThemeContext.injectAccentVars uses.
+ */
+function generateAccentMapJson(): string {
+  const out: Record<string, Record<string, Record<string, string>>> = {};
+  for (const t of Object.values(THEMES)) {
+    out[t.id] = Object.fromEntries(
+      t.accentColors.map((a) => [
+        a.id,
+        { hex: a.hex, hoverHex: a.hoverHex, subtleHex: a.subtleHex, subtleDarkHex: a.subtleDarkHex },
+      ]),
+    );
+  }
+  return JSON.stringify(out);
+}
+
+/**
  * Static `theme-color` for the meta tag in index.html — covers the
  * pre-paint window before the boot script runs, plus the no-JS case.
  * Uses the first theme's dark surface as a sensible default.
@@ -97,6 +116,7 @@ export default defineConfig({
         handler: (html) =>
           html
             .replace('__SURFACES__', generateSurfacePaletteJson())
+            .replace('__ACCENTS__', generateAccentMapJson())
             .replace('__BOOT_SURFACE__', generateBootSurface())
             .replace('/*__PALETTE_CSS__*/', generatePaletteCss()),
       },
