@@ -8,9 +8,9 @@
  * // Rendered via React Router at route "/calculate/results"
  */
 
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useMemo, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePreserveScroll, markFlowReset, getScrollRatio } from '@/hooks/usePreserveScroll';
+import { usePreserveScroll, markFlowReset, getScrollRatio, getScrollEl } from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { DistributionTable } from '@/components/organisms/DistributionTable/DistributionTable';
@@ -103,6 +103,8 @@ export function ResultsScreen() {
   const thresholdInput = useThresholdInput(thresholdInCents, setThreshold);
   const thresholdInputRef = useRef<HTMLInputElement>(null);
   const sliderWrapperRef = useRef<HTMLDivElement>(null);
+  const transfersCardRef = useRef<HTMLDivElement>(null);
+  const lastTransferHeightRef = useRef<number | null>(null);
 
   const hasKitchen = session.employees.some((e) => e.group === 'kitchen');
   const hasService = session.employees.some((e) => e.group === 'service');
@@ -154,6 +156,23 @@ export function ResultsScreen() {
 
   const fairnessScore = smartOutput.output?.distribution.fairnessScore;
   const transfers = smartOutput.output?.differences ?? [];
+
+  // When the transfers card grows or shrinks (rows appear/disappear), correct
+  // the scroll position so the slider below stays anchored in place.
+  // CSS overflow-anchor is unreliable here because the browser anchors to the
+  // topmost visible element (fairness row / summary), not the slider.
+  useLayoutEffect(() => {
+    const el = transfersCardRef.current;
+    if (!el) return;
+    const h = el.getBoundingClientRect().height;
+    if (lastTransferHeightRef.current !== null) {
+      const delta = h - lastTransferHeightRef.current;
+      if (Math.abs(delta) > 0.5) {
+        getScrollEl()?.scrollBy({ top: delta });
+      }
+    }
+    lastTransferHeightRef.current = h;
+  }, [transfers.length]);
 
   function scoreColor(score: number) {
     return score >= 95 ? 'text-status-success' : 'text-status-warning';
@@ -331,7 +350,7 @@ export function ResultsScreen() {
             : {})}
           belowGroups={
             isSmartMode ? (
-              <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1 [overflow-anchor:none]">
+              <div ref={transfersCardRef} className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1 [overflow-anchor:none]">
                 <div className="flex items-center gap-2 border-b border-border px-4 py-3">
                   <Icon name="arrow-right" size={14} className="text-status-warning" />
                   <span className="text-sm font-semibold text-text-primary">

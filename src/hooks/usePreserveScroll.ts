@@ -16,7 +16,7 @@ import { useLocation } from 'react-router-dom';
 
 const SCROLL_CONTAINER_ID = 'main-scroll';
 
-function getScrollEl(): HTMLElement | null {
+export function getScrollEl(): HTMLElement | null {
   return document.getElementById(SCROLL_CONTAINER_ID);
 }
 
