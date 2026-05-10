@@ -91,15 +91,14 @@ export function EmployeeForm() {
       <Button
         type="button"
         variant="outline"
-        className="border-accent/50 min-h-14 w-full gap-3 rounded-xl border-2 border-dashed text-base text-accent hover:border-accent hover:bg-accent-subtle"
+        className="min-h-14 w-full gap-3 rounded-xl border-2 border-dashed border-accent/50 text-base text-accent hover:border-accent hover:bg-accent-subtle"
         onClick={handleAddEmployee}
       >
-        <div className="bg-accent/10 flex h-8 w-8 items-center justify-center rounded-full">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10">
           <Icon name="plus" size={18} className="text-accent" />
         </div>
         {t('common:actions.addEmployee')}
       </Button>
-
     </div>
   );
 }

@@ -18,7 +18,7 @@
  */
 
 import type { DistributionResult } from '@/types/session';
-import { formatEurFromCents } from '@/lib/format/formatCurrency';
+import { formatEurFromCents, toFmtLocale } from '@/lib/format/formatCurrency';
 
 export interface ExportPdfOptions {
   /** BCP 47 locale for number formatting. Defaults to 'de-DE'. */
@@ -47,7 +47,7 @@ export interface ExportPdfOptions {
  * exportTipsPdf(results, { title: 'Schicht 21.03.2024', labels: { name: 'Name', group: 'Gruppe', hours: 'Stunden', amount: 'Betrag', total: 'Gesamt', kitchen: 'Küche', service: 'Service' } })
  */
 export function exportTipsPdf(results: DistributionResult[], options: ExportPdfOptions): void {
-  const locale = options.locale === 'en' ? 'en-US' : 'de-DE';
+  const locale = toFmtLocale(options.locale ?? 'de');
   const title = options.title ?? 'Tipsy';
   const date = new Date().toLocaleDateString(locale);
   const { labels } = options;

@@ -47,8 +47,7 @@ export function DenominationItem({
   onQuantityChange,
 }: DenominationItemProps) {
   const { t } = useTranslation('screens');
-  const { locale } = useLocale();
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
+  const { fmtLocale } = useLocale();
   const subtotalCents = denomination.valueInCents * quantity;
   const isActive = quantity > 0;
 

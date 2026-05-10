@@ -91,7 +91,8 @@
     "helpWhat": "Was ist das?",
     "helpText": "Ausgleichszahlungen werden vorgeschlagen, wenn die Abweichung diesen Betrag überschreitet.",
     "aboveThreshold": "über {{amount}} Schwellwert",
-    "thresholdLabel": "Fairness-Schwellwert"
+    "thresholdLabel": "Fairness-Schwellwert",
+    "noTransfers": "Keine Ausgleichszahlungen nötig"
   },
   "toast": {
     "dismiss": "Schließen",

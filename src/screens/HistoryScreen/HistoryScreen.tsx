@@ -120,7 +120,6 @@ function groupByHourly(shifts: Shift[], getValue: (s: Shift) => number): GraphDa
   });
 }
 
-
 /**
  * History screen with charts, profile-filtered shift list, and import/export.
  */
@@ -128,10 +127,9 @@ export function HistoryScreen() {
   usePreserveScroll();
   const { t } = useTranslation(['common', 'screens']);
   const { shifts: allShifts, deleteShift } = useShifts();
-  const { locale } = useLocale();
+  const { fmtLocale } = useLocale();
   const { activeProfile } = useProfiles();
   const { showToast } = useToast();
-  const fmtLocale = locale === 'en' ? 'en-US' : 'de-DE';
 
   const [graphMode, setGraphMode] = useState<GraphMode>('week');
   const [expandedShiftId, setExpandedShiftId] = useState<string | null>(null);
@@ -216,7 +214,9 @@ export function HistoryScreen() {
           <p className="mb-1 text-base font-semibold text-text-primary">
             {t('common:profile.noShiftsSignedOut')}
           </p>
-          <p className="mb-6 text-sm text-text-secondary">{t('common:profile.noShiftsSignedOutSub')}</p>
+          <p className="mb-6 text-sm text-text-secondary">
+            {t('common:profile.noShiftsSignedOutSub')}
+          </p>
         </div>
       </ScreenContainer>
     );
@@ -250,7 +250,7 @@ export function HistoryScreen() {
           <div className="rounded-xl bg-accent p-4 shadow-elevation-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-accent-foreground/80 text-sm font-medium">
+                <p className="text-sm font-medium text-accent-foreground/80">
                   {t('common:history.totalAllTime')}
                 </p>
                 <p className="font-mono text-2xl font-bold text-accent-foreground">
@@ -258,10 +258,10 @@ export function HistoryScreen() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-accent-foreground/80 text-sm font-medium">
+                <p className="text-sm font-medium text-accent-foreground/80">
                   {t('common:history.shiftsCount_other', { count: shifts.length })}
                 </p>
-                <p className="text-accent-foreground/60 mt-0.5 text-xs">
+                <p className="mt-0.5 text-xs text-accent-foreground/60">
                   ⌀{' '}
                   {formatEurFromCents(
                     shifts.length > 0 ? Math.round(totalAllTime / shifts.length) : 0,
@@ -307,12 +307,14 @@ export function HistoryScreen() {
                   : t('common:history.chartTips')}
               </p>
               <div className="h-48 min-w-0">
-                <ResponsiveContainer width="100%" height="100%" debounce={50} initialDimension={{ width: 1, height: 1 }}>
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                  debounce={50}
+                  initialDimension={{ width: 1, height: 1 }}
+                >
                   {graphMode === 'day' ? (
-                    <LineChart
-                      data={graphData}
-                      margin={{ top: 4, right: 8, bottom: 0, left: -16 }}
-                    >
+                    <LineChart data={graphData} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                       <XAxis
                         dataKey="label"
@@ -362,9 +364,7 @@ export function HistoryScreen() {
                         axisLine={false}
                       />
                       <Tooltip
-                        content={
-                          <ChartTooltip suffix={graphMode === 'hourly' ? '€/h' : '€'} />
-                        }
+                        content={<ChartTooltip suffix={graphMode === 'hourly' ? '€/h' : '€'} />}
                         cursor={false}
                         trigger="hover"
                         allowEscapeViewBox={{ x: false, y: false }}
@@ -407,7 +407,7 @@ export function HistoryScreen() {
                     className="flex min-h-14 w-full items-center justify-between px-4 py-3 transition-colors hover:bg-surface-overlay"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="bg-accent/10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/10">
                         <Icon name="clock" size={16} className="text-accent" />
                       </div>
                       <div className="text-left">

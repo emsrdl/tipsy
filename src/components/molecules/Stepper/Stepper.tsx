@@ -114,7 +114,7 @@ export function Stepper({
           'text-text-primary',
           'disabled:cursor-not-allowed disabled:opacity-50',
           'active:bg-surface-overlay',
-          '[&:not(:disabled)]:hover:border-accent [&:not(:disabled)]:hover:text-accent',
+          'not-disabled:hover:border-accent not-disabled:hover:text-accent',
         )}
       >
         <Icon name="minus" size={size === 'sm' ? 14 : 18} />
@@ -124,7 +124,7 @@ export function Stepper({
       <div
         className={cn(
           sizes.value,
-          'flex select-none items-center justify-center gap-0.5 font-semibold text-text-primary',
+          'flex items-center justify-center gap-0.5 font-semibold text-text-primary select-none',
         )}
         aria-live="polite"
         aria-atomic="true"

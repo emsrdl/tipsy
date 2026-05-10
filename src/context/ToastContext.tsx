@@ -48,8 +48,8 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
       aria-live="polite"
       className={cn(
         'flex items-center gap-3 rounded-xl px-4 py-3 shadow-elevation-4',
-        'text-sm font-medium duration-200 animate-in fade-in slide-in-from-top-2',
-        'min-w-[240px] max-w-[90vw] cursor-pointer',
+        'animate-in text-sm font-medium duration-200 fade-in slide-in-from-top-2',
+        'max-w-[90vw] min-w-[240px] cursor-pointer',
         TYPE_STYLES[toast.type],
       )}
       onClick={() => onDismiss(toast.id)}
@@ -87,7 +87,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {/* Toast container — top center */}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed left-1/2 top-6 z-50 flex -translate-x-1/2 flex-col items-center gap-2"
+        className="pointer-events-none fixed top-6 left-1/2 z-50 flex -translate-x-1/2 flex-col items-center gap-2"
       >
         {toasts.map((toast) => (
           <div key={toast.id} className="pointer-events-auto">

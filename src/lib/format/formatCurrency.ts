@@ -39,6 +39,24 @@ export function formatEurFromCents(cents: number, locale: string = 'de-DE'): str
 }
 
 /**
+ * Formats a signed cent amount with a leading `+` for positive values.
+ * Returns an empty string for zero so callers can render conditionally.
+ */
+export function formatSignedEurFromCents(cents: number, locale: string = 'de-DE'): string {
+  if (cents === 0) return '';
+  const formatted = formatEurFromCents(cents, locale);
+  return cents > 0 ? `+${formatted}` : formatted;
+}
+
+/**
+ * Maps the app's short locale id (`de` | `en` or any BCP-47 tag starting with
+ * those) to the BCP-47 tag used for `Intl.*` formatters.
+ */
+export function toFmtLocale(locale: string): string {
+  return locale.startsWith('en') ? 'en-US' : 'de-DE';
+}
+
+/**
  * Parses a user-entered string to an integer cent value.
  * Accepts both comma (DE) and dot (EN) as decimal separator.
  * Returns null if the string is not a valid positive number.

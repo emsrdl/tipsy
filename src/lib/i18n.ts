@@ -22,6 +22,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { LS_LANG_KEY } from '@/config/storageKeys';
 
 // Locale imports
 import deCommon from '@/locales/de/common.json';
@@ -56,7 +57,7 @@ void i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
-      lookupLocalStorage: 'tipsy-lang',
+      lookupLocalStorage: LS_LANG_KEY,
     },
   });
 

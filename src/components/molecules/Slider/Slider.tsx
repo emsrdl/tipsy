@@ -3,17 +3,20 @@
  * @description Slider molecule — Material Design range slider for percentage inputs.
  *
  * Touch-optimized with a 24px thumb target and visual track progress.
+ * Badges are tappable to enter exact values directly.
  * Used for the kitchen/service split configuration.
  *
  * @example
  * <Slider
- *   value={30}
- *   onChange={(v) => setSplit({ kitchenPercent: v, servicePercent: 100 - v })}
- *   label="Küche"
- *   counterLabel="Service"
+ *   value={60}
+ *   onChange={(v) => setSplit({ servicePercent: v, kitchenPercent: 100 - v })}
+ *   label="Service"
+ *   counterLabel="Kitchen"
  * />
  */
 
+import { useState, useRef, type KeyboardEvent } from 'react';
+import { GROUP_COLORS } from '@/config/groups';
 import { cn } from '@/lib/utils';
 
 export interface SliderProps {
@@ -37,14 +40,86 @@ export interface SliderProps {
   className?: string;
 }
 
+const BADGE_COLOR = {
+  left: GROUP_COLORS.service,
+  right: GROUP_COLORS.kitchen,
+} as const;
+
+interface SliderBadgeProps {
+  side: 'left' | 'right';
+  label?: string;
+  displayValue: number;
+  editing: 'left' | 'right' | null;
+  inputVal: string;
+  min: number;
+  max: number;
+  disabled?: boolean | undefined;
+  onStartEdit: (side: 'left' | 'right') => void;
+  onInputChange: (val: string) => void;
+  onCommit: () => void;
+  onKey: (e: KeyboardEvent) => void;
+}
+
+function SliderBadge({
+  side,
+  label,
+  displayValue,
+  editing,
+  inputVal,
+  min,
+  max,
+  disabled,
+  onStartEdit,
+  onInputChange,
+  onCommit,
+  onKey,
+}: SliderBadgeProps) {
+  const colorClass = BADGE_COLOR[side];
+
+  if (editing === side) {
+    return (
+      <input
+        name={`slider-${side}`}
+        type="number"
+        inputMode="numeric"
+        min={min}
+        max={max}
+        value={inputVal}
+        onChange={(e) => onInputChange(e.target.value)}
+        onBlur={onCommit}
+        onKeyDown={onKey}
+        aria-label={label ?? side}
+        autoFocus
+        className={cn(
+          'h-7 w-14 rounded-full px-2 text-center text-sm font-bold tabular-nums focus:outline-none',
+          colorClass,
+        )}
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onStartEdit(side)}
+      disabled={disabled}
+      aria-label={label ? `${label}: ${displayValue}%` : `${displayValue}%`}
+      className={cn(
+        'inline-flex h-7 w-14 items-center justify-center rounded-full text-sm font-bold tabular-nums transition-transform',
+        'not-disabled:active:scale-95',
+        colorClass,
+      )}
+    >
+      {displayValue}%
+    </button>
+  );
+}
+
 /**
- * Material-style range slider with visual percentage labels.
+ * Material-style range slider with tappable percentage badges.
  *
- * @param props - SliderProps
- * @returns div with labels and range input
- *
- * @example
- * <Slider value={30} onChange={setKitchen} label="Küche" counterLabel="Service" />
+ * Badges switch to a number input on tap for precise entry.
+ * Slider uses step=5 for comfortable touch control.
  */
 export function Slider({
   value,
@@ -57,64 +132,99 @@ export function Slider({
   'aria-label': ariaLabel,
   className,
 }: SliderProps) {
+  const [editing, setEditing] = useState<'left' | 'right' | null>(null);
+  const [inputVal, setInputVal] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const percent = ((value - min) / (max - min)) * 100;
   const counterValue = max - value;
 
+  function centerInView() {
+    containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function startEdit(side: 'left' | 'right') {
+    if (disabled) return;
+    centerInView();
+    setInputVal(String(side === 'left' ? value : counterValue));
+    setEditing(side);
+  }
+
+  function commitEdit() {
+    const n = parseInt(inputVal, 10);
+    if (!isNaN(n) && editing) {
+      const clamped = Math.min(max, Math.max(min, n));
+      onChange(editing === 'left' ? clamped : max - clamped);
+    }
+    setEditing(null);
+  }
+
+  function handleKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') commitEdit();
+    if (e.key === 'Escape') setEditing(null);
+  }
+
+  const badgeProps = {
+    editing,
+    inputVal,
+    min,
+    max,
+    disabled,
+    onStartEdit: startEdit,
+    onInputChange: setInputVal,
+    onCommit: commitEdit,
+    onKey: handleKey,
+  };
+
   return (
-    <div className={cn('space-y-3', className)}>
-      {/* Labels */}
+    <div ref={containerRef} className={cn('space-y-3', className)}>
       {(label || counterLabel) && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           {label && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex shrink-0 items-center gap-1.5">
               <span className="text-sm font-medium text-text-primary">{label}</span>
-              <span className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-teal-100 px-2 text-sm font-bold text-teal-800 dark:bg-teal-900/30 dark:text-teal-300">
-                {value}%
-              </span>
+              <SliderBadge side="left" label={label} displayValue={value} {...badgeProps} />
             </div>
           )}
           {counterLabel && (
-            <div className="flex items-center gap-1.5">
-              <span className="inline-flex h-7 min-w-[2.5rem] items-center justify-center rounded-full bg-orange-100 px-2 text-sm font-bold text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
-                {counterValue}%
-              </span>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <SliderBadge side="right" label={counterLabel} displayValue={counterValue} {...badgeProps} />
               <span className="text-sm font-medium text-text-primary">{counterLabel}</span>
             </div>
           )}
         </div>
       )}
 
-      {/* Slider track */}
       <div className="relative flex items-center py-2">
-        {/* Filled track */}
         <div
           className="absolute left-0 h-1 rounded-full bg-accent"
           style={{ width: `${percent}%` }}
         />
-        {/* Empty track */}
         <div
           className="absolute right-0 h-1 rounded-full bg-surface-overlay"
           style={{ width: `${100 - percent}%` }}
         />
 
         <input
+          name="split-ratio"
           type="range"
           min={min}
           max={max}
+          step={5}
           value={value}
           disabled={disabled}
           aria-label={ariaLabel ?? label}
           aria-valuemin={min}
           aria-valuemax={max}
           aria-valuenow={value}
+          onPointerDown={centerInView}
           onChange={(e) => onChange(parseInt(e.target.value, 10))}
-          className="relative z-10 h-8 w-full cursor-pointer opacity-0"
+          className="relative z-10 h-10 w-full cursor-pointer opacity-0"
           style={{ touchAction: 'none' }}
         />
 
-        {/* Custom thumb */}
         <div
-          className="pointer-events-none absolute z-20 h-6 w-6 rounded-full border-2 border-surface bg-accent shadow-elevation-2 transition-transform"
+          className="pointer-events-none absolute z-20 h-6 w-6 rounded-full border-2 border-surface bg-accent shadow-elevation-2 transition-all"
           style={{ left: `calc(${percent}% - 12px)` }}
         />
       </div>

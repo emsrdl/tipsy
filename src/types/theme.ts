@@ -16,6 +16,25 @@ export type ThemeId = 'tipsy' | 'katzentempel';
 export type ColorMode = 'light' | 'dark';
 
 /**
+ * Per-mode color tokens — surfaces, text, borders, status.
+ * Accent colors are not part of the palette; they live in `Theme.accentColors`
+ * and are injected at runtime by ThemeContext.
+ */
+export interface ThemePalette {
+  surface: string;
+  surfaceRaised: string;
+  surfaceOverlay: string;
+  textPrimary: string;
+  textSecondary: string;
+  textInverse: string;
+  border: string;
+  borderStrong: string;
+  statusError: string;
+  statusSuccess: string;
+  statusWarning: string;
+}
+
+/**
  * A selectable accent color within the Tipsy theme.
  * Hover and subtle variants are precomputed — no runtime color math.
  *
@@ -67,4 +86,6 @@ export interface Theme {
   accentColors: AccentColor[];
   /** The default accent color id. */
   defaultAccentId: string;
+  /** Surface/text/border/status colors per mode. */
+  palette: Record<ColorMode, ThemePalette>;
 }

@@ -1,9 +1,45 @@
 <!doctype html>
-<html lang="de" data-theme="tipsy" data-mode="light">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#3B82F6" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="__BOOT_SURFACE__" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Tipsy" />
+    <style>/*__PALETTE_CSS__*/</style>
+    <script>
+      // Pre-paint theme bootstrap — resolves stored theme/mode/accent and
+      // applies them before React mounts, so the first paint already shows
+      // the user's chosen theme (no FOUC, no accent flicker).
+      // SURFACES + ACCENTS injected at build time from src/config/themes.ts
+      // (see vite.config.ts → tipsy:theme-palette).
+      (function () {
+        var SURFACES = __SURFACES__;
+        var ACCENTS = __ACCENTS__;
+        var LS = __LS_KEYS__;
+        var theme = localStorage.getItem(LS.theme);
+        if (!SURFACES[theme]) theme = Object.keys(SURFACES)[0];
+        var mode = localStorage.getItem(LS.mode);
+        if (mode !== 'light' && mode !== 'dark') {
+          mode = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        var root = document.documentElement;
+        root.setAttribute('data-theme', theme);
+        root.setAttribute('data-mode', mode);
+        document.querySelector('meta[name="theme-color"]').content = SURFACES[theme][mode];
+        var accent = ACCENTS[theme][localStorage.getItem(LS.accent)];
+        if (accent) {
+          root.style.setProperty('--color-accent', accent.hex);
+          root.style.setProperty('--color-accent-hover', accent.hoverHex);
+          root.style.setProperty(
+            '--color-accent-subtle',
+            mode === 'dark' ? accent.subtleDarkHex : accent.subtleHex,
+          );
+        }
+      })();
+    </script>
     <meta
       name="description"
       content="Trinkgeld fair verteilen — Tip splitting for restaurant staff"

@@ -19,7 +19,12 @@
 
 import { type ReactNode, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { saveScrollPosition, getLastCalculateRoute, updateLastCalculateRoute } from '@/hooks/usePreserveScroll';
+import {
+  saveScrollPosition,
+  getLastCalculateRoute,
+  updateLastCalculateRoute,
+  getScrollEl,
+} from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { HeaderBar } from '@/components/organisms/HeaderBar/HeaderBar';
 import { Icon } from '@/components/atoms/Icon/Icon';
@@ -67,15 +72,17 @@ export function AppLayout({ children }: AppLayoutProps) {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
+    <div className="flex h-dvh flex-col bg-surface">
       <HeaderBar />
 
-      {/* Scrollable content with bottom nav clearance */}
-      <div className="flex-1 pb-20">{children}</div>
+      {/* Dedicated scroll container — keeps touch events responsive during momentum scroll */}
+      <div id="main-scroll" className="min-h-0 flex-1 overflow-y-auto pb-24">
+        {children}
+      </div>
 
       {/* Material Bottom Navigation Bar */}
       <nav
-        className="bg-surface/95 pb-safe fixed bottom-0 left-0 right-0 z-40 shadow-elevation-4 backdrop-blur-md"
+        className="pb-safe fixed right-0 bottom-0 left-0 z-40 bg-surface/95 shadow-elevation-4 backdrop-blur-md"
         role="navigation"
         aria-label={t('nav.main')}
       >
@@ -86,9 +93,16 @@ export function AppLayout({ children }: AppLayoutProps) {
               <NavLink
                 key={matchPrefix}
                 to={to}
-                onClick={() => saveScrollPosition(location.pathname)}
+                onClick={(e) => {
+                  if (isActive) {
+                    e.preventDefault();
+                    getScrollEl()?.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                  }
+                  saveScrollPosition(location.pathname);
+                }}
                 className={cn(
-                  'flex w-24 flex-col items-center gap-1 py-3 transition-colors',
+                  'flex w-24 flex-col items-center gap-1 pt-3 pb-4 transition-colors',
                   isActive ? 'text-accent' : 'text-text-secondary',
                 )}
               >

@@ -12,10 +12,14 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 import type { LocaleId } from '@/types/i18n';
+import { toFmtLocale } from '@/lib/format/formatCurrency';
+import { LS_LANG_KEY } from '@/config/storageKeys';
 
 export interface UseLocaleReturn {
   /** Current active locale. */
   locale: LocaleId;
+  /** BCP-47 tag for `Intl.*` formatters (`en` → `en-US`, `de` → `de-DE`). */
+  fmtLocale: string;
   /** Switch to a different locale. */
   setLocale: (locale: LocaleId) => void;
 }
@@ -34,12 +38,12 @@ export function useLocale(): UseLocaleReturn {
   const setLocale = useCallback(
     (locale: LocaleId) => {
       void i18n.changeLanguage(locale);
-      localStorage.setItem('tipsy-lang', locale);
+      localStorage.setItem(LS_LANG_KEY, locale);
     },
     [i18n],
   );
 
   const locale = (i18n.language?.slice(0, 2) ?? 'de') as LocaleId;
 
-  return { locale, setLocale };
+  return { locale, fmtLocale: toFmtLocale(locale), setLocale };
 }

@@ -2,14 +2,16 @@
  * @file src/styles/globals.css
  * @description Tailwind v4 entry point — imports, theme tokens, base styles, and utilities.
  *
- * @see src/styles/themes.css for per-theme color variables
+ * @see src/config/themes.ts for per-theme color values (injected at build time)
  * @see src/context/ThemeContext.tsx for runtime accent injection
  * @see src/config/themes.ts for accent color definitions
  */
 
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import './themes.css';
+
+/* Per-theme CSS variables are injected as an inline <style> in index.html
+   from src/config/themes.ts (see vite.config.ts → tipsy:theme-palette). */
 
 /* Dark mode via data-mode attribute */
 @custom-variant dark (&:where([data-mode='dark'], [data-mode='dark'] *));
@@ -40,13 +42,23 @@
   --animate-slide-up: slide-up 200ms ease-out;
 
   @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes slide-up {
-    from { transform: translateY(8px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 }
 
@@ -116,13 +128,16 @@
     -moz-osx-font-smoothing: grayscale;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    overscroll-behavior: none;
   }
 
   /* Radix scroll-lock adds margin-right to compensate for the scrollbar, but
-     scrollbar-gutter: stable already reserves that space — cancel it out. */
+     scrollbar-gutter: stable already reserves that space — cancel it out.
+     Also lock #main-scroll since body scroll is no longer used. */
   body[data-scroll-locked] {
     margin-right: 0 !important;
+  }
+  body[data-scroll-locked] #main-scroll {
+    overflow-y: hidden;
   }
 
   /* Prevent zoom on input focus (iOS Safari) */

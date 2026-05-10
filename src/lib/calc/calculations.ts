@@ -218,3 +218,8 @@ export function postTransferFairnessScore(
     ) / personShares.length;
   return fairnessScoreFromMeanDev(meanAbsDev, meanIdeal);
 }
+
+/** Tailwind color class for a fairness score (success ≥ 95, warning otherwise). */
+export function fairnessScoreColor(score: number): string {
+  return score >= 95 ? 'text-status-success' : 'text-status-warning';
+}
