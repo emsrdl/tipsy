@@ -76,9 +76,9 @@ export function DistributionTable({
     const groupHours = groupResults.reduce((s, r) => s + r.hours, 0);
 
     return (
-      <div className="space-y-2">
+      <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
         {/* Group header */}
-        <div className="flex items-center justify-between px-1">
+        <div className="flex items-center justify-between gap-2 border-b border-border bg-surface-overlay px-4 py-3">
           <div className="flex items-center gap-2">
             <Icon name={icon} size={14} className="text-text-secondary" />
             <Badge variant={badgeVariant}>{groupLabel}</Badge>
@@ -95,28 +95,26 @@ export function DistributionTable({
           </div>
         </div>
 
-        {/* Employee cards */}
-        {groupResults.map((r) => {
-          const perHour =
-            r.hours > 0
-              ? formatEurFromCents(Math.round(r.amountInCents / r.hours), fmtLocale)
-              : null;
-          const share = personShares?.find((s) => s.id === r.employeeId);
-          const isExpandable = share !== undefined;
-          const isExpanded = expandedId === r.employeeId;
+        {/* Employee rows */}
+        <div className="divide-y divide-border">
+          {groupResults.map((r) => {
+            const perHour =
+              r.hours > 0
+                ? formatEurFromCents(Math.round(r.amountInCents / r.hours), fmtLocale)
+                : null;
+            const share = personShares?.find((s) => s.id === r.employeeId);
+            const isExpandable = share !== undefined;
+            const isExpanded = expandedId === r.employeeId;
 
-          return (
-            <div
-              key={r.employeeId}
-              className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1"
-            >
-              {/* Card header row */}
-              {isExpandable ? (
-                <button
-                  type="button"
-                  onClick={() => setExpandedId(isExpanded ? null : r.employeeId)}
-                  className="flex w-full items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-surface-overlay"
-                >
+            return (
+              <div key={r.employeeId}>
+                {/* Row header */}
+                {isExpandable ? (
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(isExpanded ? null : r.employeeId)}
+                    className="flex w-full items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-surface-overlay"
+                  >
                   <div className="min-w-0 text-left">
                     <p className="truncate text-base font-semibold text-text-primary">{r.name}</p>
                     <p className="mt-0.5 flex items-center gap-1 text-sm text-text-secondary">
@@ -211,9 +209,10 @@ export function DistributionTable({
                     </div>
                   );
                 })()}
-            </div>
-          );
-        })}
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   }

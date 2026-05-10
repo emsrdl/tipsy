@@ -10,7 +10,12 @@
 
 import { useState, useRef, useMemo, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePreserveScroll, markFlowReset, getScrollRatio, getScrollEl } from '@/hooks/usePreserveScroll';
+import {
+  usePreserveScroll,
+  markFlowReset,
+  getScrollRatio,
+  getScrollEl,
+} from '@/hooks/usePreserveScroll';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { DistributionTable } from '@/components/organisms/DistributionTable/DistributionTable';
@@ -157,26 +162,37 @@ export function ResultsScreen() {
   const fairnessScore = smartOutput.output?.distribution.fairnessScore;
   const transfers = smartOutput.output?.differences ?? [];
 
-  // When the transfers card grows or shrinks (rows appear/disappear), correct
-  // the scroll position so the slider below stays anchored in place.
-  // CSS overflow-anchor is unreliable here because the browser anchors to the
-  // topmost visible element (fairness row / summary), not the slider.
+  function scoreColor(score: number) {
+    return score >= 95 ? 'text-status-success' : 'text-status-warning';
+  }
+
+  // When the user expands the settings panel, scroll the slider into view —
+  // it lives at the bottom of the page so it might otherwise be off-screen.
+  useEffect(() => {
+    if (showSettings && hasBothGroups) {
+      sliderWrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSettings]);
+
+  // Transfers sit above the slider (above the total). When dragging the slider
+  // changes the transfer list's height, compensate scroll by the delta so the
+  // slider stays anchored in the viewport.
   useLayoutEffect(() => {
     const el = transfersCardRef.current;
-    if (!el) return;
+    if (!el) {
+      lastTransferHeightRef.current = null;
+      return;
+    }
     const h = el.getBoundingClientRect().height;
-    if (lastTransferHeightRef.current !== null) {
+    if (lastTransferHeightRef.current !== null && showSettings) {
       const delta = h - lastTransferHeightRef.current;
       if (Math.abs(delta) > 0.5) {
         getScrollEl()?.scrollBy({ top: delta });
       }
     }
     lastTransferHeightRef.current = h;
-  }, [transfers.length]);
-
-  function scoreColor(score: number) {
-    return score >= 95 ? 'text-status-success' : 'text-status-warning';
-  }
+  }, [transfers.length, isSmartMode, showSettings]);
 
   const postScore = useMemo(
     () =>
@@ -189,20 +205,16 @@ export function ResultsScreen() {
     [smartOutput.output],
   );
 
-  useEffect(() => {
-    if (showSettings && hasBothGroups) {
-      sliderWrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    // hasBothGroups intentionally not a dep — only scroll when the panel opens/closes,
-    // not when employee count changes while the panel is already open.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSettings]);
-
-  const settingsDropdown = (
+  // Settings card — collapsible. Header always shows the active state
+  // (split %, mode + threshold). Body holds the slider, smart-mode toggle,
+  // and threshold controls. Lives at the bottom of the page since these are
+  // adjustments people only occasionally need to make.
+  const settingsCard = (
     <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
       <button
         type="button"
         onClick={() => setShowSettings(!showSettings)}
+        aria-expanded={showSettings}
         className="flex w-full items-center gap-2 px-4 py-2.5"
       >
         <Icon name="settings" size={14} className="shrink-0 text-text-secondary" />
@@ -241,7 +253,7 @@ export function ResultsScreen() {
       {showSettings && (
         <div className="divide-y divide-border border-t border-border">
           {hasBothGroups && (
-            <div ref={sliderWrapperRef} className="px-4 pt-3 pb-3">
+            <div ref={sliderWrapperRef} className="px-4 py-3">
               <Slider
                 value={session.split.servicePercent}
                 onChange={(s) => setSplit({ kitchenPercent: 100 - s, servicePercent: s })}
@@ -255,8 +267,8 @@ export function ResultsScreen() {
             <button
               type="button"
               onClick={toggleSmartMode}
-              className="flex h-9 w-full items-center justify-between gap-3"
               aria-pressed={isSmartMode}
+              className="flex h-9 w-full items-center justify-between gap-3"
             >
               <div className="flex items-center gap-2">
                 <Icon
@@ -322,6 +334,90 @@ export function ResultsScreen() {
     </div>
   );
 
+  // Fairness row — inline summary metric (no card surface) since it's a single
+  // status line and shouldn't compete visually with the surrounding cards.
+  const fairnessRow =
+    isSmartMode && fairnessScore !== undefined ? (
+      <div className="flex items-center gap-2 px-4 py-1">
+        <Icon
+          name="star"
+          size={14}
+          className={
+            (postScore ?? fairnessScore) >= 95 ? 'text-status-success' : 'text-status-warning'
+          }
+        />
+        <span className="flex-1 text-sm text-text-secondary">
+          {t('common:smartSplit.fairnessScore')}
+        </span>
+        {postScore !== undefined ? (
+          <span className="flex items-center gap-1.5">
+            <span className={cn('font-mono text-sm font-bold', scoreColor(fairnessScore))}>
+              {fairnessScore}%
+            </span>
+            <Icon name="arrow-right" size={12} className="text-text-secondary" />
+            <span className={cn('font-mono text-sm font-bold', scoreColor(postScore))}>
+              {postScore}%
+            </span>
+          </span>
+        ) : (
+          <span className={cn('font-mono text-sm font-bold', scoreColor(fairnessScore))}>
+            {fairnessScore}%
+          </span>
+        )}
+      </div>
+    ) : null;
+
+  // Transfers card: header + payout list. Rendered above the total.
+  const transfersCard = isSmartMode ? (
+    <div
+      ref={transfersCardRef}
+      className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1 [overflow-anchor:none]"
+    >
+      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+        <Icon name="arrow-right" size={14} className="text-status-warning" />
+        <span className="flex-1 text-sm font-semibold text-text-primary">
+          {t('common:smartSplit.transfers')}
+        </span>
+        {transfers.length > 0 && (
+          <Badge
+            variant="default"
+            className="border-0 bg-status-warning/15 text-xs text-status-warning"
+          >
+            {t('common:smartSplit.aboveThreshold', {
+              amount: formatEurFromCents(thresholdInCents, fmtLocale),
+            })}
+          </Badge>
+        )}
+      </div>
+
+      {transfers.length > 0 ? (
+        <div className="divide-y divide-border">
+          {transfers.map((diff, i) => (
+            <div key={i} className="flex items-center justify-between gap-3 px-4 py-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="truncate text-sm font-semibold text-text-primary">
+                  {diff.fromPerson.name}
+                </span>
+                <Icon name="arrow-right" size={14} className="shrink-0 text-status-warning" />
+                <span className="truncate text-sm font-semibold text-text-primary">
+                  {diff.toPerson.name}
+                </span>
+              </div>
+              <span className="shrink-0 rounded-full bg-status-warning/15 px-2.5 py-0.5 font-mono text-sm font-bold text-status-warning">
+                {formatEurFromCents(diff.amountInCents, fmtLocale)}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 px-4 py-3 text-sm text-text-secondary">
+          <Icon name="check" size={14} className="text-status-success" />
+          {t('common:smartSplit.noTransfers')}
+        </div>
+      )}
+    </div>
+  ) : null;
+
   function handleStepClick(s: number) {
     void navigate(STEP_ROUTES[s], { state: { scrollRatio: getScrollRatio(), isBack: s < 3 } });
   }
@@ -349,90 +445,12 @@ export function ResultsScreen() {
               }
             : {})}
           belowGroups={
-            isSmartMode ? (
-              <div ref={transfersCardRef} className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1 [overflow-anchor:none]">
-                <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-                  <Icon name="arrow-right" size={14} className="text-status-warning" />
-                  <span className="text-sm font-semibold text-text-primary">
-                    {t('common:smartSplit.transfers')}
-                  </span>
-                  {transfers.length > 0 && (
-                    <Badge
-                      variant="default"
-                      className="ml-auto border-0 bg-status-warning/15 text-xs text-status-warning"
-                    >
-                      {t('common:smartSplit.aboveThreshold', {
-                        amount: formatEurFromCents(thresholdInCents, fmtLocale),
-                      })}
-                    </Badge>
-                  )}
-                </div>
-                {transfers.length > 0 ? (
-                  <div className="divide-y divide-border">
-                    {transfers.map((diff, i) => (
-                      <div key={i} className="flex items-center justify-between gap-3 px-4 py-3.5">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <span className="truncate text-sm font-semibold text-text-primary">
-                            {diff.fromPerson.name}
-                          </span>
-                          <Icon
-                            name="arrow-right"
-                            size={14}
-                            className="shrink-0 text-status-warning"
-                          />
-                          <span className="truncate text-sm font-semibold text-text-primary">
-                            {diff.toPerson.name}
-                          </span>
-                        </div>
-                        <span className="shrink-0 rounded-full bg-status-warning/15 px-2.5 py-0.5 font-mono text-sm font-bold text-status-warning">
-                          {formatEurFromCents(diff.amountInCents, fmtLocale)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 px-4 py-3.5 text-sm text-text-secondary">
-                    <Icon name="check" size={14} className="text-status-success" />
-                    {t('common:smartSplit.noTransfers')}
-                  </div>
-                )}
-              </div>
-            ) : undefined
+            <>
+              {transfersCard}
+              {fairnessRow}
+            </>
           }
-          beforeSummary={
-            isSmartMode && fairnessScore !== undefined ? (
-              <div className="flex items-center gap-2 px-1">
-                <Icon
-                  name="star"
-                  size={14}
-                  className={
-                    (postScore ?? fairnessScore) >= 95
-                      ? 'text-status-success'
-                      : 'text-status-warning'
-                  }
-                />
-                <span className="flex-1 text-sm text-text-secondary">
-                  {t('common:smartSplit.fairnessScore')}
-                </span>
-                {postScore !== undefined ? (
-                  <span className="flex items-center gap-1.5">
-                    <span className={cn('font-mono text-sm font-bold', scoreColor(fairnessScore))}>
-                      {fairnessScore}%
-                    </span>
-                    <Icon name="arrow-right" size={12} className="text-text-secondary" />
-                    <span className={cn('font-mono text-sm font-bold', scoreColor(postScore))}>
-                      {postScore}%
-                    </span>
-                  </span>
-                ) : (
-                  <span className={cn('font-mono text-sm font-bold', scoreColor(fairnessScore))}>
-                    {fairnessScore}%
-                  </span>
-                )}
-              </div>
-            ) : undefined
-          }
-          afterSummary={settingsDropdown}
+          afterSummary={settingsCard}
         />
       )}
 
@@ -481,7 +499,7 @@ export function ResultsScreen() {
               type="button"
               disabled={smartOutput.output === null}
               onClick={() => setGuestFinishOpen(true)}
-              className="min-h-14 flex-[2] text-base font-semibold"
+              className="min-h-14 flex-2 text-base font-semibold"
             >
               {t('screens:results.finishGuest')}
             </Button>
@@ -490,7 +508,7 @@ export function ResultsScreen() {
               type="button"
               disabled={smartOutput.output === null}
               onClick={handleSaveAndFinish}
-              className="min-h-14 flex-[2] text-base font-semibold"
+              className="min-h-14 flex-2 text-base font-semibold"
             >
               <Icon name="save" size={18} />
               {t('screens:results.saveAndFinish')}
