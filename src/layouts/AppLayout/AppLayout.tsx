@@ -76,7 +76,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <HeaderBar />
 
       {/* Dedicated scroll container — keeps touch events responsive during momentum scroll */}
-      <div id="main-scroll" className="min-h-0 flex-1 overflow-y-auto pb-24">
+      <div id="main-scroll" className="min-h-0 flex-1 overflow-y-auto overscroll-none pb-24">
         {children}
       </div>
 
