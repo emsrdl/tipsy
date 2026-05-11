@@ -72,7 +72,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   ];
 
   return (
-    <div className="flex h-dvh flex-col bg-surface">
+    <div className="fixed inset-0 flex flex-col bg-surface">
       <HeaderBar />
 
       {/* Dedicated scroll container — keeps touch events responsive during momentum scroll */}

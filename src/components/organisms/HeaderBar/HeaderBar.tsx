@@ -20,7 +20,7 @@ import { ProfileAvatar } from '@/components/molecules/ProfileAvatar/ProfileAvata
 import { useTheme } from '@/hooks/useTheme';
 
 /**
- * Material AppBar: sticky, 56px tall, elevation shadow, safe-area aware.
+ * Material AppBar: 56px tall, elevation shadow, safe-area aware.
  * Logo navigates to the root route. Language selection is in Settings.
  *
  * @returns header element
@@ -33,7 +33,7 @@ export function HeaderBar() {
   const { colorMode, toggleColorMode } = useTheme();
 
   return (
-    <header className="pt-safe sticky top-0 z-40 bg-surface shadow-elevation-2">
+    <header className="pt-safe z-40 bg-surface shadow-elevation-2">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
         {/* Left: Logo + App Name as single home link */}
         <Link
