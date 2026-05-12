@@ -1,14 +1,10 @@
 /**
  * @file src/components/organisms/HeaderBar/HeaderBar.tsx
- * @description HeaderBar organism — Material AppBar (56px, elevation, safe area).
+ * @description Material AppBar — 56px, safe-area aware, 48px touch targets.
  *
- * Touch-first: 48px icon buttons, safe area top padding for notched devices.
- * Uses Material elevation shadow instead of border.
- * Logo links to the default route (/). Language toggle is in Settings.
- *
- * @example
- * // Used inside AppLayout
- * <HeaderBar />
+ * Separator is a 1px border rather than an elevation shadow: drop-shadow blur
+ * bleeds ~3px above the element, producing a visible band against the iOS-drawn
+ * status-bar tint that overlays `pt-safe` in PWA `black-translucent` mode.
  */
 
 import { Link } from 'react-router-dom';
@@ -19,21 +15,13 @@ import { Icon } from '@/components/atoms/Icon/Icon';
 import { ProfileAvatar } from '@/components/molecules/ProfileAvatar/ProfileAvatar';
 import { useTheme } from '@/hooks/useTheme';
 
-/**
- * Material AppBar: 56px tall, elevation shadow, safe-area aware.
- * Logo navigates to the root route. Language selection is in Settings.
- *
- * @returns header element
- *
- * @example
- * <HeaderBar />
- */
+/** Material AppBar: 56px tall, safe-area aware. Logo navigates to `/`. */
 export function HeaderBar() {
   const { t } = useTranslation('common');
   const { colorMode, toggleColorMode } = useTheme();
 
   return (
-    <header className="pt-safe z-40 bg-surface shadow-elevation-2">
+    <header className="pt-safe z-40 border-b border-border bg-surface">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
         {/* Left: Logo + App Name as single home link */}
         <Link

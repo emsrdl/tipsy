@@ -28,9 +28,8 @@
         var root = document.documentElement;
         root.setAttribute('data-theme', theme);
         root.setAttribute('data-mode', mode);
-        var accent =
-          ACCENTS[theme][localStorage.getItem(LS.accent)] ||
-          ACCENTS[theme][Object.keys(ACCENTS[theme])[0]];
+        document.querySelector('meta[name="theme-color"]').content = SURFACES[theme][mode];
+        var accent = ACCENTS[theme][localStorage.getItem(LS.accent)];
         if (accent) {
           root.style.setProperty('--color-accent', accent.hex);
           root.style.setProperty('--color-accent-hover', accent.hoverHex);
@@ -38,9 +37,6 @@
             '--color-accent-subtle',
             mode === 'dark' ? accent.subtleDarkHex : accent.subtleHex,
           );
-          document.querySelector('meta[name="theme-color"]').content = accent.hex;
-        } else {
-          document.querySelector('meta[name="theme-color"]').content = SURFACES[theme][mode];
         }
       })();
     </script>

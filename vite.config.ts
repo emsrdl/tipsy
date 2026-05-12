@@ -107,15 +107,9 @@ const ACCENT_MAP_JSON = JSON.stringify(
 /**
  * Static `theme-color` for the meta tag in index.html — covers the
  * pre-paint window before the boot script runs, plus the no-JS case.
- * Uses the first theme's default accent so the status-bar tint matches
- * the rest of the UI rather than the surface (which is the same across
- * accents and would not reflect the user's theme).
+ * Uses the first theme's dark surface as a sensible default.
  */
-const BOOT_SURFACE = (() => {
-  const t = THEMES[THEME_IDS[0]];
-  const a = t.accentColors.find((c) => c.id === t.defaultAccentId) ?? t.accentColors[0]!;
-  return a.hex;
-})();
+const BOOT_SURFACE = THEMES[THEME_IDS[0]].palette.dark.surface;
 
 const LS_KEYS_JSON = JSON.stringify({
   theme: LS_THEME_KEY,

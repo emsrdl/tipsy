@@ -60,14 +60,10 @@ function injectAccentVars(accent: AccentColor, mode: ColorMode): void {
   document.documentElement.style.setProperty('--color-accent-subtle', subtle);
 }
 
-/**
- * Sync the PWA status-bar tint with the active accent color so the iOS Safari
- * URL-bar band / Android Chrome chrome reflects the user's selected theme
- * rather than the default surface.
- */
-function syncStatusBarColor(accent: AccentColor): void {
+/** Sync the PWA status-bar tint to the given color. */
+function syncStatusBarColor(color: string): void {
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-  if (meta && meta.content !== accent.hex) meta.content = accent.hex;
+  if (meta && meta.content !== color) meta.content = color;
 }
 
 function getInitialColorMode(): ColorMode {
@@ -99,7 +95,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     document.documentElement.setAttribute('data-theme', themeId);
     document.documentElement.setAttribute('data-mode', colorMode);
     injectAccentVars(accentColor, colorMode);
-    syncStatusBarColor(accentColor);
+    syncStatusBarColor(theme.palette[colorMode].surface);
   }, [themeId, theme, accentColor, colorMode]);
 
   const setTheme = useCallback((id: ThemeId) => {
