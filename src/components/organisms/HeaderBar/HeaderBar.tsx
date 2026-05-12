@@ -2,9 +2,10 @@
  * @file src/components/organisms/HeaderBar/HeaderBar.tsx
  * @description Material AppBar — 56px, safe-area aware, 48px touch targets.
  *
- * Separator is a 1px border rather than an elevation shadow: drop-shadow blur
- * bleeds ~3px above the element, producing a visible band against the iOS-drawn
- * status-bar tint that overlays `pt-safe` in PWA `black-translucent` mode.
+ * Uses elevation shadow clipped at the top edge (clip-path inset 0 …) so
+ * the shadow renders only below the bar. Without the clip, blur bleeds ~3px
+ * upward and creates a visible band against the iOS status-bar tint in PWA
+ * black-translucent mode.
  */
 
 import { Link } from 'react-router-dom';
@@ -21,7 +22,7 @@ export function HeaderBar() {
   const { colorMode, toggleColorMode } = useTheme();
 
   return (
-    <header className="pt-safe z-40 border-b border-border bg-surface">
+    <header className="pt-safe z-40 bg-surface shadow-elevation-2 [clip-path:inset(0_-20px_-20px_-20px)]">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
         {/* Left: Logo + App Name as single home link */}
         <Link
