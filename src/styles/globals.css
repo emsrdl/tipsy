@@ -245,4 +245,14 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /*
+   * Elevation shadow clipped at the top edge so blur doesn't bleed upward
+   * into the iOS safe-area-inset-top region (which iOS paints from theme-color
+   * in PWA black-translucent mode, creating a visible band without this clip).
+   */
+  .shadow-elevation-2-top-clipped {
+    box-shadow: var(--shadow-elevation-2);
+    clip-path: inset(0 -20px -20px -20px);
+  }
 }
