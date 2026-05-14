@@ -15,6 +15,7 @@ import { EmployeeRow } from '@/components/molecules/EmployeeRow/EmployeeRow';
 import { Button } from '@/components/atoms/Button/Button';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
+import { getScrollEl } from '@/hooks/usePreserveScroll';
 import type { Employee } from '@/types/employee';
 
 function generateId(): string {
@@ -49,8 +50,8 @@ export function EmployeeForm() {
     };
     addEmployee(employee);
     setTimeout(() => {
-      const scroller = document.getElementById('main-scroll');
-      if (scroller) scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' });
+      const el = getScrollEl();
+      if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }, 0);
   }
 
