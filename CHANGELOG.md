@@ -1,3 +1,15 @@
+## [0.6.3](https://github.com/emsrdl/tipsy/compare/v0.6.2...v0.6.3) (2026-05-14)
+
+
+### Bug Fixes
+
+* enhance shadow elevation clipping for HeaderBar and clarify CSS comments ([c89a8e6](https://github.com/emsrdl/tipsy/commit/c89a8e6e78bc2ffca4c17d92131f397b06bb7cb4))
+* implement elevation shadow clipping for HeaderBar and update theme color handling ([5d38b5f](https://github.com/emsrdl/tipsy/commit/5d38b5f45392d0ca90999e540d30b886960f7f64))
+* remove status-bar strip and restore elevation shadow on HeaderBar ([#23](https://github.com/emsrdl/tipsy/issues/23)) ([a9e263e](https://github.com/emsrdl/tipsy/commit/a9e263e17cd3edadf3cb76c0ac73aa346d279785))
+* update HeaderBar to use elevation shadow and remove border styling ([5f85365](https://github.com/emsrdl/tipsy/commit/5f853659fdf73447c5c639f2ae5ea4ad25e405c2))
+* update theme color handling and sync with active accent color ([6b3196d](https://github.com/emsrdl/tipsy/commit/6b3196d2ddd2dac128522c55133d5923e0b89051))
+* update theme color handling to sync with active accent color ([6496b41](https://github.com/emsrdl/tipsy/commit/6496b4147fe7a96ca164bf75bf040c730b428ccf))
+
 ## [0.6.2](https://github.com/emsrdl/tipsy/compare/v0.6.1...v0.6.2) (2026-05-11)
 
 
