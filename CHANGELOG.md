@@ -1,3 +1,11 @@
+## [0.6.4](https://github.com/emsrdl/tipsy/compare/v0.6.3...v0.6.4) (2026-05-14)
+
+
+### Bug Fixes
+
+* ensure smooth scrolling to the bottom after adding an employee ([a5b7ca7](https://github.com/emsrdl/tipsy/commit/a5b7ca7fa4331c81589f3019dbb81b9e60d0318c))
+* ensure smooth scrolling to the bottom after adding an employee ([#24](https://github.com/emsrdl/tipsy/issues/24)) ([56ab80e](https://github.com/emsrdl/tipsy/commit/56ab80e56ef30b3f0e65549a247957bb37f18621))
+
 ## [0.6.3](https://github.com/emsrdl/tipsy/compare/v0.6.2...v0.6.3) (2026-05-14)
 
 
