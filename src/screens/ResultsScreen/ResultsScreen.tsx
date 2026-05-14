@@ -14,8 +14,8 @@ import {
   usePreserveScroll,
   markFlowReset,
   getScrollRatio,
-  getScrollEl,
 } from '@/hooks/usePreserveScroll';
+import { getScrollEl } from '@/utils/scrollContainer';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/layouts/ScreenContainer/ScreenContainer';
 import { DistributionTable } from '@/components/organisms/DistributionTable/DistributionTable';

@@ -15,7 +15,7 @@ import { EmployeeRow } from '@/components/molecules/EmployeeRow/EmployeeRow';
 import { Button } from '@/components/atoms/Button/Button';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
-import { getScrollEl } from '@/hooks/usePreserveScroll';
+import { getScrollEl } from '@/utils/scrollContainer';
 import type { Employee } from '@/types/employee';
 
 function generateId(): string {

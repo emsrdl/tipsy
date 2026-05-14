@@ -23,8 +23,8 @@ import {
   saveScrollPosition,
   getLastCalculateRoute,
   updateLastCalculateRoute,
-  getScrollEl,
 } from '@/hooks/usePreserveScroll';
+import { getScrollEl } from '@/utils/scrollContainer';
 import { useTranslation } from 'react-i18next';
 import { HeaderBar } from '@/components/organisms/HeaderBar/HeaderBar';
 import { Icon } from '@/components/atoms/Icon/Icon';
