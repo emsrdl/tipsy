@@ -24,7 +24,7 @@ import {
   getLastCalculateRoute,
   updateLastCalculateRoute,
 } from '@/hooks/usePreserveScroll';
-import { getScrollEl } from '@/utils/scrollContainer';
+import { getScrollEl, SCROLL_CONTAINER_ID } from '@/utils/scrollContainer';
 import { useTranslation } from 'react-i18next';
 import { HeaderBar } from '@/components/organisms/HeaderBar/HeaderBar';
 import { Icon } from '@/components/atoms/Icon/Icon';
@@ -76,7 +76,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <HeaderBar />
 
       {/* Dedicated scroll container — keeps touch events responsive during momentum scroll */}
-      <div id="main-scroll" className="min-h-0 flex-1 overflow-y-auto pb-24">
+      <div id={SCROLL_CONTAINER_ID} className="min-h-0 flex-1 overflow-y-auto pb-24">
         {children}
       </div>
 
