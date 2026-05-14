@@ -1,3 +1,13 @@
+## [0.6.2](https://github.com/emsrdl/tipsy/compare/v0.6.1...v0.6.2) (2026-05-11)
+
+
+### Bug Fixes
+
+* prevent overscroll behavior in main scroll container of AppLayout ([e422783](https://github.com/emsrdl/tipsy/commit/e4227834bc2a7432ecb3b4f81956972d0111a8a3))
+* remove sticky positioning from HeaderBar and update AppLayout scroll container ([88cd643](https://github.com/emsrdl/tipsy/commit/88cd643d9f3f185f84170546abdb261e12b2af8c))
+* update overscroll behavior in main scroll container of AppLayout ([ecc3cbc](https://github.com/emsrdl/tipsy/commit/ecc3cbc5276cabc42d2c886bdb0ff4847ba2ef8b))
+* vanishing navbar ([#22](https://github.com/emsrdl/tipsy/issues/22)) ([a5de06d](https://github.com/emsrdl/tipsy/commit/a5de06dcdec9627d0e8659664a076cf62f91e4b6))
+
 ## [0.6.1](https://github.com/emsrdl/tipsy/compare/v0.6.0...v0.6.1) (2026-05-10)
 
 
