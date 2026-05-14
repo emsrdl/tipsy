@@ -250,9 +250,19 @@
    * Elevation shadow clipped at the top edge so blur doesn't bleed upward
    * into the iOS safe-area-inset-top region (which iOS paints from theme-color
    * in PWA black-translucent mode, creating a visible band without this clip).
+   *
+   * Shadow is applied via ::after so that clip-path does not clip absolutely
+   * positioned descendants of the element (e.g. the ProfileAvatar dropdown).
    */
   .shadow-elevation-2-top-clipped {
+    position: relative;
+  }
+  .shadow-elevation-2-top-clipped::after {
+    content: '';
+    position: absolute;
+    inset: 0;
     box-shadow: var(--shadow-elevation-2);
     clip-path: inset(0 -20px -20px -20px);
+    pointer-events: none;
   }
 }

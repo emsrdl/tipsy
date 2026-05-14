@@ -2,7 +2,8 @@
  * @file src/components/organisms/HeaderBar/HeaderBar.tsx
  * @description Material AppBar — 56px, safe-area aware, 48px touch targets.
  *
- * Uses `shadow-elevation-2-top-clipped` (see globals.css).
+ * Uses `shadow-elevation-2-top-clipped` (see globals.css) — shadow is rendered
+ * via `::after` so `clip-path` does not clip absolutely positioned descendants.
  */
 
 import { Link } from 'react-router-dom';
