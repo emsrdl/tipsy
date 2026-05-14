@@ -26,7 +26,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { THEMES, THEME_IDS } from '@/config/themes';
 import { LS_THEME_KEY, LS_ACCENT_KEY, LS_MODE_KEY } from '@/config/storageKeys';
-import type { ThemeId, ColorMode, AccentColor, Theme } from '@/types/theme';
+import type { ThemeId, ColorMode, AccentColor, Theme, ThemePalette } from '@/types/theme';
 import { env } from '@/config/env';
 
 export interface ThemeContextValue {
@@ -52,7 +52,38 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
-/** Injects accent CSS custom properties onto document.documentElement */
+/** Pre-computed map from ThemePalette key → CSS custom property name. */
+const PALETTE_CSS_VARS: Record<keyof ThemePalette, string> = {
+  surface: '--color-surface',
+  surfaceRaised: '--color-surface-raised',
+  surfaceOverlay: '--color-surface-overlay',
+  textPrimary: '--color-text-primary',
+  textSecondary: '--color-text-secondary',
+  textInverse: '--color-text-inverse',
+  border: '--color-border',
+  borderStrong: '--color-border-strong',
+  statusError: '--color-status-error',
+  statusSuccess: '--color-status-success',
+  statusWarning: '--color-status-warning',
+};
+
+/**
+ * Injects palette CSS custom properties inline on `document.documentElement`.
+ * Inline styles have higher specificity than the build-time PALETTE_CSS selector
+ * rules, so they take effect immediately on mode/theme changes without a page reload.
+ */
+function injectPaletteVars(theme: Theme, mode: ColorMode): void {
+  const palette = theme.palette[mode];
+  const root = document.documentElement;
+  for (const key of Object.keys(PALETTE_CSS_VARS) as (keyof ThemePalette)[]) {
+    root.style.setProperty(PALETTE_CSS_VARS[key], palette[key]);
+  }
+}
+
+/**
+ * Injects accent CSS custom properties inline on `document.documentElement`.
+ * Same rationale as injectPaletteVars — bypasses the static CSS cascade.
+ */
 function injectAccentVars(accent: AccentColor, mode: ColorMode): void {
   const subtle = mode === 'dark' ? accent.subtleDarkHex : accent.subtleHex;
   document.documentElement.style.setProperty('--color-accent', accent.hex);
@@ -60,11 +91,10 @@ function injectAccentVars(accent: AccentColor, mode: ColorMode): void {
   document.documentElement.style.setProperty('--color-accent-subtle', subtle);
 }
 
-/** Sync the PWA status-bar tint with the active surface color. */
-function syncStatusBarColor(theme: Theme, mode: ColorMode): void {
-  const surface = theme.palette[mode].surface;
+/** Sync the PWA status-bar tint to the given color. */
+function syncStatusBarColor(color: string): void {
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-  if (meta && meta.content !== surface) meta.content = surface;
+  if (meta && meta.content !== color) meta.content = color;
 }
 
 function getInitialColorMode(): ColorMode {
@@ -95,9 +125,13 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', themeId);
     document.documentElement.setAttribute('data-mode', colorMode);
+    injectPaletteVars(theme, colorMode);
+    syncStatusBarColor(theme.palette[colorMode].surface);
+  }, [themeId, theme, colorMode]);
+
+  useEffect(() => {
     injectAccentVars(accentColor, colorMode);
-    syncStatusBarColor(theme, colorMode);
-  }, [themeId, theme, accentColor, colorMode]);
+  }, [accentColor, colorMode]);
 
   const setTheme = useCallback((id: ThemeId) => {
     setThemeId(id);
