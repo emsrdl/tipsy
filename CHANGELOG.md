@@ -1,3 +1,13 @@
+## [0.6.5](https://github.com/emsrdl/tipsy/compare/v0.6.4...v0.6.5) (2026-05-17)
+
+
+### Bug Fixes
+
+* centralize scroll container ID for consistent access across components ([246b32a](https://github.com/emsrdl/tipsy/commit/246b32a7c67ba11bb8e42432efc0914656d01de9))
+* replace direct DOM manipulation with getScrollEl for smooth scro… ([#25](https://github.com/emsrdl/tipsy/issues/25)) ([d77f473](https://github.com/emsrdl/tipsy/commit/d77f473106cc9d7e567f0a85fd88bd1cb3e24ffb))
+* replace direct DOM manipulation with getScrollEl for smooth scrolling after adding an employee ([8335913](https://github.com/emsrdl/tipsy/commit/83359133a0e1b90254ee4706d185db55195335cc))
+* replace setTimeout with requestAnimationFrame for smoother scrolling after adding an employee ([9fb1650](https://github.com/emsrdl/tipsy/commit/9fb1650b4bb2a158ae655cbd2d77938d3e632952))
+
 ## [0.6.4](https://github.com/emsrdl/tipsy/compare/v0.6.3...v0.6.4) (2026-05-14)
 
 
