@@ -34,6 +34,7 @@ function generateId(): string {
 export function EmployeeForm() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const { session, addEmployee, removeEmployee, updateEmployee } = useTipCalculator();
+
   const sortedEmployees = [...session.employees].sort((a, b) => {
     const aIsProfile = a.id.startsWith('profile-emp-');
     const bIsProfile = b.id.startsWith('profile-emp-');
@@ -49,10 +50,10 @@ export function EmployeeForm() {
       group: 'service',
     };
     addEmployee(employee);
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       const el = getScrollEl();
       if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-    }, 0);
+    });
   }
 
   return (
