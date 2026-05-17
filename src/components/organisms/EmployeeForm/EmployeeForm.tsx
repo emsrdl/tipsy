@@ -15,6 +15,7 @@ import { EmployeeRow } from '@/components/molecules/EmployeeRow/EmployeeRow';
 import { Button } from '@/components/atoms/Button/Button';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { useTipCalculator } from '@/hooks/useTipCalculator';
+import { getScrollEl } from '@/utils/scrollContainer';
 import type { Employee } from '@/types/employee';
 
 function generateId(): string {
@@ -33,6 +34,7 @@ function generateId(): string {
 export function EmployeeForm() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const { session, addEmployee, removeEmployee, updateEmployee } = useTipCalculator();
+
   const sortedEmployees = [...session.employees].sort((a, b) => {
     const aIsProfile = a.id.startsWith('profile-emp-');
     const bIsProfile = b.id.startsWith('profile-emp-');
@@ -48,10 +50,10 @@ export function EmployeeForm() {
       group: 'service',
     };
     addEmployee(employee);
-    setTimeout(() => {
-      const scroller = document.getElementById('main-scroll');
-      if (scroller) scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' });
-    }, 0);
+    requestAnimationFrame(() => {
+      const el = getScrollEl();
+      if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    });
   }
 
   return (

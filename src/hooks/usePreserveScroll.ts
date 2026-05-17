@@ -13,12 +13,7 @@
 
 import { useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-
-const SCROLL_CONTAINER_ID = 'main-scroll';
-
-export function getScrollEl(): HTMLElement | null {
-  return document.getElementById(SCROLL_CONTAINER_ID);
-}
+import { getScrollEl } from '@/utils/scrollContainer';
 
 function getMaxScroll(el: HTMLElement): number {
   return Math.max(0, el.scrollHeight - el.clientHeight);
