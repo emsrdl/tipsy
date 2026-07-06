@@ -14,7 +14,7 @@
  * @see src/lib/calc/cashSplitSuggester for the completion/removal searches
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { DENOMINATIONS, getDenominationValue } from '@/config/currency';
 import {
   sumBreakdownCents,
@@ -70,22 +70,35 @@ function piecesToQuantities(pieces: CashPieces): Record<string, number> {
 
 /**
  * Drives the cash-split dialog: holds the selection and recomputes the
- * verified guidance for it. Resets to empty whenever `suggestion` changes.
+ * verified guidance for it. Resets to `initialPieces` (or empty) whenever
+ * `suggestion` changes.
+ *
+ * @param initialPieces - Optional pre-fill for review/edit mode (e.g. an
+ *   already-applied split the user wants to review or modify).
  */
 export function useCashSplitGuidance(
   suggestion: CashSplitSuggestion | null,
   input: CashSplitPoolInput,
+  initialPieces?: CashPieces,
 ): CashSplitGuidance {
   const { denominations, employees, totalInCents, kitchenPercent, thresholdInCents } = input;
 
   const sourceValueCents = suggestion ? getDenominationValue(suggestion.sourceDenominationId) : 0;
 
-  // Starts EMPTY — the user counts the pieces out of the till; guidance shows
-  // the best path from wherever they are.
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  // Stable ref so the reset effect can read the latest initialPieces without
+  // listing it as a dependency (it changes identity on every render).
+  const initialPiecesRef = useRef(initialPieces);
+  initialPiecesRef.current = initialPieces;
+
+  // Starts from initialPieces if provided (review mode), otherwise empty.
+  const [quantities, setQuantities] = useState<Record<string, number>>(
+    () => (initialPieces ? piecesToQuantities(initialPieces) : {}),
+  );
 
   useEffect(() => {
-    if (suggestion) setQuantities({});
+    setQuantities(
+      initialPiecesRef.current ? piecesToQuantities(initialPiecesRef.current) : {},
+    );
   }, [suggestion]);
 
   const breakdowns = useMemo(() => suggestion?.breakdowns ?? [], [suggestion]);

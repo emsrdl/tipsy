@@ -157,6 +157,10 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
     setSession((s) => ({
       ...s,
       results: null,
+      // Applied splits are keyed to a specific denomination state. Editing the
+      // cash input treats the new state as the new baseline, so prior splits
+      // are no longer meaningful and must be cleared.
+      appliedCashSplits: [],
       denominations: s.denominations.map((d) =>
         d.denominationId === denominationId ? { ...d, quantity } : d,
       ),

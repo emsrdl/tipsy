@@ -11,7 +11,7 @@
  * @see src/components/molecules/CashSplitDialog for the picker
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { CashSplitDialog } from '@/components/molecules/CashSplitDialog';
@@ -48,16 +48,72 @@ export function CashSplitSuggestions({
 }: CashSplitSuggestionsProps) {
   const { t } = useTranslation('common');
   const [dialogSuggestion, setDialogSuggestion] = useState<CashSplitSuggestion | null>(null);
+  const [reviewApplied, setReviewApplied] = useState<AppliedCashSplit | null>(null);
+
+  const isReviewMode = reviewApplied !== null;
+
+  // For the review dialog, simulate the pool as it was before the split so
+  // the transfer-count preview reflects applying the breakdown fresh.
+  const reviewDenominations = useMemo(() => {
+    if (!reviewApplied) return denominations;
+    const pieceMap = new Map<string, number>();
+    for (const p of reviewApplied.actualPieces) {
+      if (p.count > 0) pieceMap.set(p.denominationId, (pieceMap.get(p.denominationId) ?? 0) + p.count);
+    }
+    return denominations.map((d) => {
+      if (d.denominationId === reviewApplied.sourceDenominationId) return { ...d, quantity: d.quantity + 1 };
+      const remove = pieceMap.get(d.denominationId);
+      if (remove !== undefined) return { ...d, quantity: Math.max(0, d.quantity - remove) };
+      return d;
+    });
+  }, [reviewApplied, denominations]);
+
+  // Synthetic suggestion for the review dialog. predictedTransferCount is set
+  // to Infinity so any exact breakdown is treated as "goal reached" (green).
+  const reviewSuggestion = useMemo<CashSplitSuggestion | null>(() => {
+    if (!reviewApplied) return null;
+    return {
+      id: reviewApplied.id,
+      sourceDenominationId: reviewApplied.sourceDenominationId,
+      breakdowns: [{ pieces: reviewApplied.actualPieces, predictedTransferCount: Number.POSITIVE_INFINITY }],
+      currentTransferCount: 0,
+      predictedTransferCount: Number.POSITIVE_INFINITY,
+    };
+  }, [reviewApplied]);
+
+  const activeSuggestion = isReviewMode ? reviewSuggestion : dialogSuggestion;
+  const activeDenominations = isReviewMode ? reviewDenominations : denominations;
 
   const totalOptions = suggestions.length + appliedSplits.length;
   if (totalOptions === 0) return null;
 
   const showSectionLabels = suggestions.length > 0 && appliedSplits.length > 0;
 
-  function handleApplyConfirm(pieces: CashPieces) {
-    if (!dialogSuggestion) return;
-    onApply(dialogSuggestion, pieces);
-    setDialogSuggestion(null);
+  function handleDialogConfirm(pieces: CashPieces) {
+    if (isReviewMode && reviewApplied && reviewSuggestion) {
+      // Revert the original split then re-apply with the (possibly modified) pieces.
+      onRevert(reviewApplied.id);
+      onApply(reviewSuggestion, pieces);
+      setReviewApplied(null);
+    } else if (dialogSuggestion) {
+      onApply(dialogSuggestion, pieces);
+      setDialogSuggestion(null);
+    }
+  }
+
+  function handleDialogRevert() {
+    if (reviewApplied) {
+      onRevert(reviewApplied.id);
+      setReviewApplied(null);
+    }
+  }
+
+  function handleDialogCancel() {
+    if (isReviewMode) {
+      setReviewApplied(null);
+    } else {
+      setDialogSuggestion(null);
+    }
   }
 
   return (
@@ -87,7 +143,7 @@ export function CashSplitSuggestions({
             <div className="space-y-2">
               {showSectionLabels && <SectionLabel label={t('smartSplit.cashSplits.applied')} />}
               {appliedSplits.map((a) => (
-                <AppliedCard key={a.id} applied={a} onRevert={onRevert} />
+                <AppliedCard key={a.id} applied={a} onOpenReview={() => setReviewApplied(a)} />
               ))}
             </div>
           )}
@@ -95,15 +151,18 @@ export function CashSplitSuggestions({
       </div>
 
       <CashSplitDialog
-        open={dialogSuggestion !== null}
-        suggestion={dialogSuggestion}
-        denominations={denominations}
+        key={activeSuggestion?.id ?? 'closed'}
+        open={activeSuggestion !== null}
+        suggestion={activeSuggestion}
+        {...(reviewApplied ? { initialPieces: reviewApplied.actualPieces } : {})}
+        {...(isReviewMode ? { onRevert: handleDialogRevert } : {})}
+        denominations={activeDenominations}
         employees={employees}
         totalInCents={totalInCents}
         kitchenPercent={kitchenPercent}
         thresholdInCents={thresholdInCents}
-        onConfirm={handleApplyConfirm}
-        onCancel={() => setDialogSuggestion(null)}
+        onConfirm={handleDialogConfirm}
+        onCancel={handleDialogCancel}
       />
     </>
   );
@@ -183,10 +242,10 @@ function SuggestionCard({
 
 function AppliedCard({
   applied,
-  onRevert,
+  onOpenReview,
 }: {
   applied: AppliedCashSplit;
-  onRevert: (id: string) => void;
+  onOpenReview: () => void;
 }) {
   const { t } = useTranslation('common');
   return (
@@ -201,7 +260,7 @@ function AppliedCard({
         </div>
         <button
           type="button"
-          onClick={() => onRevert(applied.id)}
+          onClick={onOpenReview}
           aria-label={t('smartSplit.cashSplits.revert')}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-raised hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-secondary/60"
         >

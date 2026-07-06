@@ -106,6 +106,7 @@
       "dialogTransfers": "Überweisungen",
       "dialogConfirm": "Bestätigen",
       "dialogCancel": "Abbrechen",
+      "dialogRevert": "Wechsel rückgängig",
       "completeWith": "Ergänze mit",
       "addBadge": "Noch {{count}} hinzufügen",
       "removeBadge": "{{count}} entfernen",

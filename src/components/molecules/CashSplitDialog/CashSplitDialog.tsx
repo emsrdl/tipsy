@@ -19,6 +19,11 @@
  * count simulated for the actual selection (only when the total matches the
  * source value exactly — a partial selection shows "—"). Confirm stays
  * disabled until the total matches exactly.
+ *
+ * Review mode (onRevert provided): the dialog opens pre-filled with
+ * `initialPieces` so the user can inspect and optionally modify the breakdown
+ * of an already-applied split. The footer adds a destructive "Revert" button
+ * that undoes the split entirely.
  */
 
 import { useMemo } from 'react';
@@ -44,8 +49,12 @@ interface CashSplitDialogProps {
   totalInCents: number;
   kitchenPercent: number;
   thresholdInCents: number;
+  /** Pre-fills the picker for review mode (an already-applied split). */
+  initialPieces?: CashPieces;
   onConfirm: (pieces: CashPieces) => void;
   onCancel: () => void;
+  /** When provided, renders a destructive "Revert" button (review mode). */
+  onRevert?: () => void;
 }
 
 export function CashSplitDialog({
@@ -56,8 +65,10 @@ export function CashSplitDialog({
   totalInCents,
   kitchenPercent,
   thresholdInCents,
+  initialPieces,
   onConfirm,
   onCancel,
+  onRevert,
 }: CashSplitDialogProps) {
   const { t } = useTranslation(['common', 'screens']);
   const { fmtLocale } = useLocale();
@@ -83,9 +94,11 @@ export function CashSplitDialog({
     setQty,
     addPieces,
     maxQtyFor,
-  } = useCashSplitGuidance(suggestion, {
-    denominations, employees, totalInCents, kitchenPercent, thresholdInCents,
-  });
+  } = useCashSplitGuidance(
+    suggestion,
+    { denominations, employees, totalInCents, kitchenPercent, thresholdInCents },
+    initialPieces,
+  );
 
   // Only denominations smaller than the source can be used as breakdown pieces
   const { banknotes, coins } = useMemo(() => {
@@ -166,17 +179,24 @@ export function CashSplitDialog({
               </button>
             </div>
           )}
+          {/* In review mode only show the simulated result, not the "before" count */}
           <div className="flex items-center justify-between">
             <span className="text-xs text-text-secondary">
               {t('common:smartSplit.cashSplits.dialogTransfers')}
             </span>
             <span className="font-mono text-sm font-semibold text-text-primary">
-              {suggestion.currentTransferCount}
-              <span className="mx-1.5 text-text-secondary">→</span>
+              {onRevert ? null : (
+                <>
+                  {suggestion.currentTransferCount}
+                  <span className="mx-1.5 text-text-secondary">→</span>
+                </>
+              )}
               <span
                 className={cn(
                   previewTransferCount !== null &&
-                    previewTransferCount < suggestion.currentTransferCount &&
+                    (onRevert
+                      ? previewTransferCount === 0
+                      : previewTransferCount < suggestion.currentTransferCount) &&
                     'text-status-success',
                 )}
               >
@@ -201,20 +221,49 @@ export function CashSplitDialog({
           </div>
         </div>
 
-        <DialogFooter className="gap-2 border-t border-border bg-surface-raised p-3 sm:gap-2 sm:space-x-0">
-          <Button type="button" variant="ghost" className="flex-1" onClick={onCancel}>
-            {t('common:smartSplit.cashSplits.dialogCancel')}
-          </Button>
-          <Button
-            type="button"
-            variant="default"
-            className="flex-1"
-            disabled={!isExact}
-            onClick={handleConfirm}
-          >
-            {t('common:smartSplit.cashSplits.dialogConfirm')}
-          </Button>
-        </DialogFooter>
+        {onRevert ? (
+          // Review mode: destructive revert on top, cancel + confirm below
+          <div className="flex flex-col gap-2 border-t border-border bg-surface-raised p-3">
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full text-status-error hover:bg-status-error/10 hover:text-status-error"
+              onClick={onRevert}
+            >
+              <Icon name="undo-2" size={16} />
+              {t('common:smartSplit.cashSplits.dialogRevert')}
+            </Button>
+            <div className="flex gap-2">
+              <Button type="button" variant="ghost" className="flex-1" onClick={onCancel}>
+                {t('common:smartSplit.cashSplits.dialogCancel')}
+              </Button>
+              <Button
+                type="button"
+                variant="default"
+                className="flex-1"
+                disabled={!isExact}
+                onClick={handleConfirm}
+              >
+                {t('common:smartSplit.cashSplits.dialogConfirm')}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <DialogFooter className="gap-2 border-t border-border bg-surface-raised p-3 sm:gap-2 sm:space-x-0">
+            <Button type="button" variant="ghost" className="flex-1" onClick={onCancel}>
+              {t('common:smartSplit.cashSplits.dialogCancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              className="flex-1"
+              disabled={!isExact}
+              onClick={handleConfirm}
+            >
+              {t('common:smartSplit.cashSplits.dialogConfirm')}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

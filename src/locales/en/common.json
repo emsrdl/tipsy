@@ -106,6 +106,7 @@
       "dialogTransfers": "Transfers",
       "dialogConfirm": "Confirm",
       "dialogCancel": "Cancel",
+      "dialogRevert": "Undo split",
       "completeWith": "Complete with",
       "addBadge": "Add {{count}} more",
       "removeBadge": "Remove {{count}}",
