@@ -94,7 +94,7 @@ export function DenominationItem({
   // dialog only ever sets one of them per guidance mode.
   const showRed = removeCount > 0;
   const showGreen = !showRed && addCount > 0;
-  const showOrange = !showRed && !showGreen && (altCount ?? 0) > 0;
+  const showOrange = !showRed && !showGreen && (altCount ?? 0) > 0 && Boolean(onAltTap);
   const isOnPlan = rowValid && isActive;
 
   return (

@@ -181,7 +181,10 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
         if (sourceQty < 1) return s;
 
         const pieceMap = new Map<string, number>();
-        for (const piece of actualPieces) pieceMap.set(piece.denominationId, piece.count);
+        for (const piece of actualPieces) {
+          if (piece.count <= 0) continue;
+          pieceMap.set(piece.denominationId, (pieceMap.get(piece.denominationId) ?? 0) + piece.count);
+        }
 
         let newDenominations = s.denominations.map((d) => {
           if (d.denominationId === suggestion.sourceDenominationId) {
@@ -194,9 +197,9 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
 
         // Add any pieces for denominations not yet in the pool
         const presentIds = new Set(newDenominations.map((d) => d.denominationId));
-        for (const piece of actualPieces) {
-          if (!presentIds.has(piece.denominationId) && piece.count > 0) {
-            newDenominations = [...newDenominations, { denominationId: piece.denominationId, quantity: piece.count }];
+        for (const [denominationId, count] of pieceMap) {
+          if (!presentIds.has(denominationId)) {
+            newDenominations = [...newDenominations, { denominationId, quantity: count }];
           }
         }
 
@@ -225,7 +228,10 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
       if (!applied) return s;
 
       const pieceMap = new Map<string, number>();
-      for (const piece of applied.actualPieces) pieceMap.set(piece.denominationId, piece.count);
+      for (const piece of applied.actualPieces) {
+        if (piece.count <= 0) continue;
+        pieceMap.set(piece.denominationId, (pieceMap.get(piece.denominationId) ?? 0) + piece.count);
+      }
 
       const newDenominations = s.denominations.map((d) => {
         if (d.denominationId === applied.sourceDenominationId) return { ...d, quantity: d.quantity + 1 };

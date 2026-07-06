@@ -286,7 +286,10 @@ export function applyBreakdownToPool(
   // Decrement source
   const denomMap = new Map<string, number>();
   for (const d of denominations) denomMap.set(d.denominationId, d.quantity);
-  denomMap.set(sourceDenominationId, (denomMap.get(sourceDenominationId) ?? 0) - 1);
+
+  const sourceQty = denomMap.get(sourceDenominationId) ?? 0;
+  if (sourceQty < 1) return denominations;
+  denomMap.set(sourceDenominationId, sourceQty - 1);
 
   for (const piece of pieces) {
     denomMap.set(piece.denominationId, (denomMap.get(piece.denominationId) ?? 0) + piece.count);
