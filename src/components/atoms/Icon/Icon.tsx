@@ -50,6 +50,8 @@ import {
   Zap,
   Edit2,
   UserPlus,
+  Scissors,
+  Undo2,
   type LucideIcon,
 } from 'lucide-react';
 import type { IconName, IconProps } from './Icon.types';
@@ -92,6 +94,8 @@ const ICON_MAP: Record<IconName, LucideIcon> = {
   zap: Zap,
   'edit-2': Edit2,
   'user-plus': UserPlus,
+  scissors: Scissors,
+  'undo-2': Undo2,
 };
 
 /**

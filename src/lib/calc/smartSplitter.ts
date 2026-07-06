@@ -154,6 +154,7 @@ function buildSmartResult(
   const matchResult = matchDenominations({
     distributions: idealResults,
     available,
+    transferThresholdInCents: thresholdInCents,
   });
 
   // Build person shares from match result

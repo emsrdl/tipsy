@@ -92,7 +92,25 @@
     "helpText": "Ausgleichszahlungen werden vorgeschlagen, wenn die Abweichung diesen Betrag überschreitet.",
     "aboveThreshold": "über {{amount}} Schwellwert",
     "thresholdLabel": "Fairness-Schwellwert",
-    "noTransfers": "Keine Ausgleichszahlungen nötig"
+    "noTransfers": "Keine Ausgleichszahlungen nötig",
+    "cashSplits": {
+      "title": "Wechselgeld-Vorschläge",
+      "optionCount_one": "{{count}} Option",
+      "optionCount_other": "{{count}} Optionen",
+      "pending": "Ausstehend",
+      "applied": "Angewendet",
+      "openDetails": "Stückelung wählen",
+      "revert": "Rückgängig",
+      "dialogTitle": "{{source}} wechseln",
+      "dialogTotal": "Gesamt",
+      "dialogTransfers": "Überweisungen",
+      "dialogConfirm": "Bestätigen",
+      "dialogCancel": "Abbrechen",
+      "completeWith": "Ergänze mit",
+      "addBadge": "Noch {{count}} hinzufügen",
+      "removeBadge": "{{count}} entfernen",
+      "altBadge": "Alternative nutzt {{count}} — tippen zum Wechseln"
+    }
   },
   "toast": {
     "dismiss": "Schließen",

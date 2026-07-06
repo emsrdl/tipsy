@@ -13,6 +13,7 @@
  */
 
 import type { Employee } from './employee';
+import type { AppliedCashSplit } from './cashSplit';
 
 /**
  * A quantity of a specific EUR denomination.
@@ -90,4 +91,6 @@ export interface TipSession {
   denominations: DenominationQuantity[];
   /** Calculated results, or null if not yet computed. */
   results: DistributionResult[] | null;
+  /** Cash-split exchanges the user has accepted. Used to allow revert. */
+  appliedCashSplits: AppliedCashSplit[];
 }

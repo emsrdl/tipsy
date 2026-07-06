@@ -121,7 +121,7 @@ describe('smartSplit', () => {
       expect(output.distribution.remainingCents).toBe(0);
     });
 
-    it('ensures every working employee gets a non-zero amount', () => {
+    it('gives every working employee a non-zero amount when denominations allow', () => {
       const output = smartSplit(
         makeInput({
           smartMode: true,
@@ -131,7 +131,11 @@ describe('smartSplit', () => {
             makeEmployee({ id: 'e3', name: 'Cara', hours: 2, group: 'service' }),
           ],
           totalInCents: 15000,
-          denominations: [makeDenomQty('eur_50', 3)],
+          denominations: [
+            makeDenomQty('eur_50', 2),
+            makeDenomQty('eur_20', 2),
+            makeDenomQty('eur_5', 2),
+          ],
         }),
       );
       for (const share of output.distribution.personShares) {
@@ -139,6 +143,84 @@ describe('smartSplit', () => {
           expect(share.actualShareInCents).toBeGreaterThan(0);
         }
       }
+    });
+
+    it('prefers a zero payout over shifting the imbalance when the pool is too coarse', () => {
+      // One €50 for two people: whoever doesn't get the bill is compensated
+      // via transfer. Moving the bill to the smaller share would only grow
+      // the deviations (±3333 instead of ±1667).
+      const output = smartSplit(
+        makeInput({
+          smartMode: true,
+          employees: [
+            makeEmployee({ id: 'e1', name: 'Anna', hours: 8, group: 'service' }),
+            makeEmployee({ id: 'e2', name: 'Bob', hours: 4, group: 'service' }),
+          ],
+          totalInCents: 5000,
+          denominations: [makeDenomQty('eur_50', 1)],
+        }),
+      );
+      const anna = output.distribution.personShares.find((s) => s.name === 'Anna')!;
+      const bob = output.distribution.personShares.find((s) => s.name === 'Bob')!;
+      expect(anna.actualShareInCents).toBe(5000); // larger share holds the bill
+      expect(bob.actualShareInCents).toBe(0);
+      expect(output.differences).toHaveLength(1);
+      expect(output.differences[0]!.fromPerson.name).toBe('Anna');
+      expect(output.differences[0]!.amountInCents).toBe(1667);
+    });
+
+    it('does not push a settled employee over the threshold to fix a zero payout', () => {
+      // Pool: €100 + €50 + 2×€20 + €5 + 3×€2 for 9/7/5/3 hours. Anna lands
+      // 38ct under her ideal (settled). Handing her €5 to Dana (€0) would
+      // push Anna to −538 — above the €1 threshold — creating a brand-new
+      // transfer just so Dana holds a token bill.
+      const output = smartSplit(
+        makeInput({
+          smartMode: true,
+          employees: [
+            makeEmployee({ id: 'e1', name: 'Anna', hours: 9, group: 'service' }),
+            makeEmployee({ id: 'e2', name: 'Bob', hours: 7, group: 'service' }),
+            makeEmployee({ id: 'e3', name: 'Cleo', hours: 5, group: 'service' }),
+            makeEmployee({ id: 'e4', name: 'Dana', hours: 3, group: 'service' }),
+          ],
+          totalInCents: 20100,
+          denominations: [
+            makeDenomQty('eur_100', 1),
+            makeDenomQty('eur_50', 1),
+            makeDenomQty('eur_20', 2),
+            makeDenomQty('eur_5', 1),
+            makeDenomQty('eur_2', 3),
+          ],
+          fairnessThresholdInCents: 100,
+        }),
+      );
+      const anna = output.distribution.personShares.find((s) => s.name === 'Anna')!;
+      expect(Math.abs(anna.deviationInCents)).toBeLessThanOrEqual(100);
+      expect(output.differences).toHaveLength(2);
+    });
+
+    it('uses exchange swaps to settle imbalances below the smallest piece', () => {
+      // Ideals 1400/1600 with a €20 and a €10: greedy ends at 2000/1000
+      // (dev ±600). A one-way move can't help (±1000 swing), but exchanging
+      // the €20 for the €10 lands at 1000/2000 (dev ±400) — below the €5
+      // threshold, so no transfer is needed at all.
+      const output = smartSplit(
+        makeInput({
+          smartMode: true,
+          employees: [
+            makeEmployee({ id: 'e1', name: 'Anna', hours: 7, group: 'service' }),
+            makeEmployee({ id: 'e2', name: 'Bob', hours: 8, group: 'service' }),
+          ],
+          totalInCents: 3000,
+          denominations: [makeDenomQty('eur_20', 1), makeDenomQty('eur_10', 1)],
+          fairnessThresholdInCents: 500,
+        }),
+      );
+      const maxDev = Math.max(
+        ...output.distribution.personShares.map((s) => Math.abs(s.deviationInCents)),
+      );
+      expect(maxDev).toBeLessThanOrEqual(400);
+      expect(output.differences).toHaveLength(0);
     });
   });
 

@@ -92,7 +92,25 @@
     "helpText": "Balance transfers are suggested when the deviation exceeds this amount.",
     "aboveThreshold": "above {{amount}} threshold",
     "thresholdLabel": "Fairness threshold",
-    "noTransfers": "No transfers needed"
+    "noTransfers": "No transfers needed",
+    "cashSplits": {
+      "title": "Change suggestions",
+      "optionCount_one": "{{count}} option",
+      "optionCount_other": "{{count}} options",
+      "pending": "Pending",
+      "applied": "Applied",
+      "openDetails": "Choose breakdown",
+      "revert": "Undo",
+      "dialogTitle": "Exchange {{source}}",
+      "dialogTotal": "Total",
+      "dialogTransfers": "Transfers",
+      "dialogConfirm": "Confirm",
+      "dialogCancel": "Cancel",
+      "completeWith": "Complete with",
+      "addBadge": "Add {{count}} more",
+      "removeBadge": "Remove {{count}}",
+      "altBadge": "Alternative plan uses {{count}} — tap to switch"
+    }
   },
   "toast": {
     "dismiss": "Dismiss",

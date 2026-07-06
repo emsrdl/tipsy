@@ -91,6 +91,7 @@ export function makeSession(opts: Partial<TipSession> = {}): TipSession {
     split: makeSplit(),
     denominations: [makeDenomQty('eur_10', 10)], // €100 default
     results: null,
+    appliedCashSplits: [],
     ...opts,
   };
 }

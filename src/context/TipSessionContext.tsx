@@ -24,6 +24,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import type { TipSession, TipSplit, DistributionResult } from '@/types/session';
 import type { Employee } from '@/types/employee';
+import type { CashPieces, CashSplitSuggestion, AppliedCashSplit } from '@/types/cashSplit';
 import { calculateDistribution } from '@/lib/calc/tipCalculator';
 import { sumDenominations } from '@/lib/calc/denominationParser';
 import { DENOMINATIONS } from '@/config/currency';
@@ -43,6 +44,7 @@ function makeDefaultSession(): TipSession {
     split: { kitchenPercent: k, servicePercent: 100 - k },
     denominations: DEFAULT_SESSION_DENOMINATIONS,
     results: null,
+    appliedCashSplits: [],
   };
 }
 
@@ -54,6 +56,10 @@ function loadPersistedSession(): TipSession | null {
     // Validate minimal shape
     if (!Array.isArray(parsed.employees) || !parsed.split || !Array.isArray(parsed.denominations)) {
       return null;
+    }
+    // Backfill field added in v0.6.6 for older persisted sessions
+    if (!Array.isArray(parsed.appliedCashSplits)) {
+      parsed.appliedCashSplits = [];
     }
     return parsed as TipSession;
   } catch {
@@ -72,6 +78,10 @@ export interface TipSessionContextValue {
   setDenominationQuantity: (denominationId: string, quantity: number) => void;
   calculate: () => DistributionResult[];
   reset: () => void;
+  /** Apply a cash split — consumes one source bill, adds the chosen pieces. */
+  applyCashSplit: (suggestion: CashSplitSuggestion, actualPieces: CashPieces) => void;
+  /** Revert a previously applied cash split by id. */
+  revertCashSplit: (splitId: string) => void;
   /** Whether session was restored from sessionStorage on mount. */
   wasRestored: boolean;
 }
@@ -163,6 +173,75 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
     return results;
   }, [totalInCents, session.employees, session.split]);
 
+  const applyCashSplit = useCallback(
+    (suggestion: CashSplitSuggestion, actualPieces: CashPieces) => {
+      setSession((s) => {
+        const sourceQty =
+          s.denominations.find((d) => d.denominationId === suggestion.sourceDenominationId)?.quantity ?? 0;
+        if (sourceQty < 1) return s;
+
+        const pieceMap = new Map<string, number>();
+        for (const piece of actualPieces) pieceMap.set(piece.denominationId, piece.count);
+
+        let newDenominations = s.denominations.map((d) => {
+          if (d.denominationId === suggestion.sourceDenominationId) {
+            return { ...d, quantity: d.quantity - 1 };
+          }
+          const add = pieceMap.get(d.denominationId);
+          if (add !== undefined) return { ...d, quantity: d.quantity + add };
+          return d;
+        });
+
+        // Add any pieces for denominations not yet in the pool
+        const presentIds = new Set(newDenominations.map((d) => d.denominationId));
+        for (const piece of actualPieces) {
+          if (!presentIds.has(piece.denominationId) && piece.count > 0) {
+            newDenominations = [...newDenominations, { denominationId: piece.denominationId, quantity: piece.count }];
+          }
+        }
+
+        // Own id, not suggestion.id — the same bill can be split repeatedly
+        // and each applied entry must be revertible individually.
+        const applied: AppliedCashSplit = {
+          id: `split-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          sourceDenominationId: suggestion.sourceDenominationId,
+          actualPieces,
+          appliedAt: new Date().toISOString(),
+        };
+
+        return {
+          ...s,
+          denominations: newDenominations,
+          appliedCashSplits: [...s.appliedCashSplits, applied],
+        };
+      });
+    },
+    [],
+  );
+
+  const revertCashSplit = useCallback((splitId: string) => {
+    setSession((s) => {
+      const applied = s.appliedCashSplits.find((a) => a.id === splitId);
+      if (!applied) return s;
+
+      const pieceMap = new Map<string, number>();
+      for (const piece of applied.actualPieces) pieceMap.set(piece.denominationId, piece.count);
+
+      const newDenominations = s.denominations.map((d) => {
+        if (d.denominationId === applied.sourceDenominationId) return { ...d, quantity: d.quantity + 1 };
+        const remove = pieceMap.get(d.denominationId);
+        if (remove !== undefined) return { ...d, quantity: Math.max(0, d.quantity - remove) };
+        return d;
+      });
+
+      return {
+        ...s,
+        denominations: newDenominations,
+        appliedCashSplits: s.appliedCashSplits.filter((a) => a.id !== splitId),
+      };
+    });
+  }, []);
+
   const reset = useCallback(() => {
     try {
       sessionStorage.removeItem(SESSION_STORAGE_KEY);
@@ -185,6 +264,8 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
         setDenominationQuantity,
         calculate,
         reset,
+        applyCashSplit,
+        revertCashSplit,
         wasRestored,
       }}
     >

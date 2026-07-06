@@ -212,6 +212,13 @@ export interface DenominationMatchInput {
   distributions: DistributionResult[];
   /** Physical denominations available to distribute. */
   available: AvailableDenomination[];
+  /**
+   * Transfer threshold in cents (deviations above it trigger transfers).
+   * The safety net uses it to reject moves that would push a donor's
+   * deviation across the threshold — that would create a NEW transfer,
+   * which defeats the purpose. @default 0
+   */
+  transferThresholdInCents?: number;
 }
 
 /**

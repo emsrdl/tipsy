@@ -15,6 +15,7 @@
  */
 
 import { formatEurFromCents, formatSignedEurFromCents } from '@/lib/format/formatCurrency';
+import type { CashPieces } from '@/types/cashSplit';
 
 /**
  * A single EUR denomination with its metadata.
@@ -51,6 +52,31 @@ export const DENOMINATIONS: Denomination[] = [
   { id: 'eur_2ct', valueInCents: 2, labelKey: 'currency.denomination.2ct', symbol: '2 ct' },
   { id: 'eur_1ct', valueInCents: 1, labelKey: 'currency.denomination.1ct', symbol: '1 ct' },
 ];
+
+/** Denominations at or above this value are banknotes; below are coins. */
+export const BANKNOTE_MIN_CENTS = 500;
+
+const DENOMINATION_BY_ID = new Map(DENOMINATIONS.map((d) => [d.id, d]));
+
+/** Cent value for a denomination id, or 0 if unknown. O(1) lookup. */
+export function getDenominationValue(id: string): number {
+  return DENOMINATION_BY_ID.get(id)?.valueInCents ?? 0;
+}
+
+/** Display symbol for a denomination id, falling back to the id itself. */
+export function getDenominationSymbol(id: string): string {
+  return DENOMINATION_BY_ID.get(id)?.symbol ?? id;
+}
+
+/** Formats a multiset of pieces as `"2×€20 + €10"`. */
+export function formatCashPieces(pieces: CashPieces): string {
+  return pieces
+    .map((p) => {
+      const sym = getDenominationSymbol(p.denominationId);
+      return p.count > 1 ? `${p.count}×${sym}` : sym;
+    })
+    .join(' + ');
+}
 
 // Re-export for convenience — consumers can import currency formatters here
 export { formatEurFromCents, formatSignedEurFromCents };
