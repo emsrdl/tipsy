@@ -28,6 +28,8 @@ import { useExport } from '@/hooks/useExport';
 import { useShifts } from '@/hooks/useShifts';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useSmartSplitter } from '@/hooks/useSmartSplitter';
+import { useCashSplitSuggestions } from '@/hooks/useCashSplitSuggestions';
+import { CashSplitSuggestions } from '@/components/organisms/CashSplitSuggestions';
 import { useThresholdInput } from '@/hooks/useThresholdInput';
 import { useToast } from '@/context/ToastContext';
 import { useLocale } from '@/hooks/useLocale';
@@ -58,7 +60,7 @@ export function ResultsScreen() {
   const { t } = useTranslation(['common', 'screens', 'errors']);
   const navigate = useNavigate();
   usePreserveScroll();
-  const { session, totalInCents, reset, setSplit } = useTipCalculator();
+  const { session, totalInCents, reset, setSplit, applyCashSplit, revertCashSplit } = useTipCalculator();
   const { exportPdf, exportCsv, isExporting } = useExport();
   const { addShift } = useShifts();
   const { activeProfile } = useProfiles();
@@ -103,6 +105,16 @@ export function ResultsScreen() {
   );
 
   const { isSmartMode, toggleSmartMode, thresholdInCents, setThreshold } = smartOutput;
+
+  const { suggestions: cashSplitSuggestions } = useCashSplitSuggestions({
+    smartOutput: smartOutput.output,
+    denominations: session.denominations,
+    employees: normalizedEmployees,
+    totalInCents,
+    kitchenPercent: session.split.kitchenPercent,
+    thresholdInCents,
+    isSmartMode,
+  });
   const thresholdInput = useThresholdInput(thresholdInCents, setThreshold);
   const thresholdInputRef = useRef<HTMLInputElement>(null);
   const sliderWrapperRef = useRef<HTMLDivElement>(null);
@@ -419,23 +431,38 @@ export function ResultsScreen() {
       {!hasResults ? (
         <Alert status="info" message={t('errors:validation.noEmployees')} />
       ) : (
-        <DistributionTable
-          results={displayResults}
-          totalInCents={totalInCents}
-          {...(isSmartMode && smartOutput.output
-            ? {
-                personShares: smartOutput.output.distribution.personShares,
-                payoutPlans: smartOutput.output.payoutPlans,
-              }
-            : {})}
-          belowGroups={
-            <>
-              {transfersCard}
-              {fairnessRow}
-            </>
-          }
-          afterSummary={settingsCard}
-        />
+        <div className="space-y-6">
+          {isSmartMode && (
+            <CashSplitSuggestions
+              suggestions={cashSplitSuggestions}
+              appliedSplits={session.appliedCashSplits}
+              denominations={session.denominations}
+              employees={normalizedEmployees}
+              totalInCents={totalInCents}
+              kitchenPercent={session.split.kitchenPercent}
+              thresholdInCents={thresholdInCents}
+              onApply={applyCashSplit}
+              onRevert={revertCashSplit}
+            />
+          )}
+          <DistributionTable
+            results={displayResults}
+            totalInCents={totalInCents}
+            {...(isSmartMode && smartOutput.output
+              ? {
+                  personShares: smartOutput.output.distribution.personShares,
+                  payoutPlans: smartOutput.output.payoutPlans,
+                }
+              : {})}
+            belowGroups={
+              <>
+                {transfersCard}
+                {fairnessRow}
+              </>
+            }
+            afterSummary={settingsCard}
+          />
+        </div>
       )}
 
       {/* Actions */}

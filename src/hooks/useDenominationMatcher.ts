@@ -17,16 +17,21 @@
  *      largest available denomination, assign as many as possible without exceeding
  *      a threshold above the ideal amount. Then fill remaining with smaller denominations.
  *
- *   3. **Sweep phase** — after initial greedy assignment, attempt to swap denominations
- *      between employees to reduce the maximum deviation. A swap is accepted if it
- *      reduces the sum of squared deviations (improving fairness).
+ *   3. **Sweep phase** — after initial greedy assignment, attempt to improve the
+ *      distribution between employee pairs. Two operations are tried: moving a
+ *      single unit from an overpaid to an underpaid employee, and *exchanging*
+ *      one unit each between two employees (e.g. a €20 for a €10). An operation
+ *      is accepted if it reduces the sum of squared deviations.
  *
  *   4. **Mop-up phase** — assign any remaining unallocated denominations to the most
  *      underpaid employee. This guarantees all available cash is distributed.
  *
  *   5. **Best-effort safety net** — if any working employee has €0, try to move
- *      the smallest denomination from the most overpaid employee to them.
- *      Only possible when enough denomination units exist.
+ *      the smallest denomination from an overpaid employee to them. The move is
+ *      only performed when the donor keeps a non-zero payout, overall fairness
+ *      improves, and the donor isn't pushed across the transfer threshold —
+ *      otherwise it would just shift the €0 problem to someone else, make
+ *      deviations worse, or create a brand-new transfer.
  *
  *   6. **Compute fairness metrics** — calculate max deviation, mean deviation,
  *      and a 0–100 fairness score.
@@ -123,7 +128,7 @@ export function useDenominationMatcher(
  */
 export function matchDenominations(input: DenominationMatchInput): DenominationMatchResult {
   const start = performance.now();
-  const { distributions, available } = input;
+  const { distributions, available, transferThresholdInCents = 0 } = input;
 
   // Edge case: no employees
   if (distributions.length === 0) {
@@ -180,7 +185,7 @@ export function matchDenominations(input: DenominationMatchInput): DenominationM
   mopUp(distributions, pool, assignmentMap, actualMap);
 
   // Phase 4: Best-effort safety net — try to avoid any working employee getting €0 where denominations allow
-  ensureNonZeroPayouts(distributions, assignmentMap, actualMap);
+  ensureNonZeroPayouts(distributions, assignmentMap, actualMap, transferThresholdInCents);
 
   // Build payouts
   const payouts: EmployeePayoutPlan[] = distributions.map((d) => {
@@ -288,12 +293,18 @@ function greedyAssign(
 }
 
 /**
- * Improvement phase: attempt pairwise denomination swaps between employees.
+ * Improvement phase: attempt pairwise denomination operations between employees.
  *
- * For each pair of employees where one is overpaid and one is underpaid,
- * try swapping a denomination from the overpaid to the underpaid.
- * Accept swaps that reduce the sum of squared deviations.
+ * For each pair of employees where A is overpaid and B is underpaid, two
+ * operations are tried, best-first:
  *
+ *   1. **Move** — one unit from A to B (e.g. A hands B a €5).
+ *   2. **Exchange** — one unit from A for one unit from B (e.g. A's €20 for
+ *      B's €10, shifting €10 of value while keeping both piece counts). Moves
+ *      alone can't fix imbalances smaller than A's smallest piece; exchanges
+ *      can shift the *difference* of two piece values.
+ *
+ * An operation is accepted if it reduces the sum of squared deviations.
  * Bounded to a maximum number of iterations to guarantee performance.
  *
  * @internal
@@ -321,41 +332,124 @@ function improveSwaps(
         const deviationA = (actualMap.get(distA.employeeId) ?? 0) - distA.amountInCents;
         const deviationB = (actualMap.get(distB.employeeId) ?? 0) - distB.amountInCents;
 
-        // Only try swaps where A is overpaid and B is underpaid
+        // Only try operations where A is overpaid and B is underpaid
         if (deviationA <= 0 || deviationB >= 0) continue;
 
-        const assignmentsA = assignmentMap.get(distA.employeeId) ?? [];
-
-        // Try moving one denomination from A to B
-        for (const assignA of assignmentsA) {
-          if (assignA.count <= 0) continue;
-          const denomValue = assignA.totalCents / assignA.count;
-
-          // Would this swap improve things?
-          const newDeviationA = deviationA - denomValue;
-          const newDeviationB = deviationB + denomValue;
-
-          const oldSumSq = deviationA * deviationA + deviationB * deviationB;
-          const newSumSq = newDeviationA * newDeviationA + newDeviationB * newDeviationB;
-
-          if (newSumSq < oldSumSq) {
-            // Accept swap: move one unit from A to B
-            assignA.count--;
-            assignA.totalCents -= denomValue;
-
-            const assignmentsB = assignmentMap.get(distB.employeeId) ?? [];
-            addUnit(assignmentsB, assignA.denominationId, denomValue);
-
-            actualMap.set(distA.employeeId, (actualMap.get(distA.employeeId) ?? 0) - denomValue);
-            actualMap.set(distB.employeeId, (actualMap.get(distB.employeeId) ?? 0) + denomValue);
-
-            improved = true;
-            break;
-          }
+        if (
+          tryMove(distA, distB, deviationA, deviationB, assignmentMap, actualMap) ||
+          tryExchange(distA, distB, deviationA, deviationB, assignmentMap, actualMap)
+        ) {
+          improved = true;
         }
       }
     }
   }
+}
+
+/**
+ * Transfers `value` worth of one denomination unit from one employee to
+ * another, keeping assignments and actuals in sync.
+ *
+ * @internal
+ */
+function transferUnit(
+  from: DenominationAssignment,
+  fromId: string,
+  toId: string,
+  assignmentMap: Map<string, DenominationAssignment[]>,
+  actualMap: Map<string, number>,
+): void {
+  const value = from.totalCents / from.count;
+  from.count--;
+  from.totalCents -= value;
+
+  let toAssignments = assignmentMap.get(toId);
+  if (!toAssignments) {
+    toAssignments = [];
+    assignmentMap.set(toId, toAssignments);
+  }
+  addUnit(toAssignments, from.denominationId, value);
+
+  actualMap.set(fromId, (actualMap.get(fromId) ?? 0) - value);
+  actualMap.set(toId, (actualMap.get(toId) ?? 0) + value);
+}
+
+/**
+ * Tries to move one denomination unit from overpaid A to underpaid B.
+ * Accepts the first move that reduces the sum of squared deviations.
+ *
+ * @internal
+ * @returns true if a move was performed
+ */
+function tryMove(
+  distA: DistributionResult,
+  distB: DistributionResult,
+  deviationA: number,
+  deviationB: number,
+  assignmentMap: Map<string, DenominationAssignment[]>,
+  actualMap: Map<string, number>,
+): boolean {
+  const assignmentsA = assignmentMap.get(distA.employeeId) ?? [];
+  const oldSumSq = deviationA * deviationA + deviationB * deviationB;
+
+  for (const assignA of assignmentsA) {
+    if (assignA.count <= 0) continue;
+    const denomValue = assignA.totalCents / assignA.count;
+
+    const newDeviationA = deviationA - denomValue;
+    const newDeviationB = deviationB + denomValue;
+    const newSumSq = newDeviationA * newDeviationA + newDeviationB * newDeviationB;
+
+    if (newSumSq < oldSumSq) {
+      transferUnit(assignA, distA.employeeId, distB.employeeId, assignmentMap, actualMap);
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Tries to exchange one unit of A's for one unit of B's (different values),
+ * shifting `valueA − valueB` from overpaid A to underpaid B. Accepts the
+ * first exchange that reduces the sum of squared deviations.
+ *
+ * @internal
+ * @returns true if an exchange was performed
+ */
+function tryExchange(
+  distA: DistributionResult,
+  distB: DistributionResult,
+  deviationA: number,
+  deviationB: number,
+  assignmentMap: Map<string, DenominationAssignment[]>,
+  actualMap: Map<string, number>,
+): boolean {
+  const assignmentsA = assignmentMap.get(distA.employeeId) ?? [];
+  const assignmentsB = assignmentMap.get(distB.employeeId) ?? [];
+  const oldSumSq = deviationA * deviationA + deviationB * deviationB;
+
+  for (const assignA of assignmentsA) {
+    if (assignA.count <= 0) continue;
+    const valueA = assignA.totalCents / assignA.count;
+
+    for (const assignB of assignmentsB) {
+      if (assignB.count <= 0) continue;
+      const valueB = assignB.totalCents / assignB.count;
+      if (valueB >= valueA) continue; // only shift value from A toward B
+
+      const shifted = valueA - valueB;
+      const newDeviationA = deviationA - shifted;
+      const newDeviationB = deviationB + shifted;
+      const newSumSq = newDeviationA * newDeviationA + newDeviationB * newDeviationB;
+
+      if (newSumSq < oldSumSq) {
+        transferUnit(assignA, distA.employeeId, distB.employeeId, assignmentMap, actualMap);
+        transferUnit(assignB, distB.employeeId, distA.employeeId, assignmentMap, actualMap);
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 /**
@@ -407,10 +501,19 @@ function mopUp(
 }
 
 /**
- * Safety net: ensures every employee with hours > 0 gets a non-zero payout.
+ * Safety net: ensures every employee with hours > 0 gets a non-zero payout
+ * where the denominations allow it.
  *
- * If an employee with hours > 0 has actualAmount === 0, moves the smallest
- * denomination from the most overpaid employee to them.
+ * If an employee with hours > 0 has actualAmount === 0, tries donors from
+ * most overpaid downwards and moves the donor's smallest denomination. The
+ * move is only performed when
+ *   - the donor keeps a non-zero payout (otherwise the €0 problem just
+ *     shifts to the donor — e.g. a pool of one single bill),
+ *   - the sum of squared deviations decreases (the move must genuinely
+ *     improve fairness, not trade one imbalance for a bigger one), and
+ *   - the donor's deviation is not pushed across the transfer threshold —
+ *     turning a settled employee into a transfer participant would trade
+ *     cosmetics (nobody at €0) for an extra transfer.
  *
  * @internal
  */
@@ -418,49 +521,56 @@ function ensureNonZeroPayouts(
   distributions: DistributionResult[],
   assignmentMap: Map<string, DenominationAssignment[]>,
   actualMap: Map<string, number>,
+  transferThresholdInCents: number,
 ): void {
   for (const dist of distributions) {
     if (dist.hours <= 0 || (actualMap.get(dist.employeeId) ?? 0) > 0) continue;
 
-    // Find the most overpaid employee (largest deviation) who has assignments
-    let bestDonorId: string | null = null;
-    let bestDonorDeviation = -Infinity;
+    // Candidate donors, most overpaid first
+    const donors = distributions
+      .filter((other) => other.employeeId !== dist.employeeId)
+      .sort(
+        (a, b) =>
+          ((actualMap.get(b.employeeId) ?? 0) - b.amountInCents) -
+          ((actualMap.get(a.employeeId) ?? 0) - a.amountInCents),
+      );
 
-    for (const other of distributions) {
-      if (other.employeeId === dist.employeeId) continue;
-      const deviation = (actualMap.get(other.employeeId) ?? 0) - other.amountInCents;
-      const assignments = assignmentMap.get(other.employeeId) ?? [];
-      const hasAssignments = assignments.some((a) => a.count > 0);
-      if (deviation > bestDonorDeviation && hasAssignments) {
-        bestDonorDeviation = deviation;
-        bestDonorId = other.employeeId;
+    for (const donor of donors) {
+      const donorActual = actualMap.get(donor.employeeId) ?? 0;
+      const donorDeviation = donorActual - donor.amountInCents;
+
+      const activeAssignments = (assignmentMap.get(donor.employeeId) ?? []).filter(
+        (a) => a.count > 0,
+      );
+      if (activeAssignments.length === 0) continue;
+
+      // Smallest denomination the donor holds
+      activeAssignments.sort((a, b) => a.totalCents / a.count - b.totalCents / b.count);
+      const smallest = activeAssignments[0]!;
+      const denomValue = smallest.totalCents / smallest.count;
+
+      // Donor must not become the new €0 employee
+      if (donorActual - denomValue <= 0) continue;
+
+      // The move must improve fairness overall
+      const recipientDeviation = -dist.amountInCents;
+      const oldSumSq = donorDeviation * donorDeviation + recipientDeviation * recipientDeviation;
+      const newDevDonor = donorDeviation - denomValue;
+      const newDevRecipient = recipientDeviation + denomValue;
+      const newSumSq = newDevDonor * newDevDonor + newDevRecipient * newDevRecipient;
+      if (newSumSq >= oldSumSq) continue;
+
+      // Must not push a settled donor across the transfer threshold
+      if (
+        Math.abs(donorDeviation) <= transferThresholdInCents &&
+        Math.abs(newDevDonor) > transferThresholdInCents
+      ) {
+        continue;
       }
+
+      transferUnit(smallest, donor.employeeId, dist.employeeId, assignmentMap, actualMap);
+      break;
     }
-
-    if (!bestDonorId) continue;
-
-    // Find the smallest denomination from the donor
-    const donorAssignments = assignmentMap.get(bestDonorId) ?? [];
-    const activeAssignments = donorAssignments.filter((a) => a.count > 0);
-    if (activeAssignments.length === 0) continue;
-
-    // Sort by value ascending to find smallest
-    activeAssignments.sort((a, b) => a.totalCents / a.count - b.totalCents / b.count);
-    const smallest = activeAssignments[0]!;
-    const denomValue = smallest.totalCents / smallest.count;
-
-    // Move one unit from donor to this employee
-    smallest.count--;
-    smallest.totalCents -= denomValue;
-    actualMap.set(bestDonorId, (actualMap.get(bestDonorId) ?? 0) - denomValue);
-
-    let recipientAssignments = assignmentMap.get(dist.employeeId);
-    if (!recipientAssignments) {
-      recipientAssignments = [];
-      assignmentMap.set(dist.employeeId, recipientAssignments);
-    }
-    addUnit(recipientAssignments, smallest.denominationId, denomValue);
-    actualMap.set(dist.employeeId, (actualMap.get(dist.employeeId) ?? 0) + denomValue);
   }
 }
 

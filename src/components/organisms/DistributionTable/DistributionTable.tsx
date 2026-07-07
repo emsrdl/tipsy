@@ -2,34 +2,40 @@
  * @file src/components/organisms/DistributionTable/DistributionTable.tsx
  * @description DistributionTable organism — Material card results per employee.
  *
- * Touch-first redesign:
- * - Each employee as a Material card with prominent amount display
- * - Group header chips with pool total
- * - Per-hour rate displayed on each card
+ * Touch-first design:
+ * - Each employee as a Material card row with prominent amount display
+ * - Denomination payout (which bills/coins to hand out) always visible per row
+ * - Secondary details (hours, per-hour rate, ideal share, deviation) behind
+ *   a tap-to-expand on each row to keep the first glance uncluttered
+ * - Group header chips with pool total and per-hour average
  * - Summary footer card with kitchen/service/total breakdown
  *
  * @example
  * <DistributionTable results={session.results} totalInCents={totalInCents} />
  */
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/atoms/Badge/Badge';
 import { Icon } from '@/components/atoms/Icon/Icon';
-import { formatEurFromCents, formatSignedEurFromCents } from '@/config/currency';
+import {
+  formatEurFromCents,
+  formatSignedEurFromCents,
+  DENOMINATIONS,
+  BANKNOTE_MIN_CENTS,
+} from '@/config/currency';
 import { useLocale } from '@/hooks/useLocale';
 import { cn } from '@/lib/utils';
 import type { DistributionResult } from '@/types/session';
 import type { PersonShare } from '@/types/shift';
-import type { EmployeePayoutPlan } from '@/types/calculation';
-import { DENOMINATIONS } from '@/config/currency';
+import type { EmployeePayoutPlan, DenominationAssignment } from '@/types/calculation';
 
 const DENOM_BY_ID = new Map(DENOMINATIONS.map((d) => [d.id, d]));
 
 export interface DistributionTableProps {
   results: DistributionResult[];
   totalInCents: number;
-  /** Optional smart-split person shares — enables expandable cards with ideal/actual/deviation. */
+  /** Optional smart-split person shares — enables ideal/deviation display per row. */
   personShares?: PersonShare[];
   /** Optional payout plans with denomination assignments (from smart split). */
   payoutPlans?: EmployeePayoutPlan[];
@@ -41,6 +47,10 @@ export interface DistributionTableProps {
 
 /**
  * Material card-based results display grouped by kitchen/service.
+ *
+ * In smart-split mode each row shows the exact bills/coins to hand out
+ * with no interaction required; tapping a row reveals secondary details
+ * (hours, per-hour rate, ideal share, deviation).
  *
  * @param props - DistributionTableProps
  * @returns div with employee cards and summary footer
@@ -76,7 +86,7 @@ export function DistributionTable({
   );
 
   const payoutsById = useMemo(
-    () => new Map((payoutPlans ?? []).map((p) => [p.employeeId, p])),
+    () => new Map((payoutPlans ?? []).map((p) => [p.employeeId, p.assignments.filter((a) => a.count > 0)])),
     [payoutPlans],
   );
 
@@ -120,69 +130,82 @@ export function DistributionTable({
                 ? formatEurFromCents(Math.round(r.amountInCents / r.hours), fmtLocale)
                 : null;
             const share = sharesById.get(r.employeeId);
-            const isExpandable = share !== undefined;
+            const assignments = payoutsById.get(r.employeeId) ?? [];
             const isExpanded = expandedId === r.employeeId;
 
             return (
               <div key={r.employeeId}>
-                {isExpandable ? (
-                  <button
-                    type="button"
-                    onClick={() => setExpandedId(isExpanded ? null : r.employeeId)}
-                    className="flex w-full items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-surface-overlay"
-                  >
-                    <div className="min-w-0 text-left">
-                      <p className="truncate text-base font-semibold text-text-primary">{r.name}</p>
-                      <p className="mt-0.5 flex items-center gap-1 text-sm text-text-secondary">
-                        <Icon name="clock" size={12} />
-                        {r.hours}h{perHour && <span className="ml-1">· {perHour}/h</span>}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      <div className="text-right">
-                        <p className="font-mono text-xl font-bold text-text-primary">
-                          {formatEurFromCents(r.amountInCents, fmtLocale)}
-                        </p>
-                        {share && (
-                          <p className="font-mono text-xs text-text-secondary">
-                            {t('screens:results.idealColumn')}:{' '}
-                            {formatEurFromCents(share.idealShareInCents, fmtLocale)}
-                          </p>
-                        )}
-                      </div>
-                      <Icon
-                        name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                        size={16}
-                        className="text-text-secondary"
-                      />
-                    </div>
-                  </button>
-                ) : (
-                  <div className="flex items-center justify-between gap-4 px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-base font-semibold text-text-primary">{r.name}</p>
-                      <p className="mt-0.5 flex items-center gap-1 text-sm text-text-secondary">
-                        <Icon name="clock" size={12} />
-                        {r.hours}h{perHour && <span className="ml-1">· {perHour}/h</span>}
-                      </p>
-                    </div>
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(isExpanded ? null : r.employeeId)}
+                  aria-expanded={isExpanded}
+                  className="w-full px-4 py-3 text-left transition-colors hover:bg-surface-overlay/50"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="min-w-0 flex-1 truncate text-base font-semibold text-text-primary">
+                      {r.name}
+                    </p>
                     <div className="shrink-0 text-right">
                       <p className="font-mono text-xl font-bold text-text-primary">
                         {formatEurFromCents(r.amountInCents, fmtLocale)}
                       </p>
+                      {share && share.deviationInCents !== 0 && (
+                        <p
+                          className={cn(
+                            'font-mono text-xs font-semibold',
+                            share.deviationInCents > 0
+                              ? 'text-status-success'
+                              : 'text-status-error',
+                          )}
+                        >
+                          {formatSignedEurFromCents(share.deviationInCents, fmtLocale)}
+                        </p>
+                      )}
                     </div>
+                    <Icon
+                      name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                      size={16}
+                      className="shrink-0 text-text-secondary"
+                    />
                   </div>
-                )}
 
-                {isExpandable && isExpanded && share && (
-                  <ExpandedDetail
-                    share={share}
-                    assignments={
-                      payoutsById.get(r.employeeId)?.assignments?.filter((a) => a.count > 0) ?? []
-                    }
-                    fmtLocale={fmtLocale}
-                    t={t}
-                  />
+                  {assignments.length > 0 && <PayoutChips assignments={assignments} />}
+                </button>
+
+                {isExpanded && (
+                  <div className="space-y-2 border-t border-border px-4 py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="flex items-center gap-1.5 text-sm text-text-secondary">
+                        <Icon name="clock" size={12} />
+                        {t('screens:results.hoursColumn')}
+                      </span>
+                      <span className="font-mono text-sm text-text-primary">
+                        {r.hours}h{perHour && <span> · {perHour}/h</span>}
+                      </span>
+                    </div>
+                    {share && (
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm text-text-secondary">
+                          {t('screens:results.idealColumn')}
+                        </span>
+                        <span className="flex items-center gap-1.5 font-mono text-sm text-text-primary">
+                          {formatEurFromCents(share.idealShareInCents, fmtLocale)}
+                          {share.deviationInCents !== 0 && (
+                            <span
+                              className={cn(
+                                'rounded-full px-1.5 py-0.5 text-xs font-semibold',
+                                share.deviationInCents > 0
+                                  ? 'bg-status-success/15 text-status-success'
+                                  : 'bg-status-error/15 text-status-error',
+                              )}
+                            >
+                              {formatSignedEurFromCents(share.deviationInCents, fmtLocale)}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             );
@@ -221,54 +244,121 @@ export function DistributionTable({
   );
 }
 
-interface ExpandedDetailProps {
-  share: PersonShare;
-  assignments: EmployeePayoutPlan['assignments'];
-  fmtLocale: string;
-  t: ReturnType<typeof useTranslation>['t'];
+interface PayoutChipsProps {
+  assignments: DenominationAssignment[];
 }
 
-function ExpandedDetail({ share, assignments, fmtLocale, t }: ExpandedDetailProps) {
+/**
+ * The physical payout for one employee as denomination chips, sorted by
+ * value descending. Banknotes are tinted for quick scanning; coins stay
+ * neutral. When all chips fit one line they share a row (banknote icon);
+ * when they would wrap, banknotes and coins split into two rows with a
+ * banknote/coins icon each. Fit is detected via a hidden single-line
+ * probe measured against the container width (re-checked on resize).
+ */
+function PayoutChips({ assignments }: PayoutChipsProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const probeRef = useRef<HTMLDivElement>(null);
+  const [split, setSplit] = useState(false);
+
+  const { banknotes, coins } = useMemo(() => {
+    const sorted = [...assignments].sort(
+      (a, b) =>
+        (DENOM_BY_ID.get(b.denominationId)?.valueInCents ?? 0) -
+        (DENOM_BY_ID.get(a.denominationId)?.valueInCents ?? 0),
+    );
+    return {
+      banknotes: sorted.filter(
+        (a) => (DENOM_BY_ID.get(a.denominationId)?.valueInCents ?? 0) >= BANKNOTE_MIN_CENTS,
+      ),
+      coins: sorted.filter(
+        (a) => (DENOM_BY_ID.get(a.denominationId)?.valueInCents ?? 0) < BANKNOTE_MIN_CENTS,
+      ),
+    };
+  }, [assignments]);
+
+  const canSplit = banknotes.length > 0 && coins.length > 0;
+
+  useLayoutEffect(() => {
+    if (!canSplit) {
+      setSplit(false);
+      return;
+    }
+    const container = containerRef.current;
+    const probe = probeRef.current;
+    if (!container || !probe) return;
+
+    const measure = () => setSplit(probe.scrollWidth > container.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [canSplit, assignments]);
+
+  const allChips = [...banknotes, ...coins];
+
   return (
-    <div className="space-y-3 border-t border-border px-4 py-3">
-      {share.deviationInCents !== 0 && (
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-text-secondary">
-            {t('screens:results.deviationColumn')}
-          </span>
-          <span
-            className={cn(
-              'rounded-full px-2 py-0.5 font-mono text-xs font-semibold',
-              share.deviationInCents > 0
-                ? 'bg-status-success/15 text-status-success'
-                : 'bg-status-error/15 text-status-error',
-            )}
-          >
-            {formatSignedEurFromCents(share.deviationInCents, fmtLocale)}
-          </span>
+    <div ref={containerRef} className="relative mt-2.5">
+      {/* Invisible single-line probe to detect whether all chips fit one row */}
+      {canSplit && (
+        <div
+          ref={probeRef}
+          aria-hidden
+          className="pointer-events-none invisible absolute inset-x-0 top-0 flex flex-nowrap items-center gap-1.5"
+        >
+          <Icon name="banknote" size={14} className="mr-0.5 shrink-0" />
+          {allChips.map((a) => (
+            <PayoutChip key={a.denominationId} assignment={a} />
+          ))}
         </div>
       )}
-      {assignments.length > 0 && (
-        <div>
-          <p className="mb-2 text-xs text-text-secondary">
-            {t('screens:results.denominationsTitle')}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {assignments.map((a) => {
-              const denom = DENOM_BY_ID.get(a.denominationId);
-              return (
-                <span
-                  key={a.denominationId}
-                  className="inline-flex items-center gap-1 rounded-full bg-surface-overlay px-2.5 py-1 font-mono text-xs text-text-primary"
-                >
-                  <span className="font-semibold">{a.count}x</span>
-                  {denom?.symbol ?? a.denominationId}
-                </span>
-              );
-            })}
+
+      {split ? (
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Icon name="banknote" size={14} className="mr-0.5 shrink-0 text-text-secondary" />
+            {banknotes.map((a) => (
+              <PayoutChip key={a.denominationId} assignment={a} />
+            ))}
           </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Icon name="coins" size={14} className="mr-0.5 shrink-0 text-text-secondary" />
+            {coins.map((a) => (
+              <PayoutChip key={a.denominationId} assignment={a} />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Icon
+            name={banknotes.length > 0 ? 'banknote' : 'coins'}
+            size={14}
+            className="mr-0.5 shrink-0 text-text-secondary"
+          />
+          {allChips.map((a) => (
+            <PayoutChip key={a.denominationId} assignment={a} />
+          ))}
         </div>
       )}
     </div>
+  );
+}
+
+/** A single "count × denomination" chip — tinted for banknotes, neutral for coins. */
+function PayoutChip({ assignment }: { assignment: DenominationAssignment }) {
+  const denom = DENOM_BY_ID.get(assignment.denominationId);
+  const isBanknote = (denom?.valueInCents ?? 0) >= BANKNOTE_MIN_CENTS;
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-0.5 rounded-lg px-2 py-1 font-mono text-sm whitespace-nowrap',
+        isBanknote ? 'bg-accent/10' : 'bg-surface-overlay',
+      )}
+    >
+      <span className="text-xs text-text-secondary">{assignment.count}×</span>
+      <span className={cn('font-semibold', isBanknote ? 'text-accent' : 'text-text-primary')}>
+        {denom?.symbol ?? assignment.denominationId}
+      </span>
+    </span>
   );
 }

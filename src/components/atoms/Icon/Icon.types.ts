@@ -44,7 +44,9 @@ export type IconName =
   | 'star'
   | 'zap'
   | 'edit-2'
-  | 'user-plus';
+  | 'user-plus'
+  | 'scissors'
+  | 'undo-2';
 
 export interface IconProps {
   /** Which icon to render. */

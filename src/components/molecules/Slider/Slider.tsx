@@ -15,9 +15,11 @@
  * />
  */
 
-import { useState, useRef, type KeyboardEvent } from 'react';
+import { useRef } from 'react';
 import { GROUP_COLORS } from '@/config/groups';
 import { cn } from '@/lib/utils';
+import { useInlineEdit } from '@/hooks/useInlineEdit';
+import type { InlineEditInputProps } from '@/hooks/useInlineEdit';
 
 export interface SliderProps {
   /** Current value (0–100). */
@@ -49,34 +51,28 @@ interface SliderBadgeProps {
   side: 'left' | 'right';
   label?: string;
   displayValue: number;
-  editing: 'left' | 'right' | null;
-  inputVal: string;
   min: number;
   max: number;
   disabled?: boolean | undefined;
-  onStartEdit: (side: 'left' | 'right') => void;
-  onInputChange: (val: string) => void;
-  onCommit: () => void;
-  onKey: (e: KeyboardEvent) => void;
+  editing: boolean;
+  inputProps: InlineEditInputProps;
+  onStartEdit: () => void;
 }
 
 function SliderBadge({
   side,
   label,
   displayValue,
-  editing,
-  inputVal,
   min,
   max,
   disabled,
+  editing,
+  inputProps,
   onStartEdit,
-  onInputChange,
-  onCommit,
-  onKey,
 }: SliderBadgeProps) {
   const colorClass = BADGE_COLOR[side];
 
-  if (editing === side) {
+  if (editing) {
     return (
       <input
         name={`slider-${side}`}
@@ -84,12 +80,8 @@ function SliderBadge({
         inputMode="numeric"
         min={min}
         max={max}
-        value={inputVal}
-        onChange={(e) => onInputChange(e.target.value)}
-        onBlur={onCommit}
-        onKeyDown={onKey}
         aria-label={label ?? side}
-        autoFocus
+        {...inputProps}
         className={cn(
           'h-7 w-14 rounded-full px-2 text-center text-sm font-bold tabular-nums focus:outline-none',
           colorClass,
@@ -101,7 +93,7 @@ function SliderBadge({
   return (
     <button
       type="button"
-      onClick={() => onStartEdit(side)}
+      onClick={onStartEdit}
       disabled={disabled}
       aria-label={label ? `${label}: ${displayValue}%` : `${displayValue}%`}
       className={cn(
@@ -132,10 +124,7 @@ export function Slider({
   'aria-label': ariaLabel,
   className,
 }: SliderProps) {
-  const [editing, setEditing] = useState<'left' | 'right' | null>(null);
-  const [inputVal, setInputVal] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
-
   const percent = ((value - min) / (max - min)) * 100;
   const counterValue = max - value;
 
@@ -143,38 +132,15 @@ export function Slider({
     containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  function startEdit(side: 'left' | 'right') {
-    if (disabled) return;
-    centerInView();
-    setInputVal(String(side === 'left' ? value : counterValue));
-    setEditing(side);
-  }
+  const leftEdit = useInlineEdit((draft) => {
+    const n = parseInt(draft, 10);
+    if (!isNaN(n)) onChange(Math.min(max, Math.max(min, n)));
+  });
 
-  function commitEdit() {
-    const n = parseInt(inputVal, 10);
-    if (!isNaN(n) && editing) {
-      const clamped = Math.min(max, Math.max(min, n));
-      onChange(editing === 'left' ? clamped : max - clamped);
-    }
-    setEditing(null);
-  }
-
-  function handleKey(e: KeyboardEvent) {
-    if (e.key === 'Enter') commitEdit();
-    if (e.key === 'Escape') setEditing(null);
-  }
-
-  const badgeProps = {
-    editing,
-    inputVal,
-    min,
-    max,
-    disabled,
-    onStartEdit: startEdit,
-    onInputChange: setInputVal,
-    onCommit: commitEdit,
-    onKey: handleKey,
-  };
+  const rightEdit = useInlineEdit((draft) => {
+    const n = parseInt(draft, 10);
+    if (!isNaN(n)) onChange(max - Math.min(max, Math.max(min, n)));
+  });
 
   return (
     <div ref={containerRef} className={cn('space-y-3', className)}>
@@ -183,12 +149,32 @@ export function Slider({
           {label && (
             <div className="flex shrink-0 items-center gap-1.5">
               <span className="text-sm font-medium text-text-primary">{label}</span>
-              <SliderBadge side="left" label={label} displayValue={value} {...badgeProps} />
+              <SliderBadge
+                side="left"
+                label={label}
+                displayValue={value}
+                min={min}
+                max={max}
+                disabled={disabled}
+                editing={leftEdit.editing}
+                inputProps={leftEdit.inputProps}
+                onStartEdit={() => { centerInView(); leftEdit.startEdit(String(value)); }}
+              />
             </div>
           )}
           {counterLabel && (
             <div className="flex shrink-0 items-center gap-1.5">
-              <SliderBadge side="right" label={counterLabel} displayValue={counterValue} {...badgeProps} />
+              <SliderBadge
+                side="right"
+                label={counterLabel}
+                displayValue={counterValue}
+                min={min}
+                max={max}
+                disabled={disabled}
+                editing={rightEdit.editing}
+                inputProps={rightEdit.inputProps}
+                onStartEdit={() => { centerInView(); rightEdit.startEdit(String(counterValue)); }}
+              />
               <span className="text-sm font-medium text-text-primary">{counterLabel}</span>
             </div>
           )}

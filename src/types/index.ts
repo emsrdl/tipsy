@@ -39,3 +39,5 @@ export type {
   SmartSplitInput,
   SmartSplitOutput,
 } from './shift';
+
+export type { CashPieces, CashSplitBreakdown, CashSplitSuggestion, AppliedCashSplit } from './cashSplit';
