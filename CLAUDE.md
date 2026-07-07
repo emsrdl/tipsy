@@ -12,7 +12,7 @@ bun run build         # Type-check + production bundle
 bun run type-check    # Standalone TypeScript check
 bun run lint          # ESLint (strict, max-warnings 0)
 bun run format        # Prettier write
-bun test              # Vitest single-run (CI)
+bun run test          # Vitest single-run (CI)
 ```
 
 ## Docs

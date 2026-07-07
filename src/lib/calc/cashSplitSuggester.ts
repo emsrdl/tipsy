@@ -511,7 +511,7 @@ function subtractPieces(a: CashPieces, b: CashPieces): CashPieces | null {
 }
 
 /** Merges two piece multisets into one. */
-function mergePieces(a: CashPieces, b: CashPieces): CashPieces {
+export function mergePieces(a: CashPieces, b: CashPieces): CashPieces {
   const counts = new Map<string, number>();
   for (const p of a) counts.set(p.denominationId, (counts.get(p.denominationId) ?? 0) + p.count);
   for (const p of b) counts.set(p.denominationId, (counts.get(p.denominationId) ?? 0) + p.count);
@@ -539,7 +539,7 @@ function completionCandidates(gap: number, sourceValue: number, pieceFloor: numb
 }
 
 /** Simulated transfer count for a complete breakdown of the source bill. */
-function simulateBreakdown(
+export function simulateBreakdown(
   pieces: CashPieces,
   sourceDenominationId: string,
   input: CashSplitPoolInput,
@@ -579,20 +579,26 @@ function simulateBreakdown(
  *   remainder is tried first — so the initial guidance equals the
  *   suggester's best plan instead of depending on search budgets.
  */
+/** A verified completion alongside the transfer count it achieves. */
+export interface CompletionResult {
+  pieces: CashPieces;
+  transferCount: number;
+}
+
 export function suggestCompletions(
   currentPieces: CashPieces,
   sourceDenominationId: string,
   targetTransferCount: number,
   input: CashSplitPoolInput,
   seedBreakdowns: CashPieces[] = [],
-): CashPieces[] {
+): CompletionResult[] {
   const sourceValue = denomValue(sourceDenominationId);
   const gap = sourceValue - sumBreakdownCents(currentPieces);
   if (gap <= 0 || sourceValue <= 0) return [];
 
   const pieceFloor = computePieceFloor(input.thresholdInCents);
   const seen = new Set<string>();
-  const passing: CashPieces[] = [];
+  const passing: CompletionResult[] = [];
 
   const seedRemainders = seedBreakdowns
     .map((b) => subtractPieces(b, currentPieces))
@@ -604,20 +610,21 @@ export function suggestCompletions(
     seen.add(key);
 
     const combined = mergePieces(currentPieces, completion);
-    if (simulateBreakdown(combined, sourceDenominationId, input) > targetTransferCount) continue;
-    passing.push(completion);
+    const transferCount = simulateBreakdown(combined, sourceDenominationId, input);
+    if (transferCount > targetTransferCount) continue;
+    passing.push({ pieces: completion, transferCount });
   }
   if (passing.length === 0) return [];
 
-  passing.sort((a, b) => pieceCount(a) - pieceCount(b) || a.length - b.length);
+  passing.sort((a, b) => pieceCount(a.pieces) - pieceCount(b.pieces) || a.pieces.length - b.pieces.length);
 
-  const result: CashPieces[] = [passing[0]!];
-  const coveredRows = new Set(passing[0]!.map((p) => p.denominationId));
+  const result: CompletionResult[] = [passing[0]!];
+  const coveredRows = new Set(passing[0]!.pieces.map((p) => p.denominationId));
   for (const candidate of passing.slice(1)) {
     if (result.length > MAX_COMPLETION_ALTERNATIVES) break;
-    if (!candidate.some((p) => !coveredRows.has(p.denominationId))) continue;
+    if (!candidate.pieces.some((p) => !coveredRows.has(p.denominationId))) continue;
     result.push(candidate);
-    for (const p of candidate) coveredRows.add(p.denominationId);
+    for (const p of candidate.pieces) coveredRows.add(p.denominationId);
   }
   return result;
 }
@@ -629,7 +636,7 @@ export function suggestCompletion(
   targetTransferCount: number,
   input: CashSplitPoolInput,
 ): CashPieces | null {
-  return suggestCompletions(currentPieces, sourceDenominationId, targetTransferCount, input)[0] ?? null;
+  return suggestCompletions(currentPieces, sourceDenominationId, targetTransferCount, input)[0]?.pieces ?? null;
 }
 
 /**

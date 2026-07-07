@@ -18,12 +18,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { DENOMINATIONS, getDenominationValue } from '@/config/currency';
 import {
   sumBreakdownCents,
-  applyBreakdownToPool,
+  simulateBreakdown,
   suggestCompletions,
   suggestRemoval,
   type CashSplitPoolInput,
 } from '@/lib/calc/cashSplitSuggester';
-import { smartSplit } from '@/lib/calc/smartSplitter';
 import type { CashPieces, CashSplitSuggestion } from '@/types/cashSplit';
 
 /** Per-row orange badge: count + the action that follows that route. */
@@ -40,8 +39,13 @@ export interface CashSplitGuidance {
   currentTotalCents: number;
   /** Total matches the source bill's value exactly. */
   isExact: boolean;
-  /** Simulated transfer count for the exact selection, else null. */
-  previewTransferCount: number | null;
+  /**
+   * Predicted transfer count for the current primary path: when exact it
+   * mirrors the actual selection; when still in progress it simulates
+   * currentPieces + best completion so the forecast is visible from the
+   * start and updates whenever the user follows an alternative route.
+   */
+  pathTransferCount: number | null;
   /** Exact and no worse than the suggester's predicted outcome. */
   goalReached: boolean;
   /** Best completion from here (green "add n"), or null. */
@@ -126,13 +130,8 @@ export function useCashSplitGuidance(
   // a partial selection shows no prediction.
   const previewTransferCount = useMemo<number | null>(() => {
     if (!suggestion || !isExact) return null;
-    const previewPool = applyBreakdownToPool(denominations, suggestion.sourceDenominationId, currentPieces);
-    const output = smartSplit({
-      employees, totalInCents, kitchenPercent, denominations: previewPool,
-      smartMode: true, fairnessThresholdInCents: thresholdInCents,
-    });
-    return output.differences.length;
-  }, [suggestion, isExact, denominations, currentPieces, employees, totalInCents, kitchenPercent, thresholdInCents]);
+    return simulateBreakdown(currentPieces, suggestion.sourceDenominationId, { denominations, employees, totalInCents, kitchenPercent, thresholdInCents });
+  }, [suggestion, isExact, currentPieces, denominations, employees, totalInCents, kitchenPercent, thresholdInCents]);
 
   const goalReached =
     isExact &&
@@ -144,7 +143,7 @@ export function useCashSplitGuidance(
   // suggestion's stored variants act as seeds: while the selection is a
   // subset of one, its remainder competes as a candidate — so the initial
   // guidance matches the suggester's best plan.
-  const completions = useMemo<CashPieces[]>(() => {
+  const completions = useMemo(() => {
     if (!suggestion || isExact) return [];
     return suggestCompletions(
       currentPieces,
@@ -155,7 +154,14 @@ export function useCashSplitGuidance(
     );
   }, [suggestion, isExact, currentPieces, denominations, employees, totalInCents, kitchenPercent, thresholdInCents, breakdowns]);
 
-  const completion = completions[0] ?? null;
+  const completion = completions[0]?.pieces ?? null;
+
+  // Transfer count for the current primary path.
+  // When exact: use the already-computed previewTransferCount.
+  // When in progress: read from the best completion's already-simulated result
+  // (suggestCompletions carries transferCount alongside pieces so we don't
+  // re-simulate). When dead end (no completion): null.
+  const pathTransferCount = isExact ? previewTransferCount : (completions[0]?.transferCount ?? null);
 
   // Dead end: exact but worse than predicted, or partial with no completion.
   // The removal search finds the smallest step back onto a working path.
@@ -210,7 +216,7 @@ export function useCashSplitGuidance(
       }
       return result;
     }
-    for (const alternative of completions.slice(1)) {
+    for (const { pieces: alternative } of completions.slice(1)) {
       for (const piece of alternative) {
         if ((addCounts[piece.denominationId] ?? 0) > 0) continue;
         if (result[piece.denominationId]) continue;
@@ -257,7 +263,7 @@ export function useCashSplitGuidance(
     currentPieces,
     currentTotalCents,
     isExact,
-    previewTransferCount,
+    pathTransferCount,
     goalReached,
     completion,
     addCounts,

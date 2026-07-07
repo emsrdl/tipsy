@@ -281,24 +281,15 @@ describe('suggestCompletion', () => {
     expect(completions.length).toBeGreaterThanOrEqual(1);
     expect(completions.length).toBeLessThanOrEqual(4);
 
-    const covered = new Set(completions[0]!.map((p) => p.denominationId));
-    for (const alternative of completions.slice(1)) {
+    const covered = new Set(completions[0]!.pieces.map((p) => p.denominationId));
+    for (const { pieces: alternative, transferCount } of completions.slice(1)) {
       // every alternative must sum to the bill and introduce a new row
       expect(sumBreakdownCents(alternative)).toBe(DENOM_VALUES[s.sourceDenominationId]);
       expect(alternative.some((p) => !covered.has(p.denominationId))).toBe(true);
       for (const p of alternative) covered.add(p.denominationId);
 
       // and must actually deliver the predicted transfer count
-      const pool = applyBreakdownToPool(denominations, s.sourceDenominationId, alternative);
-      const result = smartSplit({
-        employees: twoEmployees,
-        totalInCents: totalCents(denominations),
-        kitchenPercent: 0,
-        denominations: pool,
-        smartMode: true,
-        fairnessThresholdInCents: 100,
-      });
-      expect(result.differences.length).toBeLessThanOrEqual(s.predictedTransferCount);
+      expect(transferCount).toBeLessThanOrEqual(s.predictedTransferCount);
     }
   });
 

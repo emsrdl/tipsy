@@ -151,7 +151,6 @@ export function DenominationItem({
           onChange={(qty) => onQuantityChange(denomination.id, qty)}
           min={minQuantity}
           max={maxQuantity}
-          step={1}
           size="md"
           aria-label={`${denomination.symbol} ${t('cashInput.quantityLabel')}`}
         />
