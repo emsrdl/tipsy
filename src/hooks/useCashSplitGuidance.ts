@@ -95,7 +95,14 @@ export function useCashSplitGuidance(
     () => (initialPieces ? piecesToQuantities(initialPieces) : {}),
   );
 
+  // Skip the first fire: useState already seeded the correct quantities.
+  // Subsequent fires (suggestion changes in the same mounted instance) reset.
+  const mountedRef = useRef(false);
   useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
     setQuantities(
       initialPiecesRef.current ? piecesToQuantities(initialPiecesRef.current) : {},
     );

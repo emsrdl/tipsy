@@ -275,6 +275,28 @@ function isBetterCandidate(a: ScoredCandidate, b: ScoredCandidate): boolean {
 // ---------------------------------------------------------------------------
 
 /**
+ * Reverses a breakdown in the pool: adds back one source bill, removes the
+ * pieces. The inverse of {@link applyBreakdownToPool} — used to restore the
+ * denomination state before a split was applied.
+ */
+export function revertBreakdownFromPool(
+  denominations: DenominationQuantity[],
+  sourceDenominationId: string,
+  pieces: CashPieces,
+): DenominationQuantity[] {
+  const pieceMap = new Map<string, number>();
+  for (const p of pieces) {
+    if (p.count > 0) pieceMap.set(p.denominationId, (pieceMap.get(p.denominationId) ?? 0) + p.count);
+  }
+  return denominations.map((d) => {
+    if (d.denominationId === sourceDenominationId) return { ...d, quantity: d.quantity + 1 };
+    const remove = pieceMap.get(d.denominationId);
+    if (remove !== undefined) return { ...d, quantity: Math.max(0, d.quantity - remove) };
+    return d;
+  });
+}
+
+/**
  * Applies a breakdown to the pool: removes one source bill, adds the pieces.
  * Used for both candidate simulation and the dialog's live preview.
  */

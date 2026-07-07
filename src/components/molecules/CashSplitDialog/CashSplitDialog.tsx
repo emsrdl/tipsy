@@ -221,19 +221,9 @@ export function CashSplitDialog({
           </div>
         </div>
 
-        {onRevert ? (
-          // Review mode: destructive revert on top, cancel + confirm below
-          <div className="flex flex-col gap-2 border-t border-border bg-surface-raised p-3">
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full text-status-error hover:bg-status-error/10 hover:text-status-error"
-              onClick={onRevert}
-            >
-              <Icon name="undo-2" size={16} />
-              {t('common:smartSplit.cashSplits.dialogRevert')}
-            </Button>
-            <div className="flex gap-2">
+        {(() => {
+          const cancelConfirm = (
+            <>
               <Button type="button" variant="ghost" className="flex-1" onClick={onCancel}>
                 {t('common:smartSplit.cashSplits.dialogCancel')}
               </Button>
@@ -246,24 +236,28 @@ export function CashSplitDialog({
               >
                 {t('common:smartSplit.cashSplits.dialogConfirm')}
               </Button>
+            </>
+          );
+          return onRevert ? (
+            // Review mode: destructive revert on top, cancel + confirm below
+            <div className="flex flex-col gap-2 border-t border-border bg-surface-raised p-3">
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-status-error hover:bg-status-error/10 hover:text-status-error"
+                onClick={onRevert}
+              >
+                <Icon name="undo-2" size={16} />
+                {t('common:smartSplit.cashSplits.dialogRevert')}
+              </Button>
+              <div className="flex gap-2">{cancelConfirm}</div>
             </div>
-          </div>
-        ) : (
-          <DialogFooter className="gap-2 border-t border-border bg-surface-raised p-3 sm:gap-2 sm:space-x-0">
-            <Button type="button" variant="ghost" className="flex-1" onClick={onCancel}>
-              {t('common:smartSplit.cashSplits.dialogCancel')}
-            </Button>
-            <Button
-              type="button"
-              variant="default"
-              className="flex-1"
-              disabled={!isExact}
-              onClick={handleConfirm}
-            >
-              {t('common:smartSplit.cashSplits.dialogConfirm')}
-            </Button>
-          </DialogFooter>
-        )}
+          ) : (
+            <DialogFooter className="gap-2 border-t border-border bg-surface-raised p-3 sm:gap-2 sm:space-x-0">
+              {cancelConfirm}
+            </DialogFooter>
+          );
+        })()}
       </DialogContent>
     </Dialog>
   );

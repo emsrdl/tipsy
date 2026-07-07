@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Icon } from '@/components/atoms/Icon/Icon';
 import { CashSplitDialog } from '@/components/molecules/CashSplitDialog';
 import { formatCashPieces, getDenominationSymbol } from '@/config/currency';
+import { revertBreakdownFromPool } from '@/lib/calc/cashSplitSuggester';
 import { cn } from '@/lib/utils';
 import type { CashPieces, CashSplitSuggestion, AppliedCashSplit } from '@/types/cashSplit';
 import type { DenominationQuantity } from '@/types/session';
@@ -54,19 +55,13 @@ export function CashSplitSuggestions({
 
   // For the review dialog, simulate the pool as it was before the split so
   // the transfer-count preview reflects applying the breakdown fresh.
-  const reviewDenominations = useMemo(() => {
-    if (!reviewApplied) return denominations;
-    const pieceMap = new Map<string, number>();
-    for (const p of reviewApplied.actualPieces) {
-      if (p.count > 0) pieceMap.set(p.denominationId, (pieceMap.get(p.denominationId) ?? 0) + p.count);
-    }
-    return denominations.map((d) => {
-      if (d.denominationId === reviewApplied.sourceDenominationId) return { ...d, quantity: d.quantity + 1 };
-      const remove = pieceMap.get(d.denominationId);
-      if (remove !== undefined) return { ...d, quantity: Math.max(0, d.quantity - remove) };
-      return d;
-    });
-  }, [reviewApplied, denominations]);
+  const reviewDenominations = useMemo(
+    () =>
+      reviewApplied
+        ? revertBreakdownFromPool(denominations, reviewApplied.sourceDenominationId, reviewApplied.actualPieces)
+        : denominations,
+    [reviewApplied, denominations],
+  );
 
   // Synthetic suggestion for the review dialog. predictedTransferCount is set
   // to Infinity so any exact breakdown is treated as "goal reached" (green).
@@ -90,7 +85,7 @@ export function CashSplitSuggestions({
   const showSectionLabels = suggestions.length > 0 && appliedSplits.length > 0;
 
   function handleDialogConfirm(pieces: CashPieces) {
-    if (isReviewMode && reviewApplied && reviewSuggestion) {
+    if (reviewApplied && reviewSuggestion) {
       // Revert the original split then re-apply with the (possibly modified) pieces.
       onRevert(reviewApplied.id);
       onApply(reviewSuggestion, pieces);
@@ -109,11 +104,8 @@ export function CashSplitSuggestions({
   }
 
   function handleDialogCancel() {
-    if (isReviewMode) {
-      setReviewApplied(null);
-    } else {
-      setDialogSuggestion(null);
-    }
+    setReviewApplied(null);
+    setDialogSuggestion(null);
   }
 
   return (

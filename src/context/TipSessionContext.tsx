@@ -27,6 +27,7 @@ import type { Employee } from '@/types/employee';
 import type { CashPieces, CashSplitSuggestion, AppliedCashSplit } from '@/types/cashSplit';
 import { calculateDistribution } from '@/lib/calc/tipCalculator';
 import { sumDenominations } from '@/lib/calc/denominationParser';
+import { revertBreakdownFromPool } from '@/lib/calc/cashSplitSuggester';
 import { DENOMINATIONS } from '@/config/currency';
 import { readDefaultKitchenPercent } from '@/config/smartSplit';
 
@@ -230,23 +231,13 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
     setSession((s) => {
       const applied = s.appliedCashSplits.find((a) => a.id === splitId);
       if (!applied) return s;
-
-      const pieceMap = new Map<string, number>();
-      for (const piece of applied.actualPieces) {
-        if (piece.count <= 0) continue;
-        pieceMap.set(piece.denominationId, (pieceMap.get(piece.denominationId) ?? 0) + piece.count);
-      }
-
-      const newDenominations = s.denominations.map((d) => {
-        if (d.denominationId === applied.sourceDenominationId) return { ...d, quantity: d.quantity + 1 };
-        const remove = pieceMap.get(d.denominationId);
-        if (remove !== undefined) return { ...d, quantity: Math.max(0, d.quantity - remove) };
-        return d;
-      });
-
       return {
         ...s,
-        denominations: newDenominations,
+        denominations: revertBreakdownFromPool(
+          s.denominations,
+          applied.sourceDenominationId,
+          applied.actualPieces,
+        ),
         appliedCashSplits: s.appliedCashSplits.filter((a) => a.id !== splitId),
       };
     });
