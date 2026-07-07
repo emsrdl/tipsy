@@ -189,7 +189,9 @@
   },
   "stepper": {
     "decrement": "Decrease",
-    "increment": "Increase"
+    "increment": "Increase",
+    "editValue": "Enter value directly",
+    "resetHint": "Hold to reset"
   },
   "currency": {
     "denomination": {
