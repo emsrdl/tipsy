@@ -201,11 +201,11 @@ export function CashSplitDialog({
             <span className="text-xs text-text-secondary">
               {t('common:smartSplit.cashSplits.dialogTransfers')}
             </span>
-            <span className="font-mono text-sm font-semibold text-text-primary">
-              {onRevert ? null : (
+            <span className="flex items-center gap-1.5 font-mono text-sm font-semibold text-text-primary">
+              {!onRevert && (
                 <>
                   {suggestion.currentTransferCount}
-                  <span className="mx-1.5 text-text-secondary">→</span>
+                  <Icon name="arrow-right" size={13} className="text-text-secondary" />
                 </>
               )}
               <span

@@ -243,12 +243,12 @@ function AppliedCard({
   return (
     <div className="rounded-xl border border-border bg-surface-sunken/30 p-3 opacity-70">
       <div className="flex items-center gap-3">
-        <div className="flex-1 space-y-0.5">
-          <p className="font-mono text-sm font-bold text-text-primary">
+        <div className="flex flex-1 items-center gap-2 font-mono text-sm">
+          <span className="font-bold text-text-primary">
             {getDenominationSymbol(applied.sourceDenominationId)}
-            <span className="mx-1.5 text-text-secondary">→</span>
-            <span className="font-normal">{formatCashPieces(applied.actualPieces)}</span>
-          </p>
+          </span>
+          <Icon name="arrow-right" size={14} className="shrink-0 text-text-secondary" />
+          <span className="font-normal text-text-primary">{formatCashPieces(applied.actualPieces)}</span>
         </div>
         <button
           type="button"

@@ -351,12 +351,14 @@ function PayoutChip({ assignment }: { assignment: DenominationAssignment }) {
   return (
     <span
       className={cn(
-        'inline-flex items-baseline gap-1 rounded-lg px-2 py-1 font-mono text-sm whitespace-nowrap',
-        isBanknote ? 'bg-accent/10 text-accent' : 'bg-surface-overlay text-text-secondary',
+        'inline-flex items-center gap-0.5 rounded-lg px-2 py-1 font-mono text-sm whitespace-nowrap',
+        isBanknote ? 'bg-accent/10' : 'bg-surface-overlay',
       )}
     >
-      <span className="text-xs">{assignment.count}×</span>
-      <span className="font-semibold">{denom?.symbol ?? assignment.denominationId}</span>
+      <span className="text-xs text-text-secondary">{assignment.count}×</span>
+      <span className={cn('font-semibold', isBanknote ? 'text-accent' : 'text-text-primary')}>
+        {denom?.symbol ?? assignment.denominationId}
+      </span>
     </span>
   );
 }
