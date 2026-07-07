@@ -472,7 +472,7 @@ function enumerateFamily(
   return results;
 }
 
-function piecesKey(pieces: CashPieces): string {
+export function piecesKey(pieces: CashPieces): string {
   return [...pieces]
     .sort((a, b) => a.denominationId.localeCompare(b.denominationId))
     .map((p) => `${p.count}x${p.denominationId}`)
@@ -572,9 +572,11 @@ export function simulateBreakdown(
  * @param targetTransferCount - Transfer count the completions must reach
  * @param input - Same pool/employee context used for the suggestions
  * @param seedBreakdowns - Known-good full breakdowns (the suggestion's
- *   variants); whenever the selection is still a subset of one, its
- *   remainder is tried first — so the initial guidance equals the
- *   suggester's best plan instead of depending on search budgets.
+ *   variants, primary first); whenever the selection is still a subset of
+ *   one, its remainder outranks every freshly generated completion — the
+ *   route the user is following stays primary until they actually deviate
+ *   from all known variants, instead of flipping to whichever generated
+ *   completion happens to have fewer pieces.
  */
 /** A verified completion alongside the transfer count it achieves. */
 export interface CompletionResult {
@@ -594,25 +596,35 @@ export function suggestCompletions(
   if (gap <= 0 || sourceValue <= 0) return [];
 
   const seen = new Set<string>();
-  const passing: CompletionResult[] = [];
+  // Seeds and generated completions are kept in separate buckets so seed
+  // remainders (primary route first) always outrank generated candidates —
+  // the route being followed stays primary until the user deviates.
+  const seedPassing: CompletionResult[] = [];
+  const genPassing: CompletionResult[] = [];
 
-  const seedRemainders = seedBreakdowns
-    .map((b) => subtractPieces(b, currentPieces))
-    .filter((diff): diff is CashPieces => diff !== null && diff.length > 0);
-
-  for (const completion of [...seedRemainders, ...completionCandidates(gap, sourceValue)]) {
+  const process = (completion: CashPieces, seed: boolean) => {
     const key = piecesKey(completion);
-    if (seen.has(key)) continue;
+    if (seen.has(key)) return;
     seen.add(key);
-
     const combined = mergePieces(currentPieces, completion);
     const transferCount = simulateBreakdown(combined, sourceDenominationId, input);
-    if (transferCount > targetTransferCount) continue;
-    passing.push({ pieces: completion, transferCount });
-  }
-  if (passing.length === 0) return [];
+    if (transferCount > targetTransferCount) return;
+    (seed ? seedPassing : genPassing).push({ pieces: completion, transferCount });
+  };
 
-  passing.sort((a, b) => pieceCount(a.pieces) - pieceCount(b.pieces) || a.pieces.length - b.pieces.length);
+  for (const b of seedBreakdowns) {
+    const diff = subtractPieces(b, currentPieces);
+    if (diff !== null && diff.length > 0) process(diff, true);
+  }
+  for (const pieces of completionCandidates(gap, sourceValue)) {
+    process(pieces, false);
+  }
+
+  const byPieceCount = (a: CompletionResult, b: CompletionResult) =>
+    pieceCount(a.pieces) - pieceCount(b.pieces) || a.pieces.length - b.pieces.length;
+
+  const passing = [...seedPassing.sort(byPieceCount), ...genPassing.sort(byPieceCount)];
+  if (passing.length === 0) return [];
 
   const result: CompletionResult[] = [passing[0]!];
   const coveredRows = new Set(passing[0]!.pieces.map((p) => p.denominationId));

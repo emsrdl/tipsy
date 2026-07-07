@@ -11,6 +11,8 @@ import {
   suggestRemoval,
   sumBreakdownCents,
   applyBreakdownToPool,
+  mergePieces,
+  piecesKey,
 } from '../cashSplitSuggester';
 import { smartSplit } from '../smartSplitter';
 import { makeEmployee, makeDenomQty } from '@/test/factories';
@@ -290,6 +292,66 @@ describe('suggestCompletion', () => {
 
       // and must actually deliver the predicted transfer count
       expect(transferCount).toBeLessThanOrEqual(s.predictedTransferCount);
+    }
+  });
+
+  it('keeps the primary route primary while the selection follows it', () => {
+    // Regression: a €100 primary like 1×€50 + 1×€20 + 2×€10 + 2×€5 used to
+    // flip to a generated same-piece-count completion (e.g. 5×€10) after the
+    // user placed the first €50 — demoting the followed route to an
+    // "alternative". Seed remainders must outrank generated completions.
+    const employees = [
+      makeEmployee({ id: 'e1', hours: 2, group: 'service' }),
+      makeEmployee({ id: 'e2', hours: 5, group: 'service' }),
+      makeEmployee({ id: 'e3', hours: 4, group: 'service' }),
+      makeEmployee({ id: 'e4', hours: 10, group: 'service' }),
+    ];
+    const denominations = [
+      makeDenomQty('eur_100', 1),
+      makeDenomQty('eur_50', 2),
+      makeDenomQty('eur_20', 3),
+      makeDenomQty('eur_10', 1),
+      makeDenomQty('eur_2', 1),
+      makeDenomQty('eur_50ct', 2),
+    ];
+    const threshold = 200;
+    const { output, suggestions } = suggest(employees, denominations, threshold);
+    if (output.differences.length === 0 || suggestions.length === 0) return;
+    const input = {
+      denominations,
+      employees,
+      totalInCents: totalCents(denominations),
+      kitchenPercent: 0,
+      thresholdInCents: threshold,
+    };
+    for (const s of suggestions) {
+      const primary = s.breakdowns[0]!.pieces;
+      const seeds = s.breakdowns.map((b) => b.pieces);
+
+      // Add the primary breakdown's pieces one unit at a time; at every step
+      // the best completion must be exactly the primary route's remainder.
+      const selection: Record<string, number> = {};
+      for (const piece of primary) {
+        for (let unit = 0; unit < piece.count; unit++) {
+          selection[piece.denominationId] = (selection[piece.denominationId] ?? 0) + 1;
+          const partial = Object.entries(selection).map(([denominationId, count]) => ({
+            denominationId,
+            count,
+          }));
+          if (sumBreakdownCents(partial) === DENOM_VALUES[s.sourceDenominationId]) break;
+
+          const completions = suggestCompletions(
+            partial,
+            s.sourceDenominationId,
+            s.predictedTransferCount,
+            input,
+            seeds,
+          );
+          expect(completions.length).toBeGreaterThan(0);
+          const combined = mergePieces(partial, completions[0]!.pieces);
+          expect(piecesKey(combined)).toBe(piecesKey(primary));
+        }
+      }
     }
   });
 

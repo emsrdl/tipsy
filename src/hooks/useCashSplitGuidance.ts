@@ -123,8 +123,8 @@ export function useCashSplitGuidance(
 
   // Best completion + alternative routes from the current selection. The
   // suggestion's stored variants act as seeds: while the selection is a
-  // subset of one, its remainder competes as a candidate — so the initial
-  // guidance matches the suggester's best plan.
+  // subset of one, its remainder outranks all generated completions — so the
+  // route being followed stays primary until the user actually deviates.
   const completions = useMemo(() => {
     if (!suggestion || isExact) return [];
     return suggestCompletions(

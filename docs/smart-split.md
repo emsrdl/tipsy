@@ -131,7 +131,7 @@ The dialog opens **empty** on purpose: the user counts real money out of the til
 - **Goal reached** (total exact and simulated transfers ≤ predicted): no add/remove badges — this holds for any proven path, including fully custom ones. Orange badges remain as pointers to whole other variants ("what else would have worked"); tapping replaces the selection.
 - **Dead end** (exact but worse than predicted, or partial with no completion): a red badge shows the smallest removal (`−n`, via `suggestRemoval`: 1–3 units of one denomination, largest first) after which a verified completion exists again.
 
-**Seeding**: the suggestion's stored variants are passed to `suggestCompletions` as known-good breakdowns — while the selection is still a subset of one, its remainder competes as a candidate. The initial (empty-selection) guidance therefore always equals the suggester's best plan instead of depending on search budgets.
+**Seeding**: the suggestion's stored variants are passed to `suggestCompletions` as known-good breakdowns — while the selection is still a subset of one, its remainder *outranks* every freshly generated completion (seeds sort first, in variant order, primary before alternatives). The route the user is following therefore stays primary until they actually deviate from all known variants — a same-value generated reshuffle can never demote it to an orange alternative mid-route — and the initial (empty-selection) guidance always equals the suggester's best plan instead of depending on search budgets.
 
 Performance: each recomputation is ~30–50 `smartSplit` simulations (a few ms); the removal search runs only in dead ends and early-exits on the first witness.
 
