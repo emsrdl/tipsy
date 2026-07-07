@@ -431,36 +431,38 @@ export function ResultsScreen() {
       {!hasResults ? (
         <Alert status="info" message={t('errors:validation.noEmployees')} />
       ) : (
-        <DistributionTable
-          results={displayResults}
-          totalInCents={totalInCents}
-          {...(isSmartMode && smartOutput.output
-            ? {
-                personShares: smartOutput.output.distribution.personShares,
-                payoutPlans: smartOutput.output.payoutPlans,
-              }
-            : {})}
-          belowGroups={
-            <>
-              {transfersCard}
-              {fairnessRow}
-              {isSmartMode && (
-                <CashSplitSuggestions
-                  suggestions={cashSplitSuggestions}
-                  appliedSplits={session.appliedCashSplits}
-                  denominations={session.denominations}
-                  employees={normalizedEmployees}
-                  totalInCents={totalInCents}
-                  kitchenPercent={session.split.kitchenPercent}
-                  thresholdInCents={thresholdInCents}
-                  onApply={applyCashSplit}
-                  onRevert={revertCashSplit}
-                />
-              )}
-            </>
-          }
-          afterSummary={settingsCard}
-        />
+        <div className="space-y-6">
+          {isSmartMode && (
+            <CashSplitSuggestions
+              suggestions={cashSplitSuggestions}
+              appliedSplits={session.appliedCashSplits}
+              denominations={session.denominations}
+              employees={normalizedEmployees}
+              totalInCents={totalInCents}
+              kitchenPercent={session.split.kitchenPercent}
+              thresholdInCents={thresholdInCents}
+              onApply={applyCashSplit}
+              onRevert={revertCashSplit}
+            />
+          )}
+          <DistributionTable
+            results={displayResults}
+            totalInCents={totalInCents}
+            {...(isSmartMode && smartOutput.output
+              ? {
+                  personShares: smartOutput.output.distribution.personShares,
+                  payoutPlans: smartOutput.output.payoutPlans,
+                }
+              : {})}
+            belowGroups={
+              <>
+                {transfersCard}
+                {fairnessRow}
+              </>
+            }
+            afterSummary={settingsCard}
+          />
+        </div>
       )}
 
       {/* Actions */}

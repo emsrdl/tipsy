@@ -110,9 +110,9 @@ export function CashSplitSuggestions({
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl bg-surface-raised shadow-elevation-1">
-        <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-          <Icon name="scissors" size={16} className="shrink-0 text-text-primary" />
+      <div className="overflow-hidden rounded-xl border-2 border-accent/30 bg-surface-raised shadow-elevation-1">
+        <div className="flex items-center gap-2 border-b border-border bg-accent/5 px-4 py-3">
+          <Icon name="scissors" size={16} className="shrink-0 text-accent" />
           <span className="text-sm font-semibold text-text-primary">
             {t('smartSplit.cashSplits.title')}
           </span>
