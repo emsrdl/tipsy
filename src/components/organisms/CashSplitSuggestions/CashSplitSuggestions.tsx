@@ -241,24 +241,34 @@ function AppliedCard({
 }) {
   const { t } = useTranslation('common');
   return (
-    <div className="rounded-xl border border-border bg-surface-sunken/30 p-3 opacity-70">
-      <div className="flex items-center gap-3">
-        <div className="flex flex-1 items-center gap-2 font-mono text-sm">
-          <span className="font-bold text-text-primary">
-            {getDenominationSymbol(applied.sourceDenominationId)}
-          </span>
-          <Icon name="arrow-right" size={14} className="shrink-0 text-text-secondary" />
-          <span className="font-normal text-text-primary">{formatCashPieces(applied.actualPieces)}</span>
-        </div>
-        <button
-          type="button"
-          onClick={onOpenReview}
-          aria-label={t('smartSplit.cashSplits.revert')}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-raised hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-secondary/60"
-        >
-          <Icon name="undo-2" size={18} />
-        </button>
-      </div>
-    </div>
+    <button
+      type="button"
+      onClick={onOpenReview}
+      aria-label={t('smartSplit.cashSplits.revert')}
+      className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface-sunken/40 px-3 py-2.5 text-left opacity-80 transition-colors hover:bg-surface-raised/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+    >
+      {/* Source bill pill — check badge signals applied state */}
+      <span className="relative flex h-10 w-16 shrink-0 items-center justify-center rounded-lg bg-surface-overlay font-mono text-sm font-bold text-text-secondary">
+        {getDenominationSymbol(applied.sourceDenominationId)}
+        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-status-success">
+          <Icon name="check" size={10} className="text-white" />
+        </span>
+      </span>
+
+      {/* Breakdown */}
+      <span className="min-w-0 flex-1">
+        <span className="block text-xs text-text-secondary">
+          {t('smartSplit.cashSplits.applied')}
+        </span>
+        <span className="font-mono text-sm font-bold text-text-primary truncate">
+          {formatCashPieces(applied.actualPieces)}
+        </span>
+      </span>
+
+      {/* Revert action */}
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-status-error/10 text-status-error">
+        <Icon name="undo-2" size={16} />
+      </span>
+    </button>
   );
 }
