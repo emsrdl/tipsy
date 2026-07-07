@@ -1,3 +1,27 @@
+## [0.7.0](https://github.com/emsrdl/tipsy/compare/v0.6.5...v0.7.0) (2026-07-07)
+
+
+### Features
+
+* add allowed_bots configuration to Claude Code Review workflow ([5e16b70](https://github.com/emsrdl/tipsy/commit/5e16b7060b6aea145e84092440e9238e99826101))
+* add Claude Code GitHub Workflow ([#27](https://github.com/emsrdl/tipsy/issues/27)) ([2339e6a](https://github.com/emsrdl/tipsy/commit/2339e6abb2988022046baeffc788991e561169a7))
+* add review mode for cash split dialog with revert functionality ([0d2ed34](https://github.com/emsrdl/tipsy/commit/0d2ed34819e1ed68a1ed5f3f0fb418fa4c60ef97))
+* enhance cash split guidance to prioritize stored variants over generated completions ([3e6d644](https://github.com/emsrdl/tipsy/commit/3e6d64483631d008f93e3d5cfb01c460e281f83d))
+* enhance CashSplitDialog and CashSplitSuggestions with improved layout and icon integration ([e016aae](https://github.com/emsrdl/tipsy/commit/e016aaeab1cb49c73ca8e81f94b16d37c8bb2d37))
+* enhance DistributionTable with improved layout and expanded details for cash splits ([8652206](https://github.com/emsrdl/tipsy/commit/8652206c55859e4ab89edf6df8eb8da6ac5cd2bc))
+* enhance layout of CashSplitSuggestions and adjust rendering order in ResultsScreen ([b7f7c7c](https://github.com/emsrdl/tipsy/commit/b7f7c7c0112ae715e6e32881dda50103d9a186e9))
+* implement cash split suggestion algorithm ([2b20cac](https://github.com/emsrdl/tipsy/commit/2b20cac544ddc008e1001ab8f0efe99c2f198796))
+* implement inline editing and long press functionality for Slider and Stepper components ([39b49a3](https://github.com/emsrdl/tipsy/commit/39b49a3f950e2fd5fc8ead7d4e4553284015a729))
+* implement revert functionality for cash split suggestions and enhance dialog behavior ([035f032](https://github.com/emsrdl/tipsy/commit/035f03261a44996e738146b2a8c111acb7e1fa92))
+* redesign AppliedCard for improved layout and user interaction ([8f0185e](https://github.com/emsrdl/tipsy/commit/8f0185ea8b69c10574e5656b55c493f2e2b0e6fe))
+* refactor cash split logic and enhance simulation accuracy in guidance ([dd7fbe1](https://github.com/emsrdl/tipsy/commit/dd7fbe1c6cebec132ccb99dcbb49dc38c5df4869))
+* suggest optimal cash splits alongside balance transfers in results screen ([#28](https://github.com/emsrdl/tipsy/issues/28)) ([fb99a3e](https://github.com/emsrdl/tipsy/commit/fb99a3e542ab93a4874fc057faeda1204192e646))
+
+
+### Bug Fixes
+
+* address Copilot review findings on cash split feature ([cbe31b2](https://github.com/emsrdl/tipsy/commit/cbe31b2ec2b0a74ddc9c09b1581bb70ab0f95d36))
+
 ## [0.6.5](https://github.com/emsrdl/tipsy/compare/v0.6.4...v0.6.5) (2026-05-17)
 
 
