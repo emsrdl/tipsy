@@ -315,7 +315,7 @@ function DenomSection({
               removeCount={remove}
               altCount={alt ? alt.count : null}
               rowValid={rowsValid}
-              {...(alt ? { onAltTap: alt.apply } : {})}
+              onAltTap={alt?.apply}
               addBadgeLabel={t('common:smartSplit.cashSplits.addBadge', { count: add })}
               removeBadgeLabel={t('common:smartSplit.cashSplits.removeBadge', { count: remove })}
               altBadgeLabel={t('common:smartSplit.cashSplits.altBadge', { count: alt?.count ?? 0 })}

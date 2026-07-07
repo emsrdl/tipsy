@@ -525,16 +525,13 @@ const MAX_COMPLETION_CANDIDATES = 24;
 const MAX_COMPLETION_ALTERNATIVES = 3;
 
 /** Candidate ways to fill `gap`: exact single piece + stratified splits. */
-function completionCandidates(gap: number, sourceValue: number, pieceFloor: number): CashPieces[] {
+function completionCandidates(gap: number, sourceValue: number): CashPieces[] {
   const candidates: CashPieces[] = [];
   const exactSingle = DENOMINATIONS.find(
     (d) => d.valueInCents === gap && d.valueInCents < sourceValue,
   );
   if (exactSingle) candidates.push([{ denominationId: exactSingle.id, count: 1 }]);
-  candidates.push(...generateSplits(gap, pieceFloor, MAX_COMPLETION_CANDIDATES, null));
-  if (pieceFloor > 1) {
-    candidates.push(...generateSplits(gap, 1, MAX_COMPLETION_CANDIDATES, null));
-  }
+  candidates.push(...generateSplits(gap, 1, MAX_COMPLETION_CANDIDATES, null));
   return candidates;
 }
 
@@ -596,7 +593,6 @@ export function suggestCompletions(
   const gap = sourceValue - sumBreakdownCents(currentPieces);
   if (gap <= 0 || sourceValue <= 0) return [];
 
-  const pieceFloor = computePieceFloor(input.thresholdInCents);
   const seen = new Set<string>();
   const passing: CompletionResult[] = [];
 
@@ -604,7 +600,7 @@ export function suggestCompletions(
     .map((b) => subtractPieces(b, currentPieces))
     .filter((diff): diff is CashPieces => diff !== null && diff.length > 0);
 
-  for (const completion of [...seedRemainders, ...completionCandidates(gap, sourceValue, pieceFloor)]) {
+  for (const completion of [...seedRemainders, ...completionCandidates(gap, sourceValue)]) {
     const key = piecesKey(completion);
     if (seen.has(key)) continue;
     seen.add(key);
@@ -656,9 +652,8 @@ function canComplete(
     return simulateBreakdown(pieces, sourceDenominationId, input) <= targetTransferCount;
   }
 
-  const pieceFloor = computePieceFloor(input.thresholdInCents);
   const seen = new Set<string>();
-  for (const completion of completionCandidates(gap, sourceValue, pieceFloor)) {
+  for (const completion of completionCandidates(gap, sourceValue)) {
     const key = piecesKey(completion);
     if (seen.has(key)) continue;
     seen.add(key);

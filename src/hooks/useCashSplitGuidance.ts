@@ -14,7 +14,7 @@
  * @see src/lib/calc/cashSplitSuggester for the completion/removal searches
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DENOMINATIONS, getDenominationValue } from '@/config/currency';
 import {
   sumBreakdownCents,
@@ -89,28 +89,10 @@ export function useCashSplitGuidance(
 
   const sourceValueCents = suggestion ? getDenominationValue(suggestion.sourceDenominationId) : 0;
 
-  // Stable ref so the reset effect can read the latest initialPieces without
-  // listing it as a dependency (it changes identity on every render).
-  const initialPiecesRef = useRef(initialPieces);
-  initialPiecesRef.current = initialPieces;
-
   // Starts from initialPieces if provided (review mode), otherwise empty.
   const [quantities, setQuantities] = useState<Record<string, number>>(
     () => (initialPieces ? piecesToQuantities(initialPieces) : {}),
   );
-
-  // Skip the first fire: useState already seeded the correct quantities.
-  // Subsequent fires (suggestion changes in the same mounted instance) reset.
-  const mountedRef = useRef(false);
-  useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true;
-      return;
-    }
-    setQuantities(
-      initialPiecesRef.current ? piecesToQuantities(initialPiecesRef.current) : {},
-    );
-  }, [suggestion]);
 
   const breakdowns = useMemo(() => suggestion?.breakdowns ?? [], [suggestion]);
 

@@ -27,7 +27,7 @@ import type { Employee } from '@/types/employee';
 import type { CashPieces, CashSplitSuggestion, AppliedCashSplit } from '@/types/cashSplit';
 import { calculateDistribution } from '@/lib/calc/tipCalculator';
 import { sumDenominations } from '@/lib/calc/denominationParser';
-import { revertBreakdownFromPool } from '@/lib/calc/cashSplitSuggester';
+import { applyBreakdownToPool, revertBreakdownFromPool } from '@/lib/calc/cashSplitSuggester';
 import { DENOMINATIONS } from '@/config/currency';
 import { readDefaultKitchenPercent } from '@/config/smartSplit';
 
@@ -185,28 +185,11 @@ export function TipSessionProvider({ children, initialSession }: TipSessionProvi
           s.denominations.find((d) => d.denominationId === suggestion.sourceDenominationId)?.quantity ?? 0;
         if (sourceQty < 1) return s;
 
-        const pieceMap = new Map<string, number>();
-        for (const piece of actualPieces) {
-          if (piece.count <= 0) continue;
-          pieceMap.set(piece.denominationId, (pieceMap.get(piece.denominationId) ?? 0) + piece.count);
-        }
-
-        let newDenominations = s.denominations.map((d) => {
-          if (d.denominationId === suggestion.sourceDenominationId) {
-            return { ...d, quantity: d.quantity - 1 };
-          }
-          const add = pieceMap.get(d.denominationId);
-          if (add !== undefined) return { ...d, quantity: d.quantity + add };
-          return d;
-        });
-
-        // Add any pieces for denominations not yet in the pool
-        const presentIds = new Set(newDenominations.map((d) => d.denominationId));
-        for (const [denominationId, count] of pieceMap) {
-          if (!presentIds.has(denominationId)) {
-            newDenominations = [...newDenominations, { denominationId, quantity: count }];
-          }
-        }
+        const newDenominations = applyBreakdownToPool(
+          s.denominations,
+          suggestion.sourceDenominationId,
+          actualPieces,
+        );
 
         // Own id, not suggestion.id — the same bill can be split repeatedly
         // and each applied entry must be revertible individually.

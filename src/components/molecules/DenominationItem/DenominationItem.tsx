@@ -90,8 +90,7 @@ export function DenominationItem({
   const { fmtLocale } = useLocale();
   const subtotalCents = denomination.valueInCents * quantity;
   const isActive = quantity > 0;
-  // One badge slot per row — red wins over green over orange, though the
-  // dialog only ever sets one of them per guidance mode.
+  // One badge slot per row — red wins over green over orange.
   const showRed = removeCount > 0;
   const showGreen = !showRed && addCount > 0;
   const showOrange = !showRed && !showGreen && (altCount ?? 0) > 0 && Boolean(onAltTap);
