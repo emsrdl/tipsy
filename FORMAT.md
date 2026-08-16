@@ -4,8 +4,9 @@ Rules for writing and mutating `SPEC.md`. Read before any spec verb runs.
 
 ## Why caveman
 
-The spec is read by an agent on every build, not once by a human. Filler words cost context and add
-no constraint. Write the shortest string that pins the meaning.
+The spec is read by an agent every time the `build` skill runs, not once by a human. This is not a
+CI-enforced build step — no repo automation parses `SPEC.md`. Filler words cost context and add no
+constraint. Write the shortest string that pins the meaning.
 
 ## Prose rules
 
@@ -96,9 +97,10 @@ quietly stops matching the code.
 
 ## Prettier
 
-`SPEC.md` is prettier-formatted like any other file in the repo. §V must be a markdown list
-(`- **V1.** …`), never bare numbered prose lines — prettier reflows loose paragraphs and will merge
-every invariant into one block. One invariant per list item, no wrapping.
+`SPEC.md` is kept prettier-formatted, but `bun run format` only covers `src/**/*.{ts,tsx,json,css}`
+— run `prettier --write SPEC.md` directly. §V must be a markdown list (`- **V1.** …`), never bare
+numbered prose lines — prettier reflows loose paragraphs and will merge every invariant into one
+block. One invariant per list item, no wrapping.
 
 ## Diffs
 

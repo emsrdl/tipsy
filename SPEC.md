@@ -17,7 +17,8 @@ kitchen/service ratio, then say which physical bills each person takes and who o
 - offline-first. PWA, `registerType: 'autoUpdate'`, workbox precache,
   `navigateFallback: /index.html`.
 - phone-first. touch targets ≥ 40px, primary actions ≥ 56px. Material Design 3 tokens.
-- bilingual DE/EN. DE default, EN fallback. no hardcoded user-facing strings.
+- bilingual DE/EN. DE default, DE fallback (`fallbackLng: 'de'`, `src/lib/i18n.ts:52`). no
+  hardcoded user-facing strings.
 - stack fixed: Vite 6 + React 18 + TS 5.6 + Tailwind 4 + shadcn/ui + Vitest. bun ≥ 1.1.
 - `bun run lint` = eslint `--max-warnings 0`. `bun run build` = `tsc --noEmit` then bundle. both
   gate CI.
